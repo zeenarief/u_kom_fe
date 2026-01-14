@@ -7,6 +7,7 @@ import type {JSX} from "react";
 import UserPage from "./features/users/UserPage";
 import StudentPage from "./features/students/StudentPage";
 import RolePage from "./features/roles/RolePage";
+import ParentPage from "./features/parents/ParentPage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -60,6 +61,7 @@ function App() {
                         {/* Child Routes: Nanti kita isi di sini */}
                         <Route path="users" element={<UserPage />} />
                         <Route path="students" element={<StudentPage />} />
+                        <Route path="parents" element={<ParentPage />} />
 
                         <Route path="roles" element={<RolePage />} />
                     </Route>
