@@ -24,7 +24,13 @@ export default function StudentPage() {
     } = useForm<StudentCreateRequest>();
 
     const onSubmit: SubmitHandler<StudentCreateRequest> = (data) => {
-        createMutation.mutate(data);
+        const payload = { ...data};
+        if (payload.date_of_birth) {
+            payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
+        }
+        if (!payload.nisn) delete payload.nisn;
+        if (!payload.nim) delete payload.nim;
+        createMutation.mutate(payload);
         reset();
     };
 
