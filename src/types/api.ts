@@ -80,6 +80,8 @@ export interface Student {
     city?: string;         // Kota/Kab
     province?: string;
     postal_code?: string;
+
+    user?: User;
 }
 
 export interface StudentFormInput {

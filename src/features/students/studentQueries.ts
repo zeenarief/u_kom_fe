@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type {ApiResponse, Student, StudentFormInput, ApiError} from '../../types/api';
+import type {ApiResponse, Student, StudentFormInput, ApiError, LinkUserRequest} from '../../types/api';
 import toast from 'react-hot-toast';
 
 // === READ: List Siswa ===
@@ -84,6 +84,54 @@ export const useDeleteStudent = () => {
         },
         onError: () => {
             toast.error('Gagal menghapus data siswa');
+        }
+    });
+};
+
+// === LINK: Hubungkan Siswa ke User ===
+export const useLinkStudentToUser = (onSuccessCallback?: () => void) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ studentId, userId }: { studentId: string; userId: string }) => {
+            const payload: LinkUserRequest = { user_id: userId };
+            // Sesuaikan endpoint dengan dokumentasi backend Anda.
+            // Biasanya: POST /students/{id}/link-user
+            return await api.post(`/students/${studentId}/link-user`, payload);
+        },
+        onSuccess: (_, variables) => {
+            toast.success('Akun berhasil dihubungkan!');
+            // Refresh detail siswa agar data user muncul
+            queryClient.invalidateQueries({ queryKey: ['student', variables.studentId] });
+            // Refresh list juga jika perlu
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            if (onSuccessCallback) onSuccessCallback();
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghubungkan akun');
+        }
+    });
+};
+
+// === UNLINK: Putuskan Hubungan Siswa dengan User ===
+export const useUnlinkStudentFromUser = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (studentId: string) => {
+            // Sesuaikan endpoint dengan routing backend Anda.
+            // Biasanya: POST /students/{id}/unlink-user atau DELETE /students/{id}/user
+            return await api.delete(`/students/${studentId}/unlink-user`, {});
+        },
+        onSuccess: (_, studentId) => {
+            toast.success('Tautan akun berhasil dihapus');
+            // Refresh detail siswa agar kembali ke tampilan dropdown
+            queryClient.invalidateQueries({ queryKey: ['student', studentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghapus tautan akun');
         }
     });
 };

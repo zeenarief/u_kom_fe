@@ -1,8 +1,9 @@
-import { Edit, User, MapPin, CreditCard } from 'lucide-react';
+import {Edit, User, MapPin, CreditCard, ShieldCheck, Unlink} from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
-import { useStudentDetail } from './studentQueries';
+import { useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
 import type {Student} from '../../types/api';
+import UserLinker from "./UserLinker.tsx";
 
 interface StudentDetailModalProps {
     studentId: string | null;
@@ -20,6 +21,15 @@ const DetailRow = ({ label, value }: { label: string; value?: string | null }) =
 
 export default function StudentDetailModal({ studentId, onClose, onEdit }: StudentDetailModalProps) {
     const { data: student, isLoading, isError } = useStudentDetail(studentId);
+
+    const unlinkMutation = useUnlinkStudentFromUser();
+
+    const handleUnlink = () => {
+        if (!student) return;
+        if (confirm(`Yakin ingin memutuskan hubungan akun ${student.user?.username}? Siswa ini tidak akan bisa login lagi.`)) {
+            unlinkMutation.mutate(student.id);
+        }
+    };
 
     // Jika Loading
     if (isLoading && studentId) {
@@ -105,6 +115,48 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                             Prov. {student.province} - {student.postal_code}
                         </p>
                     </div>
+                </div>
+
+                {/* Section Akun Login */}
+                <div>
+                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
+                        <ShieldCheck size={18} className="text-blue-500"/> Akun Sistem
+                    </h3>
+
+                    {student.user ? (
+                        // KONDISI 1: SUDAH TERHUBUNG KE USER
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex justify-between items-center">
+
+                            {/* Info User (Kiri) */}
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">
+                                    {student.user.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-green-900">Terhubung ke Akun</p>
+                                    <p className="text-sm text-green-700">Username: <span className="font-mono">{student.user.username}</span></p>
+                                    <p className="text-xs text-green-600">{student.user.email}</p>
+                                </div>
+                            </div>
+
+                            {/* Tombol Unlink (Kanan) */}
+                            <button
+                                onClick={handleUnlink}
+                                disabled={unlinkMutation.isPending}
+                                className="p-2 text-red-500 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                                title="Putuskan Hubungan Akun"
+                            >
+                                {unlinkMutation.isPending ? (
+                                    <span className="text-xs">Loading...</span>
+                                ) : (
+                                    <Unlink size={18} />
+                                )}
+                            </button>
+                        </div>
+                    ) : (
+                        // KONDISI 2: BELUM TERHUBUNG
+                        <UserLinker studentId={student.id} />
+                    )}
                 </div>
 
                 {/* Action Buttons */}
