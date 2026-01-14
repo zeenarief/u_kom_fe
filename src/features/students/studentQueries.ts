@@ -7,7 +7,7 @@ import type {
     StudentFormInput,
     ApiError,
     LinkUserRequest,
-    StudentParentSyncRequest
+    StudentParentSyncRequest, SetGuardianRequest
 } from '../../types/api';
 import toast from 'react-hot-toast';
 
@@ -158,6 +158,44 @@ export const useSyncStudentParents = () => {
         onError: (err) => {
             const error = err as AxiosError<ApiError>;
             toast.error(error.response?.data?.message || 'Gagal menyimpan data keluarga');
+        }
+    });
+};
+
+// === SET GUARDIAN (Polymorphic) ===
+export const useSetGuardian = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ studentId, data }: { studentId: string; data: SetGuardianRequest }) => {
+            // Endpoint: PUT /students/:id/set-guardian
+            return await api.put(`/students/${studentId}/set-guardian`, data);
+        },
+        onSuccess: (_, variables) => {
+            toast.success('Wali utama berhasil ditetapkan');
+            queryClient.invalidateQueries({ queryKey: ['student', variables.studentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menetapkan wali');
+        }
+    });
+};
+
+// === REMOVE GUARDIAN ===
+export const useRemoveGuardian = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (studentId: string) => {
+            // Endpoint: DELETE /students/:id/remove-guardian
+            return await api.delete(`/students/${studentId}/remove-guardian`);
+        },
+        onSuccess: (_, studentId) => {
+            toast.success('Wali utama dihapus');
+            queryClient.invalidateQueries({ queryKey: ['student', studentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghapus wali');
         }
     });
 };

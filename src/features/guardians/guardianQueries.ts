@@ -1,0 +1,125 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import api from '../../lib/axios';
+import type {ApiResponse, Guardian, GuardianFormInput, ApiError} from '../../types/api';
+import toast from 'react-hot-toast';
+
+// === READ: List Guardians ===
+export const useGuardians = () => {
+    return useQuery({
+        queryKey: ['guardians'],
+        queryFn: async () => {
+            const response = await api.get<ApiResponse<Guardian[]>>('/guardians');
+            return response.data.data;
+        },
+    });
+};
+
+// === READ DETAIL (Untuk tombol mata) ===
+export const useGuardianDetail = (id: string | null) => {
+    return useQuery({
+        queryKey: ['guardian', id],
+        queryFn: async () => {
+            if (!id) return null;
+            const response = await api.get<ApiResponse<Guardian>>(`/guardians/${id}`);
+            return response.data.data;
+        },
+        enabled: !!id,
+    });
+};
+
+// === CREATE ===
+export const useCreateGuardian = (onSuccess?: () => void) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        // Ganti tipe data jadi GuardianFormInput
+        mutationFn: async (data: GuardianFormInput) => {
+            return await api.post('/guardians', data);
+        },
+        onSuccess: () => {
+            toast.success('Data wali berhasil disimpan');
+            queryClient.invalidateQueries({ queryKey: ['guardians'] });
+            if (onSuccess) onSuccess();
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menyimpan data');
+        }
+    });
+};
+
+// === UPDATE ===
+export const useUpdateGuardian = (onSuccess?: () => void) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        // Ganti tipe data jadi GuardianFormInput
+        mutationFn: async ({ id, data }: { id: string; data: GuardianFormInput }) => {
+            return await api.put(`/guardians/${id}`, data);
+        },
+        onSuccess: () => {
+            toast.success('Data berhasil diperbarui');
+            queryClient.invalidateQueries({ queryKey: ['guardians'] });
+            if (onSuccess) onSuccess();
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal update data');
+        }
+    });
+};
+
+// === DELETE ===
+export const useDeleteGuardian = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: string) => {
+            return await api.delete(`/guardians/${id}`);
+        },
+        onSuccess: () => {
+            toast.success('Data dihapus');
+            queryClient.invalidateQueries({ queryKey: ['guardians'] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghapus data');
+        }
+    });
+};
+
+// === LINK USER ===
+export const useLinkGuardianToUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ guardianId, userId }: { guardianId: string; userId: string }) => {
+            // Sesuaikan endpoint backend
+            return await api.post(`/guardians/${guardianId}/link-user`, { user_id: userId });
+        },
+        onSuccess: (_, variables) => {
+            toast.success('Akun berhasil dihubungkan');
+            queryClient.invalidateQueries({ queryKey: ['guardian', variables.guardianId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghubungkan akun');
+        }
+    });
+};
+
+// === UNLINK USER ===
+export const useUnlinkGuardianFromUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (guardianId: string) => {
+            // Sesuaikan endpoint backend (POST/DELETE)
+            return await api.delete(`/guardians/${guardianId}/unlink-user`);
+        },
+        onSuccess: (_, guardianId) => {
+            toast.success('Tautan akun dilepas');
+            queryClient.invalidateQueries({ queryKey: ['guardian', guardianId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal melepas tautan');
+        }
+    });
+};

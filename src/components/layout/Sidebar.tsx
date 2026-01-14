@@ -5,7 +5,7 @@ import {
     GraduationCap,
     UserSquare2,
     Briefcase,
-    Settings
+    Settings, Shield
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -17,6 +17,7 @@ const Sidebar = () => {
         { label: 'Manajemen User', path: '/dashboard/users', icon: Users },
         { label: 'Data Siswa', path: '/dashboard/students', icon: GraduationCap },
         { label: 'Data Orang Tua', path: '/dashboard/parents', icon: UserSquare2 },
+        { label: 'Data Wali', path: '/dashboard/guardians', icon: Shield },
         { label: 'Data Pegawai', path: '/dashboard/employees', icon: Briefcase },
         { label: 'Role & Izin', path: '/dashboard/roles', icon: Settings },
     ];

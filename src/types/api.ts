@@ -87,6 +87,8 @@ export interface Student {
         relationship_type: string;
         parent_info: Parent; // Detail orang tuanya
     }>;
+
+    guardian?: GuardianInfo | null;
 }
 
 export interface StudentFormInput {
@@ -209,4 +211,58 @@ export interface StudentParentSyncRequest {
         parent_id: string;
         relationship_type: string; // 'FATHER', 'MOTHER', etc.
     }>;
+}
+
+// Request Payload untuk Set Guardian
+export interface SetGuardianRequest {
+    guardian_id: string;
+    guardian_type: 'parent' | 'guardian';
+}
+
+// Backend Anda mengirim field "guardian" di StudentDetailResponse
+export interface GuardianInfo {
+    id: string;
+    full_name: string;
+    phone_number: string;
+    email: string;
+    type: 'parent' | 'guardian';
+    relationship: string;
+}
+
+// === GUARDIAN TYPES ===
+export interface Guardian {
+    id: string;
+    full_name: string;
+    nik?: string;
+    gender?: string;
+    phone_number: string;
+    email?: string;
+    address?: string;
+    rt?: string;
+    rw?: string;
+    sub_district?: string;
+    district?: string;
+    city?: string;
+    province?: string;
+    postal_code?: string;
+    relationship_to_student?: string; // Khusus Guardian
+
+    user?: User | null; // Untuk Link Account
+}
+
+export interface GuardianFormInput {
+    full_name: string;
+    nik?: string;
+    gender?: string;
+    phone_number: string;
+    email?: string;
+    address?: string;
+    rt?: string;
+    rw?: string;
+    sub_district?: string;
+    district?: string;
+    city?: string;
+    province?: string;
+    postal_code?: string;
+    relationship_to_student?: string;
 }

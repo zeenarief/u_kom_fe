@@ -8,6 +8,7 @@ import UserPage from "./features/users/UserPage";
 import StudentPage from "./features/students/StudentPage";
 import RolePage from "./features/roles/RolePage";
 import ParentPage from "./features/parents/ParentPage.tsx";
+import GuardianPage from "./features/guardians/GuardianPage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -62,6 +63,7 @@ function App() {
                         <Route path="users" element={<UserPage />} />
                         <Route path="students" element={<StudentPage />} />
                         <Route path="parents" element={<ParentPage />} />
+                        <Route path="guardians" element={<GuardianPage />} />
 
                         <Route path="roles" element={<RolePage />} />
                     </Route>

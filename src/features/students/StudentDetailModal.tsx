@@ -5,6 +5,7 @@ import { useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
 import type {Student} from '../../types/api';
 import UserLinker from "./UserLinker.tsx";
 import FamilyManager from './FamilyManager';
+import GuardianManager from './GuardianManager';
 
 interface StudentDetailModalProps {
     studentId: string | null;
@@ -69,6 +70,9 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
 
                 {/* Family Manager */}
                 <FamilyManager student={student} />
+
+                {/* 4. Guardian Manager (Wali Utama) */}
+                <GuardianManager student={student} />
 
                 {/* Section Data Akademik */}
                 <div>
