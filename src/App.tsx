@@ -6,6 +6,7 @@ import { useAuthStore } from './store/authStore';
 import type {JSX} from "react";
 import UserPage from "./features/users/UserPage";
 import StudentPage from "./features/students/StudentPage";
+import RolePage from "./features/roles/RolePage";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -59,6 +60,8 @@ function App() {
                         {/* Child Routes: Nanti kita isi di sini */}
                         <Route path="users" element={<UserPage />} />
                         <Route path="students" element={<StudentPage />} />
+
+                        <Route path="roles" element={<RolePage />} />
                     </Route>
 
                     {/* Default Redirect */}
