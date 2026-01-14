@@ -106,10 +106,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                     <div className="bg-gray-50 p-3 rounded-lg space-y-2">
                         <p className="text-sm font-medium text-gray-900">{student.address}</p>
                         <p className="text-sm text-gray-600">
-                            RT {student.rt} / RW {student.rw}, Kel. {student.sub_district}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                            Kec. {student.district}, {student.city}
+                            RT {student.rt} / RW {student.rw}, Kel. {student.sub_district}, Kec. {student.district}, Kab./Kota {student.city}
                         </p>
                         <p className="text-sm text-gray-600">
                             Prov. {student.province} - {student.postal_code}
