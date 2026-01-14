@@ -85,3 +85,41 @@ export const useDeleteParent = () => {
         }
     });
 };
+
+// === LINK USER ===
+export const useLinkParentToUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ parentId, userId }: { parentId: string; userId: string }) => {
+            // Sesuaikan endpoint backend
+            return await api.post(`/parents/${parentId}/link-user`, { user_id: userId });
+        },
+        onSuccess: (_, variables) => {
+            toast.success('Akun berhasil dihubungkan');
+            queryClient.invalidateQueries({ queryKey: ['parent', variables.parentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menghubungkan akun');
+        }
+    });
+};
+
+// === UNLINK USER ===
+export const useUnlinkParentFromUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (parentId: string) => {
+            // Sesuaikan endpoint backend (POST/DELETE)
+            return await api.delete(`/parents/${parentId}/unlink-user`);
+        },
+        onSuccess: (_, parentId) => {
+            toast.success('Tautan akun dilepas');
+            queryClient.invalidateQueries({ queryKey: ['parent', parentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal melepas tautan');
+        }
+    });
+};
