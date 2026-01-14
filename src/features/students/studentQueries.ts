@@ -1,7 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type {ApiResponse, Student, StudentFormInput, ApiError, LinkUserRequest} from '../../types/api';
+import type {
+    ApiResponse,
+    Student,
+    StudentFormInput,
+    ApiError,
+    LinkUserRequest,
+    StudentParentSyncRequest
+} from '../../types/api';
 import toast from 'react-hot-toast';
 
 // === READ: List Siswa ===
@@ -132,6 +139,25 @@ export const useUnlinkStudentFromUser = () => {
         onError: (err) => {
             const error = err as AxiosError<ApiError>;
             toast.error(error.response?.data?.message || 'Gagal menghapus tautan akun');
+        }
+    });
+};
+
+// === SYNC PARENTS ===
+export const useSyncStudentParents = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ studentId, data }: { studentId: string; data: StudentParentSyncRequest }) => {
+            // Endpoint backend: POST /students/:id/sync-parents
+            return await api.post(`/students/${studentId}/sync-parents`, data);
+        },
+        onSuccess: (_, variables) => {
+            toast.success('Data keluarga berhasil disimpan');
+            queryClient.invalidateQueries({ queryKey: ['student', variables.studentId] });
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal menyimpan data keluarga');
         }
     });
 };

@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import { useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
 import type {Student} from '../../types/api';
 import UserLinker from "./UserLinker.tsx";
+import FamilyManager from './FamilyManager';
 
 interface StudentDetailModalProps {
     studentId: string | null;
@@ -65,6 +66,9 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                         <p className="text-sm text-blue-700 font-medium">{student.nisn ? `NISN: ${student.nisn}` : 'Belum ada NISN'}</p>
                     </div>
                 </div>
+
+                {/* Family Manager */}
+                <FamilyManager student={student} />
 
                 {/* Section Data Akademik */}
                 <div>

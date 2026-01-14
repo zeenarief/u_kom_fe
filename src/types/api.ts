@@ -82,6 +82,11 @@ export interface Student {
     postal_code?: string;
 
     user?: User;
+    // Tambahkan ini (sesuai JSON response backend Parents []ParentRelationshipResponse)
+    parents?: Array<{
+        relationship_type: string;
+        parent_info: Parent; // Detail orang tuanya
+    }>;
 }
 
 export interface StudentFormInput {
@@ -163,7 +168,7 @@ export interface Parent {
     city?: string;
     province?: string;
     postal_code?: string;
-    // Field User jika nanti dilink
+
     user?: User | null;
 }
 export interface ParentFormInput {
@@ -193,4 +198,15 @@ export interface ParentFormInput {
 export interface StudentParentRelation {
     parent_id: string;
     relationship_type: 'FATHER' | 'MOTHER' | 'GUARDIAN';
+}
+
+// Tipe relasi
+export type RelationshipType = 'FATHER' | 'MOTHER' | 'GUARDIAN';
+
+// Struktur data untuk dikirim ke Backend (SyncParents)
+export interface StudentParentSyncRequest {
+    parents:Array<{
+        parent_id: string;
+        relationship_type: string; // 'FATHER', 'MOTHER', etc.
+    }>;
 }
