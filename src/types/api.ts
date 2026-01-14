@@ -68,24 +68,37 @@ export interface Student {
     nisn?: string;
     nim?: string;
     gender?: 'male' | 'female';
-    city?: string;
-    // Field detail (opsional di list)
     no_kk?: string;
     nik?: string;
     place_of_birth?: string;
     date_of_birth?: string;
     address?: string;
+    rt?: string;
+    rw?: string;
+    sub_district?: string; // Kelurahan
+    district?: string;     // Kecamatan
+    city?: string;         // Kota/Kab
+    province?: string;
+    postal_code?: string;
 }
 
-export interface StudentCreateRequest {
+export interface StudentFormInput {
     full_name: string;
     nisn?: string;
     nim?: string;
     gender?: 'male' | 'female';
     place_of_birth?: string;
-    date_of_birth?: string; // Format YYYY-MM-DD
+    date_of_birth?: string;
     address?: string;
-    // Field lain bisa ditambahkan nanti
+    no_kk?: string;
+    nik?: string;
+    rt?: string;
+    rw?: string;
+    sub_district?: string;
+    district?: string;
+    city?: string;
+    province?: string;
+    postal_code?: string;
 }
 
 export interface LinkUserRequest {

@@ -1,37 +1,38 @@
 import { useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Plus, Trash2, Search, GraduationCap } from 'lucide-react';
-import { useStudents, useCreateStudent, useDeleteStudent } from './studentQueries';
-import type {StudentCreateRequest} from '../../types/api';
-import Modal from '../../components/ui/Modal';
-import Input from '../../components/ui/Input';
+import { Plus, Trash2, Search, GraduationCap, Eye } from 'lucide-react'; // Ganti Pencil dengan Eye
+import { useStudents, useDeleteStudent } from './studentQueries';
+import type { Student } from '../../types/api';
 import Button from '../../components/ui/Button';
+import StudentFormModal from './StudentFormModal';
+import StudentDetailModal from './StudentDetailModal'; // Import Modal Detail
 
 export default function StudentPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // State Modal Form (Create/Edit)
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
 
-    // Queries
+    // State Modal Detail
+    const [detailId, setDetailId] = useState<string | null>(null);
+
     const { data: students, isLoading, isError } = useStudents();
-    const createMutation = useCreateStudent(() => setIsModalOpen(false));
     const deleteMutation = useDeleteStudent();
 
-    // Form
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors }
-    } = useForm<StudentCreateRequest>();
+    // 1. Buka Form Create
+    const handleCreate = () => {
+        setStudentToEdit(null);
+        setIsFormOpen(true);
+    };
 
-    const onSubmit: SubmitHandler<StudentCreateRequest> = (data) => {
-        const payload = { ...data};
-        if (payload.date_of_birth) {
-            payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
-        }
-        if (!payload.nisn) delete payload.nisn;
-        if (!payload.nim) delete payload.nim;
-        createMutation.mutate(payload);
-        reset();
+    // 2. Buka Detail (Klik Mata)
+    const handleViewDetail = (id: string) => {
+        setDetailId(id);
+    };
+
+    // 3. Callback dari Detail -> Edit (Klik tombol Edit di dalam detail)
+    const handleEditFromDetail = (student: Student) => {
+        setDetailId(null); // Tutup modal detail
+        setStudentToEdit(student); // Set data edit
+        setIsFormOpen(true); // Buka modal form
     };
 
     const handleDelete = (id: string) => {
@@ -43,26 +44,24 @@ export default function StudentPage() {
 
     return (
         <div className="space-y-6">
-            {/* HEADER */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Data Siswa</h1>
-                    <p className="text-gray-500 text-sm">Manajemen data induk siswa.</p>
+                    <p className="text-gray-500 text-sm">Manajemen data induk siswa lengkap.</p>
                 </div>
-                <Button onClick={() => setIsModalOpen(true)}>
+                <Button onClick={handleCreate}>
                     <Plus className="w-4 h-4 mr-2" />
                     Tambah Siswa
                 </Button>
             </div>
 
-            {/* TABLE */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
                     <div className="relative max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                             type="text"
-                            placeholder="Cari nama atau NISN..."
+                            placeholder="Cari nama, NISN, atau Kota..."
                             className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500"
                         />
                     </div>
@@ -72,8 +71,8 @@ export default function StudentPage() {
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3">Nama Lengkap</th>
-                            <th className="px-6 py-3">NISN / NIM</th>
+                            <th className="px-6 py-3">Identitas Siswa</th>
+                            <th className="px-6 py-3">NIM</th>
                             <th className="px-6 py-3">L/P</th>
                             <th className="px-6 py-3">Kota Asal</th>
                             <th className="px-6 py-3 text-right">Aksi</th>
@@ -81,29 +80,47 @@ export default function StudentPage() {
                         </thead>
                         <tbody>
                         {students?.map((student) => (
-                            <tr key={student.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-500">
-                                            <GraduationCap size={16} />
+                            <tr key={student.id} className="bg-white border-b hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                            <GraduationCap size={20} />
                                         </div>
-                                        {student.full_name}
+                                        <div>
+                                            <div className="font-medium text-gray-900">{student.full_name}</div>
+                                            <div className="text-xs text-gray-500">NISN: {student.nisn || '-'}</div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span className="font-mono">{student.nisn || '-'}</span>
-                                        <span className="text-xs text-gray-400">{student.nim}</span>
-                                    </div>
+                                <td className="px-6 py-4 font-mono text-gray-600">
+                                    {student.nim || '-'}
                                 </td>
                                 <td className="px-6 py-4">
-                                    {student.gender === 'male' ? 'L' : student.gender === 'female' ? 'P' : '-'}
+                                    {student.gender === 'male' ? 'L' : 'P'}
                                 </td>
-                                <td className="px-6 py-4">{student.city || '-'}</td>
+                                <td className="px-6 py-4">
+                                    {/* Tampilkan City, jika kosong strip */}
+                                    {student.city || '-'}
+                                </td>
                                 <td className="px-6 py-4 text-right">
-                                    <button onClick={() => handleDelete(student.id)} className="text-red-600 hover:bg-red-50 p-2 rounded">
-                                        <Trash2 size={16}/>
-                                    </button>
+                                    <div className="flex justify-end gap-2">
+                                        {/* Tombol Detail (Mata) */}
+                                        <button
+                                            onClick={() => handleViewDetail(student.id)}
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Lihat Detail Lengkap"
+                                        >
+                                            <Eye size={18}/>
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(student.id)}
+                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Hapus Data"
+                                        >
+                                            <Trash2 size={18}/>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -115,60 +132,19 @@ export default function StudentPage() {
                 </div>
             </div>
 
-            {/* MODAL FORM CREATE */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Siswa Baru">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <Input
-                        label="Nama Lengkap"
-                        placeholder="Nama Siswa"
-                        error={errors.full_name?.message}
-                        {...register('full_name', { required: 'Nama wajib diisi' })}
-                    />
+            {/* MODAL 1: Form Create/Edit */}
+            <StudentFormModal
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                studentToEdit={studentToEdit}
+            />
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input
-                            label="NISN"
-                            placeholder="00123..."
-                            {...register('nisn')}
-                        />
-                        <Input
-                            label="NIM"
-                            placeholder="2024..."
-                            {...register('nim')}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
-                            <select
-                                {...register('gender')}
-                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            >
-                                <option value="">- Pilih -</option>
-                                <option value="male">Laki-laki</option>
-                                <option value="female">Perempuan</option>
-                            </select>
-                        </div>
-                        <Input
-                            label="Tanggal Lahir"
-                            type="date"
-                            {...register('date_of_birth')}
-                        />
-                    </div>
-
-                    <Input
-                        label="Alamat / Kota"
-                        placeholder="Alamat singkat..."
-                        {...register('address')}
-                    />
-
-                    <div className="flex justify-end gap-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Batal</Button>
-                        <Button type="submit" isLoading={createMutation.isPending}>Simpan</Button>
-                    </div>
-                </form>
-            </Modal>
+            {/* MODAL 2: Detail Viewer */}
+            <StudentDetailModal
+                studentId={detailId}
+                onClose={() => setDetailId(null)}
+                onEdit={handleEditFromDetail}
+            />
         </div>
     );
 }
