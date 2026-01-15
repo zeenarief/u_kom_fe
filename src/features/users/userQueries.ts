@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type {ApiResponse, User, RegisterRequest, Role, ApiError} from '../../types/api';
+import type { ApiResponse, User, RegisterRequest, Role, ApiError } from '../../types/api';
 import toast from 'react-hot-toast';
 
 // === READ: Ambil Semua User ===
@@ -15,7 +15,20 @@ export const useUsers = () => {
     });
 };
 
-// === READ: Ambil Role (Untuk Dropdown Form) ===
+// === READ: Detail User ===
+export const useUserDetail = (id: string | null) => {
+    return useQuery({
+        queryKey: ['user', id],
+        queryFn: async () => {
+            if (!id) return null;
+            const response = await api.get<ApiResponse<User>>(`/users/${id}`);
+            return response.data.data;
+        },
+        enabled: !!id,
+    });
+};
+
+// === READ: Ambil Role ===
 export const useRoles = () => {
     return useQuery({
         queryKey: ['roles'],
@@ -26,8 +39,7 @@ export const useRoles = () => {
     });
 };
 
-// === CREATE: Tambah User Baru ===
-// Kita extend RegisterRequest karena di Backend butuh role_ids juga saat Create Admin
+// === CREATE: Tambah User ===
 interface CreateUserPayload extends RegisterRequest {
     role_ids: string[];
 }
@@ -37,18 +49,45 @@ export const useCreateUser = (onSuccessCallback?: () => void) => {
 
     return useMutation({
         mutationFn: async (newUser: CreateUserPayload) => {
-            // Endpoint POST /users (khusus admin, beda dengan /auth/register publik)
             return await api.post('/users', newUser);
         },
         onSuccess: () => {
             toast.success('User berhasil ditambahkan');
-            queryClient.invalidateQueries({ queryKey: ['users'] }); // Refresh tabel otomatis
+            queryClient.invalidateQueries({ queryKey: ['users'] });
             if (onSuccessCallback) onSuccessCallback();
         },
         onError: (err) => {
             const error = err as AxiosError<ApiError>;
-            const msg = error.response?.data?.message || 'Gagal membuat user';
-            toast.error(msg);
+            toast.error(error.response?.data?.message || 'Gagal membuat user');
+        }
+    });
+};
+
+// === UPDATE: Edit User ===
+// Kita butuh tipe data khusus untuk update (password opsional)
+export interface UpdateUserPayload {
+    name?: string;
+    username?: string;
+    email?: string;
+    password?: string; // Opsional jika tidak ingin ganti password
+    role_ids?: string[];
+}
+
+export const useUpdateUser = (onSuccessCallback?: () => void) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: string; data: UpdateUserPayload }) => {
+            return await api.put(`/users/${id}`, data);
+        },
+        onSuccess: () => {
+            toast.success('Data user berhasil diperbarui');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            if (onSuccessCallback) onSuccessCallback();
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal update user');
         }
     });
 };
