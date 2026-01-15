@@ -18,7 +18,7 @@ const Sidebar = () => {
         { label: 'Data Siswa', path: '/dashboard/students', icon: GraduationCap },
         { label: 'Data Orang Tua', path: '/dashboard/parents', icon: UserSquare2 },
         { label: 'Data Wali', path: '/dashboard/guardians', icon: Shield },
-        { label: 'Data Pegawai', path: '/dashboard/employees', icon: Briefcase },
+        { label: 'Data Guru & Tendik', path: '/dashboard/employees', icon: Briefcase },
         { label: 'Role & Izin', path: '/dashboard/roles', icon: Settings },
     ];
 
