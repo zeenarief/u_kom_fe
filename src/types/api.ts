@@ -16,6 +16,17 @@ export interface ApiError {
     };
 }
 
+export interface DashboardStats {
+    total_students: number;
+    total_employees: number;
+    total_parents: number;
+    total_users: number;
+    student_gender: {
+        male: number;
+        female: number;
+    };
+}
+
 // === ENTITY TYPES ===
 
 export interface Role {

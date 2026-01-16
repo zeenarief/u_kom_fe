@@ -10,6 +10,7 @@ import RolePage from "./features/roles/RolePage";
 import ParentPage from "./features/parents/ParentPage.tsx";
 import GuardianPage from "./features/guardians/GuardianPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
+import DashboardHome from "./features/dashboard/DashboardHome.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -17,27 +18,6 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;
 };
-
-// Halaman Dashboard Home Sederhana
-const DashboardHome = () => (
-    <div>
-        <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-gray-500 text-sm font-medium">Total Siswa</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">1,234</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-gray-500 text-sm font-medium">Total Guru</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">56</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-gray-500 text-sm font-medium">User Aktif</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">890</p>
-            </div>
-        </div>
-    </div>
-);
 
 function App() {
     return (
