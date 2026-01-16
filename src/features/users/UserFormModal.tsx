@@ -11,7 +11,7 @@ interface UserFormInput {
     username: string;
     email: string;
     password?: string; // Opsional di form
-    role_id: string; // Kita pakai single select dulu untuk UI sederhana
+    role_ids: string[];
 }
 
 interface Props {
@@ -33,7 +33,11 @@ export default function UserFormModal({ isOpen, onClose, userToEdit }: Props) {
         reset,
         setValue,
         formState: { errors }
-    } = useForm<UserFormInput>();
+    } = useForm<UserFormInput>({
+        defaultValues: {
+            role_ids: []
+        }
+    });
 
     // Populate data saat Edit Mode
     useEffect(() => {
@@ -42,40 +46,55 @@ export default function UserFormModal({ isOpen, onClose, userToEdit }: Props) {
                 setValue('name', userToEdit.name);
                 setValue('username', userToEdit.username);
                 setValue('email', userToEdit.email);
-                // Ambil role pertama jika ada
+
+                // Ambil semua role ID dan masukkan ke form
                 if (userToEdit.roles && userToEdit.roles.length > 0) {
-                    setValue('role_id', userToEdit.roles[0].id);
+                    const currentRoleIds = userToEdit.roles.map(r => r.id);
+                    setValue('role_ids', currentRoleIds);
+                } else {
+                    setValue('role_ids', []);
                 }
+
                 setValue('password', ''); // Kosongkan password saat edit
             } else {
-                reset({ name: '', username: '', email: '', password: '', role_id: '' });
+                reset({
+                    name: '',
+                    username: '',
+                    email: '',
+                    password: '',
+                    role_ids: []
+                });
             }
         }
     }, [isOpen, userToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<UserFormInput> = (data) => {
+        // Validasi Manual: Pastikan minimal 1 role dipilih (karena checkbox html kadang tricky)
+        if (!data.role_ids || data.role_ids.length === 0) {
+            alert("Minimal satu role harus dipilih!");
+            return;
+        }
+
         if (isEditMode && userToEdit) {
             // Logic Update
             const payload: UpdateUserPayload = {
                 name: data.name,
                 username: data.username,
                 email: data.email,
-                role_ids: [data.role_id]
+                role_ids: data.role_ids // Kirim Array langsung
             };
-            // Hanya kirim password jika diisi
             if (data.password && data.password.trim() !== '') {
                 payload.password = data.password;
             }
             updateMutation.mutate({ id: userToEdit.id, data: payload });
         } else {
             // Logic Create
-            if (!data.password) return; // Seharusnya dicegah validasi form
             createMutation.mutate({
                 name: data.name,
                 username: data.username,
                 email: data.email,
-                password: data.password,
-                role_ids: [data.role_id]
+                password: data.password || '123456', // Fallback safety
+                role_ids: data.role_ids // Kirim Array langsung
             });
         }
     };
@@ -120,21 +139,39 @@ export default function UserFormModal({ isOpen, onClose, userToEdit }: Props) {
                         })}
                         error={errors.password?.message}
                     />
-                    {isEditMode && <p className="text-xs text-gray-500 mt-1">Isi hanya jika ingin mereset password user ini.</p>}
                 </div>
 
+                {/* --- UI MULTI SELECT ROLE (CHECKBOX) --- */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <select
-                        {...register('role_id', { required: 'Role wajib dipilih' })}
-                        className="w-full px-4 py-2 bg-white border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    >
-                        <option value="">-- Pilih Role --</option>
-                        {roles?.map((role) => (
-                            <option key={role.id} value={role.id}>{role.name}</option>
-                        ))}
-                    </select>
-                    {errors.role_id && <p className="mt-1 text-xs text-red-500">{errors.role_id.message}</p>}
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Roles (Hak Akses) <span className="text-red-500">*</span>
+                    </label>
+
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 max-h-40 overflow-y-auto space-y-2">
+                        {roles && roles.length > 0 ? (
+                            roles.map((role) => (
+                                <label
+                                    key={role.id}
+                                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        value={role.id}
+                                        {...register('role_ids', { required: 'Minimal satu role harus dipilih' })}
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-700">{role.name}</span>
+                                        {/* Optional: Tampilkan deskripsi role jika ada */}
+                                        {/* <p className="text-xs text-gray-500">{role.description}</p> */}
+                                    </div>
+                                </label>
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-500 italic">Memuat roles...</p>
+                        )}
+                    </div>
+                    {errors.role_ids && <p className="mt-1 text-xs text-red-500">{errors.role_ids.message}</p>}
                 </div>
 
                 <div className="pt-4 flex justify-end gap-2 border-t mt-4">
