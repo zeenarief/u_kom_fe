@@ -11,6 +11,7 @@ import ParentPage from "./features/parents/ParentPage.tsx";
 import GuardianPage from "./features/guardians/GuardianPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
 import DashboardHome from "./features/dashboard/DashboardHome.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -27,6 +28,7 @@ function App() {
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
 
                     {/* Protected Dashboard Routes */}
                     <Route
