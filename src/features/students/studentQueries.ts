@@ -199,3 +199,39 @@ export const useRemoveGuardian = () => {
         }
     });
 };
+
+// === EXPORT EXCEL ===
+export const useExportStudents = () => {
+    return useMutation({
+        mutationFn: async () => {
+            // PENTING: responseType: 'blob' agar axios menanggapinya sebagai file/binary
+            const response = await api.get('/students/export/excel', {
+                responseType: 'blob',
+            });
+            return response;
+        },
+        onSuccess: (response) => {
+            // Trik JavaScript untuk memicu download file dari Blob
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Ambil nama file dari header jika ada, atau default
+            // (Header content-disposition agak tricky diambil jika CORS tidak diset expose-headers)
+            // Kita pakai default nama file saja biar aman
+            const date = new Date().toISOString().split('T')[0];
+            link.setAttribute('download', `Students_Export_${date}.xlsx`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            // Bersihkan
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('Data berhasil diunduh');
+        },
+        onError: () => {
+            toast.error('Gagal mengunduh file');
+        }
+    });
+};
