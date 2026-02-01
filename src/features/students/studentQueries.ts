@@ -235,3 +235,30 @@ export const useExportStudents = () => {
         }
     });
 };
+
+// === EXPORT PDF ===
+export const useExportStudentsPDF = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const response = await api.get('/students/export/pdf', {
+                responseType: 'blob', // Penting
+            });
+            return response;
+        },
+        onSuccess: (response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const date = new Date().toISOString().split('T')[0];
+            link.setAttribute('download', `Laporan_Siswa_${date}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('PDF berhasil diunduh');
+        },
+        onError: () => {
+            toast.error('Gagal mengunduh PDF');
+        }
+    });
+};

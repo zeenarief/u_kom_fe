@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Plus, Trash2, Search, GraduationCap, Eye, Download } from 'lucide-react'; // Ganti Pencil dengan Eye
-import { useStudents, useDeleteStudent, useExportStudents } from './studentQueries';
+import {Plus, Trash2, Search, GraduationCap, Eye, Download, Printer} from 'lucide-react'; // Ganti Pencil dengan Eye
+import {useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF} from './studentQueries';
 import type { Student } from '../../types/api';
 import Button from '../../components/ui/Button';
 import StudentFormModal from './StudentFormModal';
-import StudentDetailModal from './StudentDetailModal'; // Import Modal Detail
+import StudentDetailModal from './StudentDetailModal';
 
 export default function StudentPage() {
     const exportMutation = useExportStudents();
+    const exportPDFMutation = useExportStudentsPDF();
 
     // State Modal Form (Create/Edit)
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -56,6 +57,15 @@ export default function StudentPage() {
                     <p className="text-gray-500 text-sm">Manajemen data induk siswa lengkap.</p>
                 </div>
                 <div className="flex gap-2">
+                    {/* TOMBOL PDF */}
+                    <Button
+                        variant="outline"
+                        onClick={() => exportPDFMutation.mutate()}
+                        isLoading={exportPDFMutation.isPending}
+                        className="bg-white border border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                    >
+                        <Printer className="w-4 h-4 mr-2" /> Export PDF
+                    </Button>
                     {/* TOMBOL EXPORT */}
                     <Button
                         variant="outline"
