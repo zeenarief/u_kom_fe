@@ -14,6 +14,7 @@ import DashboardHome from "./features/dashboard/DashboardHome.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import AcademicYearPage from "./features/academic-years/AcademicYearPage.tsx";
 import ClassroomPage from "./features/classroom/ClassroomPage.tsx";
+import SubjectPage from "./features/subjects/SubjectPage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -53,6 +54,7 @@ function App() {
 
                         <Route path="academic-years" element={<AcademicYearPage />} />
                         <Route path="classrooms" element={<ClassroomPage />} />
+                        <Route path="subjects" element={<SubjectPage />} />
 
                         <Route path="roles" element={<RolePage />} />
                     </Route>
