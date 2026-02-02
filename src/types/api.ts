@@ -396,3 +396,21 @@ export interface AssignmentFormInput {
     subject_id: string;
     teacher_id: string;
 }
+
+export interface Schedule {
+    id: string;
+    day_of_week: number; // 1-7
+    day_name: string;    // "Senin"
+    start_time: string;  // "07:00"
+    end_time: string;    // "08:30"
+    subject_name: string;
+    teacher_name: string;
+    classroom_name: string;
+}
+
+export interface ScheduleFormInput {
+    teaching_assignment_id: string;
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+}
