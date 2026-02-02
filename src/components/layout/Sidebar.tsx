@@ -6,7 +6,7 @@ import {
     UserSquare2,
     Briefcase,
     Settings, Shield,
-    Calendar, School, BookOpen
+    Calendar, School, BookOpen, UserCheck
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -23,6 +23,7 @@ const Sidebar = () => {
         { label: 'Tahun Ajaran', path: '/dashboard/academic-years', icon: Calendar },
         { label: 'Data Kelas', path: '/dashboard/classrooms', icon: School },
         { label: 'Mata Pelajaran', path: '/dashboard/subjects', icon: BookOpen },
+        { label: 'Guru Pengampu', path: '/dashboard/assignments', icon: UserCheck },
         { label: 'Role & Izin', path: '/dashboard/roles', icon: Settings },
     ];
 

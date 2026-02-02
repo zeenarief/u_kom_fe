@@ -22,7 +22,7 @@ export const useClassrooms = (academicYearId: string) => {
 // GET DETAIL (Info Kelas + Daftar Siswa)
 export const useClassroomDetail = (id: string | null) => {
     return useQuery({
-        queryKey: ['classroom', id],
+        queryKey: ['classrooms', id],
         queryFn: async () => {
             if (!id) return null;
             const response = await api.get<ApiResponse<ClassroomDetail>>(`/classrooms/${id}`);
@@ -93,7 +93,7 @@ export const useAddStudentsToClass = (classroomId: string) => {
             toast.success('Siswa berhasil ditambahkan');
 
             // 1. Refresh Data Detail (Untuk Modal agar list siswa update)
-            await queryClient.invalidateQueries({ queryKey: ['classroom', classroomId] });
+            await queryClient.invalidateQueries({ queryKey: ['classrooms', classroomId] });
 
             // 2. Refresh List Utama (Untuk Halaman Depan agar angka total_students update)
             // Kita invalidate key 'classrooms' agar mencakup semua variasi filternya
@@ -114,7 +114,7 @@ export const useRemoveStudentFromClass = (classroomId: string) => {
             toast.success('Siswa dikeluarkan dari kelas');
 
             // 1. Refresh Detail
-            await queryClient.invalidateQueries({ queryKey: ['classroom', classroomId] });
+            await queryClient.invalidateQueries({ queryKey: ['classrooms', classroomId] });
 
             // 2. Refresh List Utama
             await queryClient.invalidateQueries({ queryKey: ['classrooms'] });
