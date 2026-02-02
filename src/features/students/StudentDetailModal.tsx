@@ -1,7 +1,7 @@
-import {Edit, User, MapPin, CreditCard, ShieldCheck, Unlink} from 'lucide-react';
+import {Edit, User, MapPin, CreditCard, ShieldCheck, Unlink, Printer} from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
-import { useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
+import {useExportStudentBiodata, useStudentDetail, useUnlinkStudentFromUser} from './studentQueries';
 import type {Student} from '../../types/api';
 import UserLinker from "./UserLinker.tsx";
 import FamilyManager from './FamilyManager';
@@ -23,8 +23,20 @@ const DetailRow = ({ label, value }: { label: string; value?: string | null }) =
 
 export default function StudentDetailModal({ studentId, onClose, onEdit }: StudentDetailModalProps) {
     const { data: student, isLoading, isError } = useStudentDetail(studentId);
+    const exportBiodataMutation = useExportStudentBiodata(); // Init hook
 
     const unlinkMutation = useUnlinkStudentFromUser();
+
+    // Handler Download
+    const handlePrintBiodata = () => {
+        if(studentId && student) {
+            // Kirim ID dan Nama ke mutation
+            exportBiodataMutation.mutate({
+                id: studentId,
+                name: student.full_name
+            });
+        }
+    }
 
     const handleUnlink = () => {
         if (!student) return;
@@ -57,15 +69,34 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
         <Modal isOpen={!!studentId} onClose={onClose} title="Detail Siswa">
             <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
 
-                {/* Header Profile Singkat */}
-                <div className="bg-blue-50 p-4 rounded-xl flex items-center gap-4">
-                    <div className="w-16 h-16 bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-2xl">
-                        {student.full_name.charAt(0)}
+                {/* Header Profile dengan Tombol Print di pojok kanan */}
+                <div className="bg-blue-50 p-4 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-2xl">
+                            {student.full_name.charAt(0)}
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-900">{student.full_name}</h2>
+                            <div className="flex gap-2 mt-1">
+                                <span className="text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-700">{student.nisn || 'No NISN'}</span>
+                                <span className="text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-700">{student.gender === 'male' ? 'Laki-laki' : 'Perempuan'}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">{student.full_name}</h2>
-                        <p className="text-sm text-blue-700 font-medium">{student.nisn ? `NISN: ${student.nisn}` : 'Belum ada NISN'}</p>
-                    </div>
+
+                    {/* TOMBOL PRINT BIODATA */}
+                    <button
+                        onClick={handlePrintBiodata}
+                        disabled={exportBiodataMutation.isPending}
+                        className="p-2 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition shadow-sm"
+                        title="Cetak Biodata"
+                    >
+                        {exportBiodataMutation.isPending ? (
+                            <span className="text-xs">...</span>
+                        ) : (
+                            <Printer size={20} />
+                        )}
+                    </button>
                 </div>
 
                 {/* Family Manager */}

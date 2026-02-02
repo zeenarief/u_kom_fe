@@ -262,3 +262,38 @@ export const useExportStudentsPDF = () => {
         }
     });
 };
+
+// === EXPORT BIODATA (SINGLE) ===
+export const useExportStudentBiodata = () => {
+    return useMutation({
+        // Ubah parameter input menjadi object { id, name }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        mutationFn: async ({ id, name: _name}: { id: string; name: string }) => {
+            const response = await api.get(`/students/${id}/export/pdf`, {
+                responseType: 'blob',
+            });
+            return response;
+        },
+        // Parameter ke-2 di onSuccess adalah 'variables' (input yang kita kirim saat mutate)
+        onSuccess: (response, variables) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Sanitasi nama file: Ganti spasi dengan underscore, hapus karakter aneh
+            const safeName = variables.name.replace(/[^a-zA-Z0-9]/g, '_');
+
+            // Set nama file dinamis
+            link.setAttribute('download', `Biodata_${safeName}.pdf`);
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('Biodata berhasil diunduh');
+        },
+        onError: () => {
+            toast.error('Gagal mengunduh biodata');
+        }
+    });
+};
