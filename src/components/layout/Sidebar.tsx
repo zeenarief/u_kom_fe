@@ -5,7 +5,8 @@ import {
     GraduationCap,
     UserSquare2,
     Briefcase,
-    Settings, Shield
+    Settings, Shield,
+    Calendar
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -19,6 +20,7 @@ const Sidebar = () => {
         { label: 'Data Orang Tua', path: '/dashboard/parents', icon: UserSquare2 },
         { label: 'Data Wali', path: '/dashboard/guardians', icon: Shield },
         { label: 'Data Guru & Tendik', path: '/dashboard/employees', icon: Briefcase },
+        { label: 'Tahun Ajaran', path: '/dashboard/academic-years', icon: Calendar },
         { label: 'Role & Izin', path: '/dashboard/roles', icon: Settings },
     ];
 

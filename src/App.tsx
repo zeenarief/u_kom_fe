@@ -12,6 +12,7 @@ import GuardianPage from "./features/guardians/GuardianPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
 import DashboardHome from "./features/dashboard/DashboardHome.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
+import AcademicYearPage from "./features/academic-years/AcademicYearPage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -50,6 +51,8 @@ function App() {
                         <Route path="employees" element={<EmployeePage />} />
 
                         <Route path="roles" element={<RolePage />} />
+
+                        <Route path="academic-years" element={<AcademicYearPage />} />
                     </Route>
 
                     {/* Default Redirect */}
