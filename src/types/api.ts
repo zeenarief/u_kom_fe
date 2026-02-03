@@ -414,3 +414,32 @@ export interface ScheduleFormInput {
     start_time: string;
     end_time: string;
 }
+
+export interface AttendanceSession {
+    id: string;
+    date: string;
+    topic: string;
+    schedule_info: Schedule;
+    details: AttendanceDetail[];
+    summary: { [key: string]: number }; // Contoh: { PRESENT: 20, SICK: 1 }
+}
+
+export interface AttendanceDetail {
+    student_id: string;
+    student_name: string;
+    nisn: string;
+    status: 'PRESENT' | 'SICK' | 'PERMISSION' | 'ABSENT';
+    notes: string;
+}
+
+export interface AttendanceSubmitRequest {
+    schedule_id: string;
+    date: string; // YYYY-MM-DD
+    topic: string;
+    notes: string;
+    students: {
+        student_id: string;
+        status: string;
+        notes: string;
+    }[];
+}

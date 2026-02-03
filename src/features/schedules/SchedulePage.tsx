@@ -3,27 +3,28 @@ import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms } from '../classrooms/classroomQueries';
 import { useSchedulesByClass, useDeleteSchedule } from './scheduleQueries';
 import Button from '../../components/ui/Button';
-import { Plus, Trash2, Calendar, Clock, User, BookOpen } from 'lucide-react';
+import { Plus, Trash2, Calendar, Clock, User, BookOpen, ClipboardList } from 'lucide-react';
 import ScheduleFormModal from './ScheduleFormModal';
+import AttendanceModal from '../attendances/AttendanceModal';
+import type { Schedule } from '../../types/api';
 
 export default function SchedulePage() {
     const [selectedYear, setSelectedYear] = useState<string>('');
     const [selectedClassId, setSelectedClassId] = useState<string>('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // 1. Data Tahun Ajaran & Kelas
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
+    // State untuk Modal Absen
+    const [attendanceSchedule, setAttendanceSchedule] = useState<Schedule | null>(null);
+
+    // ... (Bagian Query Years & Classrooms sama persis seperti sebelumnya) ...
     const { data: years } = useAcademicYears();
-
-    // Auto select active year
     if (!selectedYear && years) {
         const active = years.find(y => y.status === 'ACTIVE');
         if (active) setSelectedYear(active.id);
         else if (years.length > 0) setSelectedYear(years[0].id);
     }
-
     const { data: classrooms } = useClassrooms(selectedYear);
-
-    // 2. Data Jadwal
     const { data: schedules, isLoading } = useSchedulesByClass(selectedClassId);
     const deleteMutation = useDeleteSchedule(selectedClassId);
 
@@ -45,12 +46,12 @@ export default function SchedulePage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Jadwal Pelajaran</h1>
-                    <p className="text-gray-500 text-sm">Atur jadwal mingguan per kelas.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Jadwal & Presensi</h1>
+                    <p className="text-gray-500 text-sm">Atur jadwal dan isi presensi harian.</p>
                 </div>
             </div>
 
-            {/* FILTER */}
+            {/* FILTER (Sama seperti sebelumnya) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran</label>
@@ -83,7 +84,7 @@ export default function SchedulePage() {
                 </div>
                 <div className="flex items-end">
                     <Button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => setIsFormOpen(true)}
                         disabled={!selectedClassId}
                         className="w-full"
                     >
@@ -92,11 +93,11 @@ export default function SchedulePage() {
                 </div>
             </div>
 
-            {/* CONTENT: JADWAL GRID */}
+            {/* CONTENT */}
             {!selectedClassId ? (
                 <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-gray-500">
                     <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                    Pilih kelas untuk melihat jadwal.
+                    Pilih kelas untuk melihat jadwal dan mengisi absen.
                 </div>
             ) : isLoading ? (
                 <div className="text-center py-12">Loading...</div>
@@ -104,7 +105,6 @@ export default function SchedulePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3, 4, 5, 6].map(day => (
                         <div key={day} className="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col h-full">
-                            {/* Header Hari */}
                             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 font-bold text-gray-700 flex justify-between items-center">
                                 <span>{dayNames[day]}</span>
                                 <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full text-gray-600">
@@ -112,36 +112,45 @@ export default function SchedulePage() {
                                 </span>
                             </div>
 
-                            {/* List Jadwal */}
                             <div className="p-4 space-y-3 flex-1">
                                 {groupedSchedules[day]?.length === 0 ? (
-                                    <p className="text-center text-sm text-gray-400 italic py-4">Libur / Kosong</p>
+                                    <p className="text-center text-sm text-gray-400 italic py-4">Tidak ada jadwal</p>
                                 ) : (
                                     groupedSchedules[day]?.map(s => (
                                         <div key={s.id} className="group relative border-l-4 border-blue-500 bg-blue-50/50 p-3 rounded-r-lg hover:bg-blue-50 transition-colors">
-                                            {/* Jam */}
-                                            <div className="flex items-center gap-1 text-xs font-mono text-blue-700 mb-1">
-                                                <Clock size={12} />
-                                                {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <div className="flex items-center gap-1 text-xs font-mono text-blue-700 mb-1">
+                                                        <Clock size={12} />
+                                                        {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
+                                                    </div>
+                                                    <div className="font-bold text-gray-800 text-sm mb-1 flex items-center gap-2">
+                                                        <BookOpen size={14} className="text-gray-400"/>
+                                                        {s.subject_name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600 flex items-center gap-2">
+                                                        <User size={14} className="text-gray-400"/>
+                                                        {s.teacher_name}
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            {/* Mapel */}
-                                            <div className="font-bold text-gray-800 text-sm mb-1 flex items-center gap-2">
-                                                <BookOpen size={14} className="text-gray-400"/>
-                                                {s.subject_name}
+                                            {/* ACTION BUTTONS */}
+                                            <div className="mt-3 flex gap-2 border-t border-blue-200 pt-2">
+                                                {/* Tombol Absen */}
+                                                <button
+                                                    onClick={() => setAttendanceSchedule(s)}
+                                                    className="flex-1 flex items-center justify-center gap-1 text-xs bg-white border border-blue-200 text-blue-700 py-1.5 rounded hover:bg-blue-100 transition-colors shadow-sm"
+                                                >
+                                                    <ClipboardList size={14} />
+                                                    Isi Absen
+                                                </button>
                                             </div>
 
-                                            {/* Guru */}
-                                            <div className="text-xs text-gray-600 flex items-center gap-2">
-                                                <User size={14} className="text-gray-400"/>
-                                                {s.teacher_name}
-                                            </div>
-
-                                            {/* Delete Button (Hover) */}
+                                            {/* Delete Button (Top Right) */}
                                             <button
                                                 onClick={() => handleDelete(s.id)}
-                                                className="absolute top-2 right-2 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                                title="Hapus Jadwal"
+                                                className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
                                                 <Trash2 size={14} />
                                             </button>
@@ -154,9 +163,18 @@ export default function SchedulePage() {
                 </div>
             )}
 
+            {/* Modals */}
             <ScheduleFormModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                classroomId={selectedClassId}
+            />
+
+            {/* MODAL ABSEN */}
+            <AttendanceModal
+                isOpen={!!attendanceSchedule}
+                onClose={() => setAttendanceSchedule(null)}
+                schedule={attendanceSchedule}
                 classroomId={selectedClassId}
             />
         </div>
