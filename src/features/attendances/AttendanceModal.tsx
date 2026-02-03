@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'; // Tambah useRef
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
@@ -29,18 +29,51 @@ const STATUSES = [
 ];
 
 export default function AttendanceModal({ isOpen, onClose, schedule, classroomId }: Props) {
-    const { data: classroom, isLoading: loadingStudents } = useClassroomDetail(classroomId);
+    const { data: classroom, isLoading: loadingStudents } = useClassroomDetail(
+        isOpen ? classroomId : null
+    );
 
     const [attendanceMap, setAttendanceMap] = useState<Record<string, string>>({});
 
-    // PERBAIKAN 1: Gunakan useRef untuk melacak inisialisasi
-    // Ini mencegah re-render berulang dan menghilangkan warning ESLint
-    const initializedClassId = useRef<string | null>(null);
+    // Ref untuk melacak apakah kita sudah inisialisasi data untuk kelas ini
+    const loadedClassIdRef = useRef<string | null>(null);
+
+    // SOLUSI 1: Hapus useEffect reset (yang menyebabkan error).
+    // Pindahkan logika reset ke fungsi handleClose di bawah.
+
+    // Logic Inisialisasi (Mengisi default 'PRESENT')
+    useEffect(() => {
+        // Cek 1: Data siswa harus ada
+        // Cek 2: Pastikan kita belum melakukan inisialisasi untuk kelas ID ini agar tidak loop
+        if (classroom?.students && classroom.id !== loadedClassIdRef.current) {
+
+            const initialMap: Record<string, string> = {};
+            classroom.students.forEach(s => {
+                initialMap[s.id] = 'PRESENT';
+            });
+
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setAttendanceMap(initialMap);
+
+            // Tandai bahwa kelas ini sudah di-load
+            loadedClassIdRef.current = classroom.id;
+        }
+    }, [classroom]);
+
+    // SOLUSI 2: Fungsi Reset dijalankan saat user menutup modal
+    const handleClose = () => {
+        // 1. Reset Ref agar nanti kalau dibuka lagi bisa init ulang
+        loadedClassIdRef.current = null;
+
+        // 2. Reset State Map
+        setAttendanceMap({});
+
+        // 3. Panggil prop onClose dari parent
+        onClose();
+    };
 
     const submitMutation = useSubmitAttendance(() => {
-        onClose();
-        setAttendanceMap({});
-        initializedClassId.current = null; // Reset ref agar bisa buka ulang dengan fresh state
+        handleClose(); // Gunakan handleClose agar state ter-reset setelah sukses submit
     });
 
     const { register, handleSubmit } = useForm<FormValues>({
@@ -51,19 +84,8 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
         }
     });
 
-    // PERBAIKAN 1 (Lanjutan): Logic useEffect yang aman
-    useEffect(() => {
-        // Hanya jalankan jika data siswa ada DAN kita belum inisialisasi untuk kelas ini
-        if (classroom?.students && initializedClassId.current !== classroomId) {
-            const initialMap: Record<string, string> = {};
-            classroom.students.forEach(s => {
-                initialMap[s.id] = 'PRESENT';
-            });
-
-            setAttendanceMap(initialMap);
-            initializedClassId.current = classroomId; // Tandai sudah diinisialisasi
-        }
-    }, [classroom, classroomId]);
+    // Key unik untuk me-reset form input saat modal dibuka/tutup
+    const formKey = isOpen ? `open-${schedule?.id}` : 'closed';
 
     const handleStatusChange = (studentId: string, status: string) => {
         setAttendanceMap(prev => ({ ...prev, [studentId]: status }));
@@ -99,25 +121,35 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
     const studentList = classroom?.students || [];
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`Presensi: ${schedule.subject_name}`}>
-            {/* PERBAIKAN 2: Ubah h-[80vh] menjadi h-[70vh] agar aman di layar laptop */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 h-[70vh] flex flex-col">
-
-                {/* Header Info */}
+        // Gunakan handleClose di sini, BUKAN onClose langsung
+        <Modal isOpen={isOpen} onClose={handleClose} title={`Presensi: ${schedule.subject_name}`}>
+            <form
+                key={formKey}
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-4 h-[70vh] flex flex-col"
+            >
                 <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 space-y-1">
                     <p><strong>Kelas:</strong> {classroom?.name}</p>
                     <p><strong>Guru:</strong> {schedule.teacher_name}</p>
                     <p><strong>Waktu:</strong> {schedule.day_name}, {schedule.start_time.substring(0,5)} - {schedule.end_time.substring(0,5)}</p>
                 </div>
 
-                {/* Form Header (Jurnal) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b pb-4">
-                    <Input label="Tanggal" type="date" {...register('date', { required: true })} />
-                    <Input label="Materi / Topik (Jurnal)" placeholder="Contoh: Bab 1 Pendahuluan" {...register('topic', { required: true })} />
+                    <Input
+                        label="Tanggal"
+                        type="date"
+                        {...register('date', { required: true })}
+                        defaultValue={new Date().toISOString().split('T')[0]}
+                    />
+                    <Input
+                        label="Materi / Topik (Jurnal)"
+                        placeholder="Contoh: Bab 1 Pendahuluan"
+                        {...register('topic', { required: true })}
+                        defaultValue=""
+                    />
                 </div>
 
-                {/* List Siswa */}
-                <div className="flex-1 overflow-y-auto pr-2"> {/* Tambah pr-2 untuk padding scrollbar */}
+                <div className="flex-1 overflow-y-auto pr-2">
                     {loadingStudents ? (
                         <p className="text-center py-4">Loading siswa...</p>
                     ) : studentList.length === 0 ? (
@@ -140,7 +172,9 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                                     <td className="px-3 py-3">
                                         <div className="flex justify-center gap-1">
                                             {STATUSES.map((status) => {
-                                                const isSelected = attendanceMap[student.id] === status.value;
+                                                // Fallback visual agar tidak kosong saat ms inisialisasi
+                                                const currentStatus = attendanceMap[student.id] || 'PRESENT';
+                                                const isSelected = currentStatus === status.value;
                                                 return (
                                                     <button
                                                         key={status.value}
@@ -166,9 +200,8 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                     )}
                 </div>
 
-                {/* Footer Buttons */}
                 <div className="pt-3 border-t flex justify-end gap-2 bg-white">
-                    <Button type="button" variant="ghost" onClick={onClose}>Batal</Button>
+                    <Button type="button" variant="ghost" onClick={handleClose}>Batal</Button>
                     <Button type="submit" isLoading={submitMutation.isPending}>
                         <Check size={16} className="mr-2" /> Simpan Presensi
                     </Button>
