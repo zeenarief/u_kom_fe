@@ -12,6 +12,7 @@ const Header = () => {
     // State for active dropdown
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const navRef = useRef<HTMLDivElement>(null);
+    const userMenuRef = useRef<HTMLDivElement>(null);
 
     const handleLogout = () => {
         logout();
@@ -22,7 +23,13 @@ const Header = () => {
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (navRef.current && !navRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+
+            // Check if click is outside nav AND outside user menu
+            const outsideNav = navRef.current && !navRef.current.contains(target);
+            const outsideUserMenu = userMenuRef.current && !userMenuRef.current.contains(target);
+
+            if (outsideNav && outsideUserMenu) {
                 setActiveDropdown(null);
             }
         };
@@ -93,8 +100,8 @@ const Header = () => {
                     <Link
                         to="/dashboard"
                         className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/dashboard'
-                                ? 'bg-blue-50 text-blue-700'
-                                : 'text-gray-600 hover:bg-gray-50 text-gray-700'
+                            ? 'bg-blue-50 text-blue-700'
+                            : 'text-gray-600 hover:bg-gray-50 text-gray-700'
                             }`}
                     >
                         Dashboard
@@ -108,8 +115,8 @@ const Header = () => {
                                 <button
                                     onClick={() => toggleDropdown(group.name)}
                                     className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${groupActive || activeDropdown === group.name
-                                            ? 'bg-blue-50 text-blue-700'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                         }`}
                                 >
                                     {group.name}
@@ -123,8 +130,8 @@ const Header = () => {
                                                 key={item.path}
                                                 to={item.path}
                                                 className={`block px-4 py-2 text-sm ${isActive(item.path)
-                                                        ? 'bg-blue-50 text-blue-700'
-                                                        : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'bg-blue-50 text-blue-700'
+                                                    : 'text-gray-700 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 {item.label}
@@ -138,9 +145,11 @@ const Header = () => {
                 </nav>
             </div>
 
-            {/* Right: User Profile & Logout */}
-            <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-right">
+            <div className="relative" ref={userMenuRef}>
+                <button
+                    onClick={() => toggleDropdown('user-menu')}
+                    className={`flex items-center gap-2 text-right p-1 rounded-md transition-colors ${activeDropdown === 'user-menu' ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                >
                     <div className="hidden sm:block">
                         <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                         <p className="text-xs text-gray-500">{user?.roles?.[0]?.name || 'User'}</p>
@@ -148,17 +157,33 @@ const Header = () => {
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
                         <UserIcon size={16} />
                     </div>
-                </div>
-
-                <div className="h-8 w-px bg-gray-200 mx-1"></div>
-
-                <button
-                    onClick={handleLogout}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                    title="Keluar"
-                >
-                    <LogOut size={20} />
+                    <ChevronDown size={14} className={`transition-transform duration-200 text-gray-400 ${activeDropdown === 'user-menu' ? 'rotate-180' : ''}`} />
                 </button>
+
+                {activeDropdown === 'user-menu' && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                        <div className="px-4 py-2 border-b border-gray-100 sm:hidden">
+                            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                            <p className="text-xs text-gray-500">{user?.roles?.[0]?.name || 'User'}</p>
+                        </div>
+
+                        <Link
+                            to="/dashboard/profile"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            <UserIcon size={16} />
+                            Profil Saya
+                        </Link>
+
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
+                            <LogOut size={16} />
+                            Keluar
+                        </button>
+                    </div>
+                )}
             </div>
         </header>
     );

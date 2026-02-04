@@ -53,6 +53,15 @@ api.interceptors.response.use(
 
         // Jika error 401 (Unauthorized) dan belum pernah diretry sebelumnya
         if (error.response?.status === 401 && !originalRequest._retry) {
+            const { isAuthenticated } = useAuthStore.getState();
+
+            // Jika tidak terautentikasi (misal login gagal, atau logout manual),
+            // jangan jalankan logic refresh token / sesi habis.
+            // Biarkan error 401 ditangani oleh pemanggil (misal form login).
+            if (!isAuthenticated) {
+                return Promise.reject(error);
+            }
+
             originalRequest._retry = true;
 
             try {

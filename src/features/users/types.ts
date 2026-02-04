@@ -7,4 +7,6 @@ export interface User {
     email: string;
     roles: Role[];
     permissions?: string[]; // Ada di detail user
+    created_at?: string;
+    updated_at?: string;
 }

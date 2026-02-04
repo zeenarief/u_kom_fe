@@ -1,7 +1,16 @@
 import LoginForm from '../features/auth/LoginForm';
 import { GraduationCap } from 'lucide-react';
+import { useEffect } from 'react';
+import { useAlertStore } from '../store/alertStore';
 
 export default function LoginPage() {
+    const { closeAlert } = useAlertStore();
+
+    // Reset alert jika ada sisa alert dari sesi sebelumnya (misal race condition saat logout)
+    useEffect(() => {
+        closeAlert();
+    }, [closeAlert]);
+
     return (
         <div className="min-h-screen flex bg-gray-50">
 

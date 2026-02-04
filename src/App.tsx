@@ -18,6 +18,7 @@ import ClassroomPage from "./features/classrooms/ClassroomPage.tsx";
 import SubjectPage from "./features/subjects/SubjectPage.tsx";
 import AssignmentPage from "./features/assignments/AssignmentPage.tsx";
 import SchedulePage from "./features/schedules/SchedulePage.tsx";
+import ProfilePage from "./features/profile/ProfilePage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -74,6 +75,7 @@ function App() {
                         <Route path="schedules" element={<SchedulePage />} />
 
                         <Route path="roles" element={<RolePage />} />
+                        <Route path="profile" element={<ProfilePage />} />
                     </Route>
 
                     {/* Default Redirect */}

@@ -33,6 +33,17 @@ export const useUserDetail = (id: string | null) => {
     });
 };
 
+// === READ: Profile User (Current User) ===
+export const useProfile = () => {
+    return useQuery({
+        queryKey: ['profile'],
+        queryFn: async () => {
+            const response = await api.get<ApiResponse<User>>('/profile');
+            return response.data.data;
+        },
+    });
+};
+
 // === READ: Ambil Role ===
 export const useRoles = () => {
     return useQuery({
