@@ -42,7 +42,6 @@ export default function UserPage() {
         }
     };
 
-    if (isLoading) return <div className="p-8 text-center">Loading data users...</div>;
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;
 
     return (
@@ -82,6 +81,11 @@ export default function UserPage() {
                             </tr>
                         </thead>
                         <tbody>
+                            {isLoading && (
+                                <tr>
+                                    <td colSpan={4} className="text-center py-8 text-gray-400">Loading data...</td>
+                                </tr>
+                            )}
                             {users?.map((user) => (
                                 <tr key={user.id} className="bg-white border-b hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">

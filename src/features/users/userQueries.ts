@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
 import type { ApiResponse, ApiError } from '../../types/api';
@@ -16,6 +16,7 @@ export const useUsers = (search?: string) => {
             const response = await api.get<ApiResponse<User[]>>('/users', { params });
             return response.data.data;
         },
+        placeholderData: keepPreviousData,
     });
 };
 

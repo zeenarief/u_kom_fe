@@ -39,7 +39,6 @@ export default function ParentPage() {
         if (confirm('Yakin hapus data ini?')) deleteMutation.mutate(id);
     };
 
-    if (isLoading) return <div className="p-8 text-center">Loading...</div>;
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;
 
     return (
@@ -82,6 +81,11 @@ export default function ParentPage() {
                             </tr>
                         </thead>
                         <tbody>
+                            {isLoading && (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-8 text-gray-400">Loading...</td>
+                                </tr>
+                            )}
                             {parents?.map((parent) => (
                                 <tr key={parent.id} className="bg-white border-b hover:bg-gray-50">
                                     <td className="px-6 py-4 font-medium text-gray-900">

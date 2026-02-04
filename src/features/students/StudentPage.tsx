@@ -52,7 +52,6 @@ export default function StudentPage() {
         exportMutation.mutate();
     };
 
-    if (isLoading) return <div className="p-8 text-center">Loading data siswa...</div>;
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;
 
     return (
@@ -114,6 +113,11 @@ export default function StudentPage() {
                             </tr>
                         </thead>
                         <tbody>
+                            {isLoading && (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-8 text-gray-400">Loading data...</td>
+                                </tr>
+                            )}
                             {students?.map((student) => (
                                 <tr key={student.id} className="bg-white border-b hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">

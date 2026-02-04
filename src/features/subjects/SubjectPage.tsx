@@ -32,7 +32,6 @@ export default function SubjectPage() {
         if (confirm('Yakin hapus mata pelajaran ini?')) deleteMutation.mutate(id);
     };
 
-    if (isLoading) return <div className="p-8 text-center">Loading data mapel...</div>;
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;
 
     return (
@@ -73,6 +72,11 @@ export default function SubjectPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
+                            {isLoading && (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-8 text-gray-400">Loading data...</td>
+                                </tr>
+                            )}
                             {subjects?.map((item) => (
                                 <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 font-mono font-bold text-blue-600">
