@@ -8,6 +8,7 @@ import StudentDetailModal from './StudentDetailModal';
 
 import { useDebounce } from '../../hooks/useDebounce';
 
+
 export default function StudentPage() {
     const exportMutation = useExportStudents();
     const exportPDFMutation = useExportStudentsPDF();

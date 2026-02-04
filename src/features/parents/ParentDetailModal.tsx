@@ -1,4 +1,5 @@
 import { Edit, User, MapPin, Briefcase, Phone, ShieldCheck, Unlink } from 'lucide-react';
+import { formatDate } from '../../lib/date';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useParentDetail, useUnlinkParentFromUser } from './parentQueries';
@@ -94,7 +95,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                         <DetailRow label="NIK" value={parent.nik} />
                         <DetailRow label="Gender" value={parent.gender === 'male' ? 'Laki-laki' : 'Perempuan'} />
                         <DetailRow label="Tempat Lahir" value={parent.place_of_birth} />
-                        <DetailRow label="Tanggal Lahir" value={parent.date_of_birth ? parent.date_of_birth.split('T')[0] : '-'} />
+                        <DetailRow label="Tanggal Lahir" value={formatDate(parent.date_of_birth)} />
                     </div>
                 </div>
 

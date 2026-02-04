@@ -8,6 +8,7 @@ import EmployeeDetailModal from './EmployeeDetailModal';
 
 import { useDebounce } from '../../hooks/useDebounce';
 
+
 export default function EmployeePage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null);

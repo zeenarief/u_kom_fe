@@ -55,11 +55,11 @@ export default function StudentFormModal({ isOpen, onClose, studentToEdit }: Stu
     }, [isOpen, studentToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<StudentFormInput> = (data) => {
-        // 1. Format Tanggal ke ISO 8601 (tambah jam)
+        // 1. Payload Date Only (YYYY-MM-DD) - Kirim apa adanya
         const payload = { ...data };
-        if (payload.date_of_birth) {
-            payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
-        }
+
+        // 2. Kirim Request
+
 
         // 2. Kirim Request
         if (isEditMode && studentToEdit) {

@@ -38,8 +38,8 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
         // tapi backend Go biasanya handle empty string ok.
         // Format tanggal ISO
         const payload = { ...data };
-        if (payload.date_of_birth) payload.date_of_birth = `${payload.date_of_birth} T00:00:00Z`;
-        if (payload.join_date) payload.join_date = `${payload.join_date} T00:00:00Z`;
+        // Backend now accepts YYYY-MM-DD directly
+
 
         if (isEditMode && employeeToEdit) {
             updateMutation.mutate({ id: employeeToEdit.id, data: payload });

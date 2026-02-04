@@ -1,4 +1,5 @@
 import { Edit, User, MapPin, CreditCard, ShieldCheck, Unlink, Printer } from 'lucide-react';
+import { formatDate } from '../../lib/date';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useExportStudentBiodata, useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
@@ -131,7 +132,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                             <DetailRow label="Jenis Kelamin" value={student.gender === 'male' ? 'Laki-laki' : 'Perempuan'} />
                             <DetailRow
                                 label="Tempat, Tanggal Lahir"
-                                value={`${student.place_of_birth || ''}, ${student.date_of_birth ? student.date_of_birth.split('T')[0] : ''}`}
+                                value={`${student.place_of_birth || ''}, ${formatDate(student.date_of_birth)}`}
                             />
                         </div>
                     </div>

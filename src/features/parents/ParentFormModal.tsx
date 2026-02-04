@@ -47,10 +47,10 @@ export default function ParentFormModal({ isOpen, onClose, parentToEdit }: Paren
     const onSubmit: SubmitHandler<ParentFormInput> = (data) => {
         const payload = { ...data };
 
-        // Format Tanggal ke ISO Time
-        if (payload.date_of_birth) {
-            payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
-        }
+        // Format Tanggal: Kirim YYYY-MM-DD apa adanya
+        // if (payload.date_of_birth) {
+        //     payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
+        // }
 
         if (isEditMode && parentToEdit) {
             updateMutation.mutate({ id: parentToEdit.id, data: payload });
