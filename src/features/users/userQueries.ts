@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type { ApiResponse, User, RegisterRequest, Role, ApiError } from '../../types/api';
+import type { ApiResponse, ApiError } from '../../types/api';
+import type { User } from './types';
+import type { RegisterRequest } from '../../types/auth';
+import type { Role } from '../roles/types';
 import toast from 'react-hot-toast';
 
 // === READ: Ambil Semua User ===

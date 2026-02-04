@@ -2,7 +2,7 @@ import { Edit, User, ShieldCheck, Unlink, Briefcase } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useEmployeeDetail, useUnlinkEmployeeFromUser } from './employeeQueries';
-import type { Employee } from '../../types/api';
+import type { Employee } from './types';
 import EmployeeUserLinker from './EmployeeUserLinker';
 
 interface Props {
@@ -50,7 +50,7 @@ export default function EmployeeDetailModal({ employeeId, onClose, onEdit }: Pro
 
                 {/* Section Akun Sistem */}
                 <div>
-                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><ShieldCheck size={18} className="text-teal-500"/> Akun Sistem</h3>
+                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><ShieldCheck size={18} className="text-teal-500" /> Akun Sistem</h3>
                     {employee.user ? (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex justify-between items-center">
                             <div className="flex items-center gap-3">
@@ -71,7 +71,7 @@ export default function EmployeeDetailModal({ employeeId, onClose, onEdit }: Pro
 
                 {/* Kepegawaian */}
                 <div>
-                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><Briefcase size={18} className="text-teal-500"/> Data Kepegawaian</h3>
+                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><Briefcase size={18} className="text-teal-500" /> Data Kepegawaian</h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg">
                         <DetailRow label="Status" value={employee.employment_status} />
                         <DetailRow label="Tanggal Masuk" value={employee.join_date ? employee.join_date.split('T')[0] : '-'} />
@@ -82,7 +82,7 @@ export default function EmployeeDetailModal({ employeeId, onClose, onEdit }: Pro
 
                 {/* Pribadi */}
                 <div>
-                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><User size={18} className="text-teal-500"/> Data Pribadi</h3>
+                    <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b"><User size={18} className="text-teal-500" /> Data Pribadi</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <DetailRow label="Gender" value={employee.gender === 'male' ? 'Laki-laki' : 'Perempuan'} />
                         <DetailRow label="Tanggal Lahir" value={employee.date_of_birth ? employee.date_of_birth.split('T')[0] : '-'} />

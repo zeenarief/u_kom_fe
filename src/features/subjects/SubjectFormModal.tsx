@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type { Subject, SubjectFormInput } from '../../types/api';
+import type { Subject, SubjectFormInput } from './types';
 import { useCreateSubject, useUpdateSubject } from './subjectQueries';
 
 interface Props {

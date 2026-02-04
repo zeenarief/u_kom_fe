@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Edit, BookOpen, Search } from 'lucide-react';
 import { useSubjects, useDeleteSubject } from './subjectQueries';
-import type { Subject } from '../../types/api';
+import type { Subject } from './types';
 import Button from '../../components/ui/Button';
 import SubjectFormModal from './SubjectFormModal';
 
@@ -66,57 +66,57 @@ export default function SubjectPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3">Kode</th>
-                            <th className="px-6 py-3">Nama Mapel</th>
-                            <th className="px-6 py-3">Kelompok</th>
-                            <th className="px-6 py-3">Deskripsi</th>
-                            <th className="px-6 py-3 text-right">Aksi</th>
-                        </tr>
+                            <tr>
+                                <th className="px-6 py-3">Kode</th>
+                                <th className="px-6 py-3">Nama Mapel</th>
+                                <th className="px-6 py-3">Kelompok</th>
+                                <th className="px-6 py-3">Deskripsi</th>
+                                <th className="px-6 py-3 text-right">Aksi</th>
+                            </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                        {filteredSubjects?.map((item) => (
-                            <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-mono font-bold text-blue-600">
-                                    {item.code}
-                                </td>
-                                <td className="px-6 py-4 font-medium text-gray-900">
-                                    <div className="flex items-center gap-2">
-                                        <BookOpen size={16} className="text-gray-400"/>
-                                        {item.name}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
+                            {filteredSubjects?.map((item) => (
+                                <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4 font-mono font-bold text-blue-600">
+                                        {item.code}
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-gray-900">
+                                        <div className="flex items-center gap-2">
+                                            <BookOpen size={16} className="text-gray-400" />
+                                            {item.name}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                             {item.type || '-'}
                                         </span>
-                                </td>
-                                <td className="px-6 py-4 text-gray-500 max-w-xs truncate">
-                                    {item.description || '-'}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            onClick={() => handleEdit(item)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="Edit"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(item.id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Hapus"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredSubjects?.length === 0 && (
-                            <tr><td colSpan={5} className="text-center py-8 text-gray-400">Data tidak ditemukan.</td></tr>
-                        )}
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-500 max-w-xs truncate">
+                                        {item.description || '-'}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleEdit(item)}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Edit"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(item.id)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Hapus"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredSubjects?.length === 0 && (
+                                <tr><td colSpan={5} className="text-center py-8 text-gray-400">Data tidak ditemukan.</td></tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

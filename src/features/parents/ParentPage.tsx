@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {Plus, Trash2, Search, Users, Eye} from 'lucide-react';
 import { useParents, useDeleteParent } from './parentQueries';
-import type {Parent} from '../../types/api';
+import type { Parent } from './types';
 import Button from '../../components/ui/Button';
 import ParentFormModal from './ParentFormModal';
 import ParentDetailModal from './ParentDetailModal';
@@ -79,7 +79,7 @@ export default function ParentPage() {
                                         </div>
                                         <div>
                                             <div>{parent.full_name}</div>
-                                            <div className={`text-[10px] px-1.5 py-0.5 rounded inline-block mt-0.5 ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            <div className={`text - [10px] px - 1.5 py - 0.5 rounded inline - block mt - 0.5 ${ parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' } `}>
                                                 {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
                                             </div>
                                         </div>

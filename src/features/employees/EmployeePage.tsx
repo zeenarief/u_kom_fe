@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Briefcase, Eye } from 'lucide-react';
 import { useEmployees, useDeleteEmployee } from './employeeQueries';
-import type {Employee} from '../../types/api';
+import type { Employee } from './types';
 import Button from '../../components/ui/Button';
 import EmployeeFormModal from './EmployeeFormModal';
 import EmployeeDetailModal from './EmployeeDetailModal';

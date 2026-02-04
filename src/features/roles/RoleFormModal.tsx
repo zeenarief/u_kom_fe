@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type {Role} from '../../types/api';
+import type { Role } from './types';
 import { useCreateRole, useUpdateRole } from './roleQueries';
 
 interface RoleFormModalProps {

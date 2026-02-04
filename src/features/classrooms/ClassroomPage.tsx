@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms, useDeleteClassroom } from './classroomQueries';
-import type { Classroom } from '../../types/api';
+import type { Classroom } from './types';
+
 import Button from '../../components/ui/Button';
 import { Plus, Edit, Trash2, Users, GraduationCap } from 'lucide-react';
 import ClassroomFormModal from './ClassroomFormModal';
@@ -40,7 +41,7 @@ export default function ClassroomPage() {
     };
 
     const handleDelete = (id: string) => {
-        if(confirm('Hapus kelas ini? Data history siswa di kelas ini juga akan terhapus.')) {
+        if (confirm('Hapus kelas ini? Data history siswa di kelas ini juga akan terhapus.')) {
             deleteMutation.mutate(id);
         }
     };

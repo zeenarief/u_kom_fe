@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type {Parent, ParentFormInput} from '../../types/api';
+import type { Parent, ParentFormInput } from './types';
 import { useCreateParent, useUpdateParent } from './parentQueries';
 
 interface ParentFormModalProps {

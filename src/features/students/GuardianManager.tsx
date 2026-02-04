@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import {UserCheck, Shield, AlertCircle, X, Users} from 'lucide-react';
+import { UserCheck, Shield, AlertCircle, X, Users } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import type {Student} from '../../types/api';
+import type { Student } from './types';
 import { useSetGuardian, useRemoveGuardian } from './studentQueries';
 import { useGuardians } from '../guardians/guardianQueries';
 
@@ -43,20 +43,20 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
         return (
             <div className="mt-6">
                 <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                    <Shield size={18} className="text-green-600"/> Wali Utama (Penanggung Jawab)
+                    <Shield size={18} className="text-green-600" /> Wali Utama (Penanggung Jawab)
                 </h3>
 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex justify-between items-center">
                     <div>
                         <p className="text-sm font-bold text-green-900">{student.guardian.full_name}</p>
                         <div className="flex gap-2 text-xs text-green-700 mt-1">
-                 <span className="bg-green-200 px-2 py-0.5 rounded uppercase font-semibold">
-                    {student.guardian.relationship || 'WALI'}
-                 </span>
+                            <span className="bg-green-200 px-2 py-0.5 rounded uppercase font-semibold">
+                                {student.guardian.relationship || 'WALI'}
+                            </span>
                             {/* Tampilkan Label Tipe Data */}
                             <span className="bg-white border border-green-200 px-2 py-0.5 rounded uppercase text-[10px] text-gray-500">
-                    DATA: {student.guardian.type === 'parent' ? 'ORANG TUA' : 'WALI LAIN'}
-                 </span>
+                                DATA: {student.guardian.type === 'parent' ? 'ORANG TUA' : 'WALI LAIN'}
+                            </span>
                             <span className="font-mono ml-1">{student.guardian.phone_number}</span>
                         </div>
                     </div>
@@ -78,12 +78,12 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
     return (
         <div className="mt-6">
             <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                <Shield size={18} className="text-gray-400"/> Wali Utama
+                <Shield size={18} className="text-gray-400" /> Wali Utama
             </h3>
 
             {!isSelecting ? (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-                    <UserCheck size={24} className="mx-auto text-gray-400 mb-2"/>
+                    <UserCheck size={24} className="mx-auto text-gray-400 mb-2" />
                     <p className="text-sm text-gray-600 mb-3">Belum ada wali utama yang ditetapkan.</p>
                     <Button onClick={() => setIsSelecting(true)}>
                         Tetapkan Wali
@@ -137,7 +137,7 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
                                     </div>
                                 ) : (
                                     <div className="text-center py-6 text-gray-400">
-                                        <AlertCircle size={24} className="mx-auto mb-2 opacity-50"/>
+                                        <AlertCircle size={24} className="mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">Belum ada data keluarga.</p>
                                     </div>
                                 )}
@@ -174,7 +174,7 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
                                     </div>
                                 ) : (
                                     <div className="text-center py-6 text-gray-400">
-                                        <Shield size={24} className="mx-auto mb-2 opacity-50"/>
+                                        <Shield size={24} className="mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">Database wali kosong.</p>
                                         <p className="text-xs mt-1">Input data di menu "Data Wali" dulu.</p>
                                     </div>

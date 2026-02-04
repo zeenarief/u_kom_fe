@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type { Employee, EmployeeFormInput } from '../../types/api';
+import type { Employee, EmployeeFormInput } from './types';
 import { useCreateEmployee, useUpdateEmployee } from './employeeQueries';
 
 interface Props {
@@ -25,8 +25,8 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
                 const fields: (keyof EmployeeFormInput)[] = ['full_name', 'nip', 'job_title', 'nik', 'gender', 'phone_number', 'address', 'employment_status'];
                 fields.forEach(f => setValue(f, employeeToEdit[f as keyof Employee] as string));
                 // Handle Tanggal
-                if(employeeToEdit.date_of_birth) setValue('date_of_birth', employeeToEdit.date_of_birth.split('T')[0]);
-                if(employeeToEdit.join_date) setValue('join_date', employeeToEdit.join_date.split('T')[0]);
+                if (employeeToEdit.date_of_birth) setValue('date_of_birth', employeeToEdit.date_of_birth.split('T')[0]);
+                if (employeeToEdit.join_date) setValue('join_date', employeeToEdit.join_date.split('T')[0]);
             } else {
                 reset({});
             }
@@ -38,8 +38,8 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
         // tapi backend Go biasanya handle empty string ok.
         // Format tanggal ISO
         const payload = { ...data };
-        if (payload.date_of_birth) payload.date_of_birth = `${payload.date_of_birth}T00:00:00Z`;
-        if (payload.join_date) payload.join_date = `${payload.join_date}T00:00:00Z`;
+        if (payload.date_of_birth) payload.date_of_birth = `${payload.date_of_birth} T00:00:00Z`;
+        if (payload.join_date) payload.join_date = `${payload.join_date} T00:00:00Z`;
 
         if (isEditMode && employeeToEdit) {
             updateMutation.mutate({ id: employeeToEdit.id, data: payload });

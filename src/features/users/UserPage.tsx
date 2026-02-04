@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Eye } from 'lucide-react';
 import { useUsers, useDeleteUser } from './userQueries';
-import type {User} from '../../types/api';
+import type { User } from './types';
 import Button from '../../components/ui/Button';
 import UserFormModal from './UserFormModal';
 import UserDetailModal from './UserDetailModal';
@@ -66,60 +66,60 @@ export default function UserPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3">User Info</th>
-                            <th className="px-6 py-3">Role</th>
-                            <th className="px-6 py-3">Status</th>
-                            <th className="px-6 py-3 text-right">Aksi</th>
-                        </tr>
+                            <tr>
+                                <th className="px-6 py-3">User Info</th>
+                                <th className="px-6 py-3">Role</th>
+                                <th className="px-6 py-3">Status</th>
+                                <th className="px-6 py-3 text-right">Aksi</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {users?.map((user) => (
-                            <tr key={user.id} className="bg-white border-b hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                            {user.name.charAt(0).toUpperCase()}
+                            {users?.map((user) => (
+                                <tr key={user.id} className="bg-white border-b hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                                {user.name.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">{user.name}</div>
+                                                <div className="text-xs text-gray-500">@{user.username}</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="font-medium text-gray-900">{user.name}</div>
-                                            <div className="text-xs text-gray-500">@{user.username}</div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-wrap gap-1">
+                                            {user.roles?.map(role => (
+                                                <span key={role.id} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">
+                                                    {role.name}
+                                                </span>
+                                            ))}
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex flex-wrap gap-1">
-                                        {user.roles?.map(role => (
-                                            <span key={role.id} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">
-                                              {role.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        {/* Ubah tombol Edit jadi Eye */}
-                                        <button
-                                            onClick={() => handleViewDetail(user.id)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="Lihat Detail"
-                                        >
-                                            <Eye size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(user.id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Hapus User"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            {/* Ubah tombol Edit jadi Eye */}
+                                            <button
+                                                onClick={() => handleViewDetail(user.id)}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Lihat Detail"
+                                            >
+                                                <Eye size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user.id)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Hapus User"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

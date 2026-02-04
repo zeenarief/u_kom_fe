@@ -3,7 +3,8 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type { Classroom, ClassroomFormInput } from '../../types/api';
+import type { Classroom, ClassroomFormInput } from './types';
+
 import { useCreateClassroom, useUpdateClassroom } from './classroomQueries';
 import { useEmployees } from '../employees/employeeQueries'; // Asumsi Anda sudah punya ini
 

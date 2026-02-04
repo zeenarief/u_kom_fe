@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import {Plus, Trash2, Search, GraduationCap, Eye, Download, Printer} from 'lucide-react'; // Ganti Pencil dengan Eye
-import {useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF} from './studentQueries';
-import type { Student } from '../../types/api';
+import { Plus, Trash2, Search, GraduationCap, Eye, Download, Printer } from 'lucide-react'; // Ganti Pencil dengan Eye
+import { useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF } from './studentQueries';
+import type { Student } from './types';
 import Button from '../../components/ui/Button';
 import StudentFormModal from './StudentFormModal';
 import StudentDetailModal from './StudentDetailModal';

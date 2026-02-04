@@ -2,7 +2,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type { ScheduleFormInput } from '../../types/api';
+import type { ScheduleFormInput } from './types';
 import { useCreateSchedule } from './scheduleQueries';
 import { useAssignmentsByClass } from '../assignments/assignmentQueries'; // Reuse query assignments
 

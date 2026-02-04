@@ -3,7 +3,8 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import type { User } from '../../types/api';
+import type { User } from './types';
+
 import { useCreateUser, useUpdateUser, useRoles, type UpdateUserPayload } from './userQueries';
 
 interface UserFormInput {

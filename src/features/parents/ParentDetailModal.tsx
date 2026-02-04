@@ -2,7 +2,7 @@ import { Edit, User, MapPin, Briefcase, Phone, ShieldCheck, Unlink } from 'lucid
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useParentDetail, useUnlinkParentFromUser } from './parentQueries';
-import type {Parent} from '../../types/api';
+import type { Parent } from './types';
 import ParentUserLinker from './ParentUserLinker';
 
 interface ParentDetailModalProps {
@@ -52,12 +52,12 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">{parent.full_name}</h2>
                         <div className="flex gap-2 mt-1">
-                <span className={`text-xs px-2 py-0.5 rounded ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
-                </span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                                {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
+                            </span>
                             <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase">
-                    {parent.marital_status || '-'}
-                </span>
+                                {parent.marital_status || '-'}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                 {/* Kontak */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <Phone size={18} className="text-purple-500"/> Kontak
+                        <Phone size={18} className="text-purple-500" /> Kontak
                     </h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg">
                         <DetailRow label="No. Handphone" value={parent.phone_number} />
@@ -76,7 +76,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                 {/* Pekerjaan */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <Briefcase size={18} className="text-purple-500"/> Pekerjaan & Pendidikan
+                        <Briefcase size={18} className="text-purple-500" /> Pekerjaan & Pendidikan
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                         <DetailRow label="Pekerjaan" value={parent.occupation} />
@@ -88,7 +88,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                 {/* Data Pribadi */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <User size={18} className="text-purple-500"/> Data Pribadi
+                        <User size={18} className="text-purple-500" /> Data Pribadi
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                         <DetailRow label="NIK" value={parent.nik} />
@@ -101,7 +101,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                 {/* Alamat */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <MapPin size={18} className="text-purple-500"/> Alamat
+                        <MapPin size={18} className="text-purple-500" /> Alamat
                     </h3>
                     <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
                         <p>{parent.address}</p>
@@ -114,7 +114,7 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
                 {/* Akun Sistem */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <ShieldCheck size={18} className="text-purple-500"/> Akun Sistem
+                        <ShieldCheck size={18} className="text-purple-500" /> Akun Sistem
                     </h3>
 
                     {parent.user ? (

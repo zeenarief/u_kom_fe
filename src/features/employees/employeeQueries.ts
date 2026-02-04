@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type { ApiResponse, Employee, EmployeeFormInput, ApiError } from '../../types/api';
+import type { ApiResponse, ApiError } from '../../types/api';
+import type { Employee, EmployeeFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List ===

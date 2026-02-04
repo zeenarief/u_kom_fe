@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GraduationCap, User, Mail, Lock, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../lib/axios'; // Gunakan axios instance kita
-import type {ApiError, RegisterRequest} from '../types/api';
+import type { RegisterRequest } from '../types/auth';
+import type { ApiError } from '../types/api';
 import { AxiosError } from 'axios';
 
 
@@ -65,7 +66,7 @@ export default function RegisterPage() {
                                 <input
                                     {...register('name', { required: 'Nama lengkap wajib diisi' })}
                                     type="text"
-                                    className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.name ? 'border-red-300' : 'border-gray-300'}`}
+                                    className={`block w - full pl - 10 pr - 3 py - 2 border rounded - md focus: outline - none focus: ring - blue - 500 focus: border - blue - 500 sm: text - sm ${errors.name ? 'border-red-300' : 'border-gray-300'} `}
                                     placeholder="Contoh: Budi Santoso"
                                 />
                             </div>
@@ -85,7 +86,7 @@ export default function RegisterPage() {
                                         minLength: { value: 3, message: 'Minimal 3 karakter' }
                                     })}
                                     type="text"
-                                    className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.username ? 'border-red-300' : 'border-gray-300'}`}
+                                    className={`block w - full pl - 10 pr - 3 py - 2 border rounded - md focus: outline - none focus: ring - blue - 500 focus: border - blue - 500 sm: text - sm ${errors.username ? 'border-red-300' : 'border-gray-300'} `}
                                     placeholder="budi123"
                                 />
                             </div>
@@ -105,7 +106,7 @@ export default function RegisterPage() {
                                         pattern: { value: /^\S+@\S+$/i, message: 'Format email salah' }
                                     })}
                                     type="email"
-                                    className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.email ? 'border-red-300' : 'border-gray-300'}`}
+                                    className={`block w - full pl - 10 pr - 3 py - 2 border rounded - md focus: outline - none focus: ring - blue - 500 focus: border - blue - 500 sm: text - sm ${errors.email ? 'border-red-300' : 'border-gray-300'} `}
                                     placeholder="email@contoh.com"
                                 />
                             </div>
@@ -130,7 +131,7 @@ export default function RegisterPage() {
                                         }
                                     })}
                                     type="password"
-                                    className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.password ? 'border-red-300' : 'border-gray-300'}`}
+                                    className={`block w - full pl - 10 pr - 3 py - 2 border rounded - md focus: outline - none focus: ring - blue - 500 focus: border - blue - 500 sm: text - sm ${errors.password ? 'border-red-300' : 'border-gray-300'} `}
                                     placeholder="********"
                                 />
                             </div>

@@ -5,10 +5,11 @@ import toast from 'react-hot-toast';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { AxiosError } from 'axios';
-import type {ApiError} from '../../types/api';
+import type { ApiError } from '../../types/api';
+import type { LoginRequest, AuthResponse } from '../../types/auth';
 import api from '../../lib/axios';
 import { useAuthStore } from '../../store/authStore';
-import type {LoginRequest, ApiResponse, AuthResponse} from '../../types/api';
+import type { ApiResponse } from '../../types/api';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 

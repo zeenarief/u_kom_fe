@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {Shield, Check, Plus, Pencil, Trash2, Save} from 'lucide-react';
 import {useRoles, usePermissions, useRoleDetail, useSyncRolePermissions, useDeleteRole} from './roleQueries';
-import type {Permission, Role, RoleDetail} from '../../types/api';
+import type { Role, Permission, RoleDetail } from './types';
 import Button from '../../components/ui/Button';
 import RoleFormModal from './RoleFormModal';
 
@@ -162,14 +162,14 @@ export default function RolePage() {
                             <div
                                 key={role.id}
                                 onClick={() => setSelectedRoleId(role.id)}
-                                className={`group w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-colors cursor-pointer border ${
-                                    selectedRoleId === role.id
-                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                        : 'hover:bg-gray-50 text-gray-700 border-transparent'
-                                }`}
+                                className={`group w - full text - left px - 4 py - 3 rounded - lg flex items - center justify - between transition - colors cursor - pointer border ${
+    selectedRoleId === role.id
+        ? 'bg-blue-50 text-blue-700 border-blue-200'
+        : 'hover:bg-gray-50 text-gray-700 border-transparent'
+} `}
                             >
                                 <div className="flex items-center gap-3 overflow-hidden">
-                                    <Shield size={18} className={`shrink-0 ${selectedRoleId === role.id ? 'fill-blue-200' : ''}`}/>
+                                    <Shield size={18} className={`shrink - 0 ${ selectedRoleId === role.id ? 'fill-blue-200' : '' } `}/>
                                     <div className="truncate">
                                         <p className="font-medium text-sm">{role.name}</p>
                                         {/* Tampilkan deskripsi pendek jika ada */}
@@ -178,7 +178,7 @@ export default function RolePage() {
                                 </div>
 
                                 {/* Action Buttons (Muncul saat hover atau active) */}
-                                <div className={`flex items-center gap-1 ${selectedRoleId === role.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+                                <div className={`flex items - center gap - 1 ${ selectedRoleId === role.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' } transition - opacity`}>
                                     <button
                                         onClick={(e) => handleEdit(e, role)}
                                         className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-white rounded shadow-sm"

@@ -1,7 +1,8 @@
 // src/store/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type {User, AuthResponse} from '../types/api';
+import type { User } from '../features/users/types';
+import type { AuthResponse } from '../types/auth';
 
 interface AuthState {
     user: User | null;

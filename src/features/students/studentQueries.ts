@@ -1,15 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
+import type { ApiResponse, ApiError } from '../../types/api';
 import type {
-    ApiResponse,
     Student,
     StudentFormInput,
-    ApiError,
     LinkUserRequest,
-    StudentParentSyncRequest, SetGuardianRequest
-} from '../../types/api';
-import toast from 'react-hot-toast';
+    StudentParentSyncRequest,
+    SetGuardianRequest
+} from './types'; import toast from 'react-hot-toast';
 
 // === READ: List Siswa ===
 export const useStudents = () => {
@@ -268,7 +267,7 @@ export const useExportStudentBiodata = () => {
     return useMutation({
         // Ubah parameter input menjadi object { id, name }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        mutationFn: async ({ id, name: _name}: { id: string; name: string }) => {
+        mutationFn: async ({ id, name: _name }: { id: string; name: string }) => {
             const response = await api.get(`/students/${id}/export/pdf`, {
                 responseType: 'blob',
             });

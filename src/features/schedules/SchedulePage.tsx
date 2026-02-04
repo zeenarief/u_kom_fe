@@ -6,7 +6,8 @@ import Button from '../../components/ui/Button';
 import { Plus, Trash2, Calendar, Clock, User, BookOpen, ClipboardList } from 'lucide-react';
 import ScheduleFormModal from './ScheduleFormModal';
 import AttendanceModal from '../attendances/AttendanceModal';
-import type { Schedule } from '../../types/api';
+import type { Schedule } from './types';
+
 
 export default function SchedulePage() {
     const [selectedYear, setSelectedYear] = useState<string>('');
@@ -29,7 +30,7 @@ export default function SchedulePage() {
     const deleteMutation = useDeleteSchedule(selectedClassId);
 
     const handleDelete = (id: string) => {
-        if(confirm('Hapus jadwal ini?')) deleteMutation.mutate(id);
+        if (confirm('Hapus jadwal ini?')) deleteMutation.mutate(id);
     };
 
     // Helper: Grouping jadwal by Hari
@@ -125,11 +126,11 @@ export default function SchedulePage() {
                                                         {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
                                                     </div>
                                                     <div className="font-bold text-gray-800 text-sm mb-1 flex items-center gap-2">
-                                                        <BookOpen size={14} className="text-gray-400"/>
+                                                        <BookOpen size={14} className="text-gray-400" />
                                                         {s.subject_name}
                                                     </div>
                                                     <div className="text-xs text-gray-600 flex items-center gap-2">
-                                                        <User size={14} className="text-gray-400"/>
+                                                        <User size={14} className="text-gray-400" />
                                                         {s.teacher_name}
                                                     </div>
                                                 </div>

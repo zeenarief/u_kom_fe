@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useClassroomDetail } from '../classrooms/classroomQueries';
 import { useSubmitAttendance, useCheckAttendanceSession } from './attendanceQueries';
-import type { Schedule } from '../../types/api';
+import type { Schedule } from '../schedules/types';
 import { Check, Loader2 } from 'lucide-react';
 
 interface Props {
@@ -194,42 +194,42 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                     ) : (
                         <table className="w-full text-sm border-collapse">
                             <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th className="px-3 py-2 text-left font-semibold text-gray-700">Nama Siswa</th>
-                                <th className="px-3 py-2 text-center font-semibold text-gray-700">Status</th>
-                            </tr>
+                                <tr>
+                                    <th className="px-3 py-2 text-left font-semibold text-gray-700">Nama Siswa</th>
+                                    <th className="px-3 py-2 text-center font-semibold text-gray-700">Status</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                            {studentList.map((student) => (
-                                <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-3 py-3">
-                                        <p className="font-medium text-gray-900">{student.full_name}</p>
-                                        <p className="text-xs text-gray-500">{student.nisn}</p>
-                                    </td>
-                                    <td className="px-3 py-3">
-                                        <div className="flex justify-center gap-1">
-                                            {STATUSES.map((status) => {
-                                                const isSelected = (attendanceMap[student.id] || 'PRESENT') === status.value;
-                                                return (
-                                                    <button
-                                                        key={status.value}
-                                                        type="button"
-                                                        onClick={() => handleStatusChange(student.id, status.value)}
-                                                        className={`
+                                {studentList.map((student) => (
+                                    <tr key={student.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-3 py-3">
+                                            <p className="font-medium text-gray-900">{student.full_name}</p>
+                                            <p className="text-xs text-gray-500">{student.nisn}</p>
+                                        </td>
+                                        <td className="px-3 py-3">
+                                            <div className="flex justify-center gap-1">
+                                                {STATUSES.map((status) => {
+                                                    const isSelected = (attendanceMap[student.id] || 'PRESENT') === status.value;
+                                                    return (
+                                                        <button
+                                                            key={status.value}
+                                                            type="button"
+                                                            onClick={() => handleStatusChange(student.id, status.value)}
+                                                            className={`
                                                                 px-3 py-1.5 rounded-md text-xs font-bold border transition-all duration-200
                                                                 ${isSelected
-                                                            ? status.color + ' ring-2 ring-offset-1 ring-blue-300 shadow-sm transform scale-105'
-                                                            : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-100'}
+                                                                    ? status.color + ' ring-2 ring-offset-1 ring-blue-300 shadow-sm transform scale-105'
+                                                                    : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-100'}
                                                             `}
-                                                    >
-                                                        {status.label}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                                        >
+                                                            {status.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     )}

@@ -2,12 +2,12 @@ import { Edit, Mail, Shield, Key } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useUserDetail } from './userQueries';
-import type {User as UserType} from '../../types/api';
+import type { User } from './types';
 
 interface Props {
     userId: string | null;
     onClose: () => void;
-    onEdit: (user: UserType) => void;
+    onEdit: (user: User) => void;
 }
 
 const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string; value?: string | null }) => (
@@ -54,8 +54,8 @@ export default function UserDetailModal({ userId, onClose, onEdit }: Props) {
                             <div className="flex flex-wrap gap-2 mt-1">
                                 {user.roles && user.roles.length > 0 ? user.roles.map(r => (
                                     <span key={r.id} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium border border-blue-200">
-                                {r.name}
-                            </span>
+                                        {r.name}
+                                    </span>
                                 )) : <span className="text-gray-400 italic text-sm">Tidak ada role</span>}
                             </div>
                         </div>

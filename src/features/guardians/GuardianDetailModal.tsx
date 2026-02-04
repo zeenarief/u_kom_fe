@@ -2,7 +2,7 @@ import { Edit, MapPin, Phone, ShieldCheck, Unlink } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useGuardianDetail, useUnlinkGuardianFromUser } from './guardianQueries';
-import type {Guardian} from '../../types/api';
+import type { Guardian } from './types';
 import GuardianUserLinker from './GuardianUserLinker';
 
 interface GuardianDetailModalProps {
@@ -24,7 +24,7 @@ export default function GuardianDetailModal({ guardianId, onClose, onEdit }: Gua
 
     const handleUnlink = () => {
         if (!guardian) return;
-        if (confirm(`Putuskan akun ${guardian.user?.username}?`)) {
+        if (confirm(`Putuskan akun ${ guardian.user?.username }?`)) {
             unlinkMutation.mutate(guardian.id);
         }
     };

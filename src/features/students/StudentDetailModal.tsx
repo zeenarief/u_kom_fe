@@ -1,8 +1,8 @@
-import {Edit, User, MapPin, CreditCard, ShieldCheck, Unlink, Printer} from 'lucide-react';
+import { Edit, User, MapPin, CreditCard, ShieldCheck, Unlink, Printer } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
-import {useExportStudentBiodata, useStudentDetail, useUnlinkStudentFromUser} from './studentQueries';
-import type {Student} from '../../types/api';
+import { useExportStudentBiodata, useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
+import type { Student } from './types';
 import UserLinker from "./UserLinker.tsx";
 import FamilyManager from './FamilyManager';
 import GuardianManager from './GuardianManager';
@@ -29,7 +29,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
 
     // Handler Download
     const handlePrintBiodata = () => {
-        if(studentId && student) {
+        if (studentId && student) {
             // Kirim ID dan Nama ke mutation
             exportBiodataMutation.mutate({
                 id: studentId,
@@ -108,7 +108,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                 {/* Section Data Akademik */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <CreditCard size={18} className="text-blue-500"/> Data Akademik
+                        <CreditCard size={18} className="text-blue-500" /> Data Akademik
                     </h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg">
                         <DetailRow label="NIM / No. Induk" value={student.nim} />
@@ -119,7 +119,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                 {/* Section Data Pribadi */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <User size={18} className="text-blue-500"/> Identitas Pribadi
+                        <User size={18} className="text-blue-500" /> Identitas Pribadi
                     </h3>
                     <div className="grid grid-cols-1 gap-1">
                         <DetailRow label="Nama Lengkap" value={student.full_name} />
@@ -140,7 +140,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                 {/* Section Alamat */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <MapPin size={18} className="text-blue-500"/> Alamat Domisili
+                        <MapPin size={18} className="text-blue-500" /> Alamat Domisili
                     </h3>
                     <div className="bg-gray-50 p-3 rounded-lg space-y-2">
                         <p className="text-sm font-medium text-gray-900">{student.address}</p>
@@ -156,7 +156,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
                 {/* Section Akun Login */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <ShieldCheck size={18} className="text-blue-500"/> Akun Sistem
+                        <ShieldCheck size={18} className="text-blue-500" /> Akun Sistem
                     </h3>
 
                     {student.user ? (

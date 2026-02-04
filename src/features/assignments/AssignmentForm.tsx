@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useSubjects } from '../subjects/subjectQueries';
 import { useEmployees } from '../employees/employeeQueries';
 import { useCreateAssignment } from './assignmentQueries';
-import type { AssignmentFormInput } from '../../types/api';
+import type { AssignmentFormInput } from './types';
 import Button from '../../components/ui/Button';
 
 interface Props {

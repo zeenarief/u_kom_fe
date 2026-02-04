@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/axios';
-import type { ApiResponse, Classroom, ClassroomDetail, ClassroomFormInput, AddStudentsRequest } from '../../types/api';
+import type { ApiResponse } from '../../types/api';
+import type {
+    Classroom,
+    ClassroomDetail,
+    ClassroomFormInput,
+    AddStudentsRequest
+} from './types';
 import toast from 'react-hot-toast';
 
 // GET LIST (Filter by Academic Year)
