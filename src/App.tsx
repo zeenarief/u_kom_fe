@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import AlertModal from './components/ui/AlertModal';
 import LoginPage from './pages/LoginPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import { useAuthStore } from './store/authStore';
-import type {JSX} from "react";
+import type { JSX } from "react";
 import UserPage from "./features/users/UserPage";
 import StudentPage from "./features/students/StudentPage";
 import RolePage from "./features/roles/RolePage";
@@ -28,7 +29,19 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 function App() {
     return (
         <>
-            <Toaster position="top-center" reverseOrder={false} />
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+                containerStyle={{
+                    zIndex: 999999, // Ensure container is highest
+                }}
+                toastOptions={{
+                    style: {
+                        zIndex: 99999,
+                    },
+                }}
+            />
+            <AlertModal />
             <BrowserRouter>
                 <Routes>
                     {/* Public Routes */}

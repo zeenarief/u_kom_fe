@@ -1,6 +1,7 @@
 // src/lib/axios.ts
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { useAlertStore } from '../store/alertStore';
 
 // URL Backend Golang (Pastikan portnya sesuai)
 const BASE_URL = 'http://localhost:8080/api/v1';
@@ -29,6 +30,26 @@ api.interceptors.response.use(
     (response) => response, // Jika sukses, loloskan
     async (error) => {
         const originalRequest = error.config;
+        const { showAlert } = useAlertStore.getState(); // Get action without hook
+
+        // Handle Network Errors (Server Down / No Internet)
+        if (!error.response && error.code === "ERR_NETWORK") {
+            showAlert(
+                "Koneksi Gagal",
+                "Tidak dapat terhubung ke server. Periksa koneksi internet Anda atau coba lagi nanti.",
+                "error"
+            );
+            return Promise.reject(error);
+        }
+
+        // Handle 500 Internal Server Error
+        if (error.response?.status === 500) {
+            showAlert(
+                "Server Error",
+                "Terjadi kesalahan internal pada server. Silakan hubungi admin.",
+                "error"
+            );
+        }
 
         // Jika error 401 (Unauthorized) dan belum pernah diretry sebelumnya
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -62,7 +83,16 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 // Jika refresh gagal (token benar-benar hangus), logout paksa
                 useAuthStore.getState().logout();
-                // Opsional: Redirect ke login page bisa dihandle di komponen React
+
+                showAlert(
+                    "Sesi Habis",
+                    "Sesi login Anda telah berakhir. Silakan login kembali untuk melanjutkan.",
+                    "warning",
+                    () => {
+                        window.location.href = '/login';
+                    }
+                );
+
                 return Promise.reject(refreshError);
             }
         }
