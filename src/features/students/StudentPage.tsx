@@ -6,6 +6,8 @@ import Button from '../../components/ui/Button';
 import StudentFormModal from './StudentFormModal';
 import StudentDetailModal from './StudentDetailModal';
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function StudentPage() {
     const exportMutation = useExportStudents();
     const exportPDFMutation = useExportStudentsPDF();
@@ -17,7 +19,11 @@ export default function StudentPage() {
     // State Modal Detail
     const [detailId, setDetailId] = useState<string | null>(null);
 
-    const { data: students, isLoading, isError } = useStudents();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: students, isLoading, isError } = useStudents(debouncedSearch);
     const deleteMutation = useDeleteStudent();
 
     // 1. Buka Form Create
@@ -90,6 +96,8 @@ export default function StudentPage() {
                             type="text"
                             placeholder="Cari nama, NISN, atau Kota..."
                             className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
                 </div>

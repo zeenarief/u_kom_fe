@@ -6,12 +6,18 @@ import Button from '../../components/ui/Button';
 import GuardianFormModal from './GuardianFormModal';
 import GuardianDetailModal from './GuardianDetailModal'; // Import Detail Modal
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function GuardianPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null); // State untuk Detail ID
     const [guardianToEdit, setGuardianToEdit] = useState<Guardian | null>(null);
 
-    const { data: guardians, isLoading, isError } = useGuardians();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: guardians, isLoading, isError } = useGuardians(debouncedSearch);
     const deleteMutation = useDeleteGuardian();
 
     // Buka Form Create
@@ -61,6 +67,8 @@ export default function GuardianPage() {
                             type="text"
                             placeholder="Cari nama wali..."
                             className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
                 </div>

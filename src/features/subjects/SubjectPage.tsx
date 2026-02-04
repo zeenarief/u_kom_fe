@@ -5,12 +5,17 @@ import type { Subject } from './types';
 import Button from '../../components/ui/Button';
 import SubjectFormModal from './SubjectFormModal';
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function SubjectPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editData, setEditData] = useState<Subject | null>(null);
-    const [search, setSearch] = useState('');
 
-    const { data: subjects, isLoading, isError } = useSubjects();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: subjects, isLoading, isError } = useSubjects(debouncedSearch);
     const deleteMutation = useDeleteSubject();
 
     const handleCreate = () => {
@@ -26,13 +31,6 @@ export default function SubjectPage() {
     const handleDelete = (id: string) => {
         if (confirm('Yakin hapus mata pelajaran ini?')) deleteMutation.mutate(id);
     };
-
-    // Filter Client Side
-    const filteredSubjects = subjects?.filter(s =>
-        s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.code.toLowerCase().includes(search.toLowerCase()) ||
-        s.type.toLowerCase().includes(search.toLowerCase())
-    );
 
     if (isLoading) return <div className="p-8 text-center">Loading data mapel...</div>;
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;
@@ -75,7 +73,7 @@ export default function SubjectPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {filteredSubjects?.map((item) => (
+                            {subjects?.map((item) => (
                                 <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 font-mono font-bold text-blue-600">
                                         {item.code}
@@ -114,7 +112,7 @@ export default function SubjectPage() {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredSubjects?.length === 0 && (
+                            {subjects?.length === 0 && (
                                 <tr><td colSpan={5} className="text-center py-8 text-gray-400">Data tidak ditemukan.</td></tr>
                             )}
                         </tbody>

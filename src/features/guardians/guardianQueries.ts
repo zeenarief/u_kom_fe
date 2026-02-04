@@ -6,11 +6,12 @@ import type { Guardian, GuardianFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List Guardians ===
-export const useGuardians = () => {
+export const useGuardians = (search?: string) => {
     return useQuery({
-        queryKey: ['guardians'],
+        queryKey: ['guardians', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<Guardian[]>>('/guardians');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<Guardian[]>>('/guardians', { params });
             return response.data.data;
         },
     });

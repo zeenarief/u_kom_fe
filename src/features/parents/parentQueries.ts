@@ -6,11 +6,12 @@ import type { Parent, ParentFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List Parents ===
-export const useParents = () => {
+export const useParents = (search?: string) => {
     return useQuery({
-        queryKey: ['parents'],
+        queryKey: ['parents', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<Parent[]>>('/parents');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<Parent[]>>('/parents', { params });
             return response.data.data;
         },
     });

@@ -6,12 +6,18 @@ import Button from '../../components/ui/Button';
 import EmployeeFormModal from './EmployeeFormModal';
 import EmployeeDetailModal from './EmployeeDetailModal';
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function EmployeePage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null);
     const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
 
-    const { data: employees, isLoading, isError } = useEmployees();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: employees, isLoading, isError } = useEmployees(debouncedSearch);
     const deleteMutation = useDeleteEmployee();
 
     const handleCreate = () => { setEmployeeToEdit(null); setIsFormOpen(true); };
@@ -36,41 +42,47 @@ export default function EmployeePage() {
                 <div className="p-4 border-b border-gray-200">
                     <div className="relative max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input type="text" placeholder="Cari nama atau NIP..." className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-teal-500"/>
+                        <input
+                            type="text"
+                            placeholder="Cari nama atau NIP..."
+                            className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-teal-500"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
                 </div>
 
                 <table className="w-full text-sm text-left text-gray-500">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3">Nama Lengkap</th>
-                        <th className="px-6 py-3">Jabatan</th>
-                        <th className="px-6 py-3">Status</th>
-                        <th className="px-6 py-3 text-right">Aksi</th>
-                    </tr>
+                        <tr>
+                            <th className="px-6 py-3">Nama Lengkap</th>
+                            <th className="px-6 py-3">Jabatan</th>
+                            <th className="px-6 py-3">Status</th>
+                            <th className="px-6 py-3 text-right">Aksi</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {employees?.map((e) => (
-                        <tr key={e.id} className="bg-white border-b hover:bg-gray-50">
-                            <td className="px-6 py-4 font-medium text-gray-900">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded bg-teal-100 flex items-center justify-center text-teal-600"><Briefcase size={16} /></div>
-                                    <div>
-                                        <div>{e.full_name}</div>
-                                        <div className="text-xs text-gray-400">{e.nip || '-'}</div>
+                        {employees?.map((e) => (
+                            <tr key={e.id} className="bg-white border-b hover:bg-gray-50">
+                                <td className="px-6 py-4 font-medium text-gray-900">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded bg-teal-100 flex items-center justify-center text-teal-600"><Briefcase size={16} /></div>
+                                        <div>
+                                            <div>{e.full_name}</div>
+                                            <div className="text-xs text-gray-400">{e.nip || '-'}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">{e.job_title}</td>
-                            <td className="px-6 py-4"><span className="bg-gray-100 px-2 py-1 rounded text-xs">{e.employment_status || '-'}</span></td>
-                            <td className="px-6 py-4 text-right">
-                                <div className="flex justify-end gap-2">
-                                    <button onClick={() => handleViewDetail(e.id)} className="text-blue-600 hover:bg-blue-50 p-2 rounded"><Eye size={18} /></button>
-                                    <button onClick={() => handleDelete(e.id)} className="text-red-600 hover:bg-red-50 p-2 rounded"><Trash2 size={18} /></button>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
+                                </td>
+                                <td className="px-6 py-4">{e.job_title}</td>
+                                <td className="px-6 py-4"><span className="bg-gray-100 px-2 py-1 rounded text-xs">{e.employment_status || '-'}</span></td>
+                                <td className="px-6 py-4 text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <button onClick={() => handleViewDetail(e.id)} className="text-blue-600 hover:bg-blue-50 p-2 rounded"><Eye size={18} /></button>
+                                        <button onClick={() => handleDelete(e.id)} className="text-red-600 hover:bg-red-50 p-2 rounded"><Trash2 size={18} /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

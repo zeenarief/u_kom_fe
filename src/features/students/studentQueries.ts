@@ -11,11 +11,12 @@ import type {
 } from './types'; import toast from 'react-hot-toast';
 
 // === READ: List Siswa ===
-export const useStudents = () => {
+export const useStudents = (search?: string) => {
     return useQuery({
-        queryKey: ['students'],
+        queryKey: ['students', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<Student[]>>('/students');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<Student[]>>('/students', { params });
             return response.data.data;
         },
     });

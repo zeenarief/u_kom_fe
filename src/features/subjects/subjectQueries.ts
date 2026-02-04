@@ -6,11 +6,12 @@ import type { Subject, SubjectFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ ===
-export const useSubjects = () => {
+export const useSubjects = (search?: string) => {
     return useQuery({
-        queryKey: ['subjects'],
+        queryKey: ['subjects', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<Subject[]>>('/subjects');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<Subject[]>>('/subjects', { params });
             return response.data.data;
         },
     });

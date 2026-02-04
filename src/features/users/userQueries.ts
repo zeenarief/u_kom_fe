@@ -8,11 +8,12 @@ import type { Role } from '../roles/types';
 import toast from 'react-hot-toast';
 
 // === READ: Ambil Semua User ===
-export const useUsers = () => {
+export const useUsers = (search?: string) => {
     return useQuery({
-        queryKey: ['users'],
+        queryKey: ['users', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<User[]>>('/users');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<User[]>>('/users', { params });
             return response.data.data;
         },
     });

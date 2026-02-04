@@ -6,12 +6,18 @@ import Button from '../../components/ui/Button';
 import UserFormModal from './UserFormModal';
 import UserDetailModal from './UserDetailModal';
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function UserPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null);
     const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
-    const { data: users, isLoading, isError } = useUsers();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: users, isLoading, isError } = useUsers(debouncedSearch);
     const deleteMutation = useDeleteUser();
 
     // -- Handlers --
@@ -59,6 +65,8 @@ export default function UserPage() {
                             type="text"
                             placeholder="Cari user..."
                             className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
                 </div>

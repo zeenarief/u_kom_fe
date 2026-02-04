@@ -6,11 +6,12 @@ import type { Employee, EmployeeFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List ===
-export const useEmployees = () => {
+export const useEmployees = (search?: string) => {
     return useQuery({
-        queryKey: ['employees'],
+        queryKey: ['employees', search],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<Employee[]>>('/employees');
+            const params = search ? { q: search } : {};
+            const response = await api.get<ApiResponse<Employee[]>>('/employees', { params });
             return response.data.data;
         },
     });

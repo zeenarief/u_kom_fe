@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import {Plus, Trash2, Search, Users, Eye} from 'lucide-react';
+import { Plus, Trash2, Search, Users, Eye } from 'lucide-react';
 import { useParents, useDeleteParent } from './parentQueries';
 import type { Parent } from './types';
 import Button from '../../components/ui/Button';
 import ParentFormModal from './ParentFormModal';
 import ParentDetailModal from './ParentDetailModal';
 
+import { useDebounce } from '../../hooks/useDebounce';
+
 export default function ParentPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null);
     const [parentToEdit, setParentToEdit] = useState<Parent | null>(null);
 
-    const { data: parents, isLoading, isError } = useParents();
+    // Search State
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
+
+    const { data: parents, isLoading, isError } = useParents(debouncedSearch);
     const deleteMutation = useDeleteParent();
 
     const handleCreate = () => {
@@ -53,7 +59,13 @@ export default function ParentPage() {
                 <div className="p-4 border-b border-gray-200">
                     <div className="relative max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input type="text" placeholder="Cari nama..." className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500"/>
+                        <input
+                            type="text"
+                            placeholder="Cari nama..."
+                            className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
                 </div>
 
@@ -61,54 +73,54 @@ export default function ParentPage() {
                     {/* TABLE */}
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3">Nama Lengkap</th>
-                            <th className="px-6 py-3">Gender</th>
-                            <th className="px-6 py-3">Kontak</th>
-                            <th className="px-6 py-3">Pekerjaan</th>
-                            <th className="px-6 py-3 text-right">Aksi</th>
-                        </tr>
+                            <tr>
+                                <th className="px-6 py-3">Nama Lengkap</th>
+                                <th className="px-6 py-3">Gender</th>
+                                <th className="px-6 py-3">Kontak</th>
+                                <th className="px-6 py-3">Pekerjaan</th>
+                                <th className="px-6 py-3 text-right">Aksi</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {parents?.map((parent) => (
-                            <tr key={parent.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-600">
-                                            <Users size={16} />
-                                        </div>
-                                        <div>
-                                            <div>{parent.full_name}</div>
-                                            <div className={`text - [10px] px - 1.5 py - 0.5 rounded inline - block mt - 0.5 ${ parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' } `}>
-                                                {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
+                            {parents?.map((parent) => (
+                                <tr key={parent.id} className="bg-white border-b hover:bg-gray-50">
+                                    <td className="px-6 py-4 font-medium text-gray-900">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-600">
+                                                <Users size={16} />
+                                            </div>
+                                            <div>
+                                                <div>{parent.full_name}</div>
+                                                <div className={`text - [10px] px - 1.5 py - 0.5 rounded inline - block mt - 0.5 ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} `}>
+                                                    {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {parent.gender === 'male' ? 'L' : parent.gender === 'female' ? 'P' : '-'}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span>{parent.phone_number || '-'}</span>
-                                        <span className="text-xs text-gray-400">{parent.email}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">{parent.occupation || '-'}</td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        {/* Tombol Mata */}
-                                        <button onClick={() => handleViewDetail(parent.id)} className="text-blue-600 hover:bg-blue-50 p-2 rounded">
-                                            <Eye size={18} />
-                                        </button>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {parent.gender === 'male' ? 'L' : parent.gender === 'female' ? 'P' : '-'}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-col">
+                                            <span>{parent.phone_number || '-'}</span>
+                                            <span className="text-xs text-gray-400">{parent.email}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">{parent.occupation || '-'}</td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            {/* Tombol Mata */}
+                                            <button onClick={() => handleViewDetail(parent.id)} className="text-blue-600 hover:bg-blue-50 p-2 rounded">
+                                                <Eye size={18} />
+                                            </button>
 
-                                        <button onClick={() => handleDelete(parent.id)} className="text-red-600 hover:bg-red-50 p-2 rounded">
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                            <button onClick={() => handleDelete(parent.id)} className="text-red-600 hover:bg-red-50 p-2 rounded">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
