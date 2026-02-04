@@ -419,6 +419,7 @@ export interface AttendanceSession {
     id: string;
     date: string;
     topic: string;
+    notes: string;
     schedule_info: Schedule;
     details: AttendanceDetail[];
     summary: { [key: string]: number }; // Contoh: { PRESENT: 20, SICK: 1 }

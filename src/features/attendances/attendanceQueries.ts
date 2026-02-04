@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
-import type { AttendanceSubmitRequest, ApiError } from '../../types/api';
+import type {AttendanceSubmitRequest, ApiError, AttendanceSession, ApiResponse} from '../../types/api';
 import toast from 'react-hot-toast';
 
 // === SUBMIT ATTENDANCE ===
@@ -12,10 +12,18 @@ export const useSubmitAttendance = (onSuccessCallback?: () => void) => {
             const response = await api.post('/attendances', data);
             return response.data.data;
         },
-        onSuccess: () => {
+        onSuccess: () => { // Ambil variables untuk tau schedule & date jika perlu
             toast.success('Presensi berhasil disimpan');
-            // Invalidate queries jika nanti kita punya list history presensi
+
+            // === PERBAIKAN DI SINI ===
+            // 1. Hapus cache spesifik untuk pengecekan sesi ini agar saat modal dibuka lagi, dia fetch ulang
+            queryClient.invalidateQueries({
+                queryKey: ['attendance-check']
+            });
+
+            // 2. Refresh history (jika ada list riwayat di halaman lain)
             queryClient.invalidateQueries({ queryKey: ['attendance-history'] });
+
             if (onSuccessCallback) onSuccessCallback();
         },
         onError: (err: AxiosError<ApiError>) => {
@@ -26,5 +34,22 @@ export const useSubmitAttendance = (onSuccessCallback?: () => void) => {
                 toast.error(msg || 'Gagal menyimpan presensi');
             }
         }
+    });
+};
+
+export const useCheckAttendanceSession = (scheduleId: string | undefined, date: string) => {
+    return useQuery({
+        queryKey: ['attendance-check', scheduleId, date],
+        queryFn: async () => {
+            if (!scheduleId || !date) return null;
+
+            const response = await api.get<ApiResponse<AttendanceSession | null>>(`/attendances/check?schedule_id=${scheduleId}&date=${date}`);
+
+            // PERBAIKAN: Gunakan '?? null'
+            // Jika response.data.data undefined, ganti jadi null.
+            return response.data.data ?? null;
+        },
+        enabled: !!scheduleId && !!date,
+        retry: false
     });
 };

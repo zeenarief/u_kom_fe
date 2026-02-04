@@ -4,9 +4,9 @@ import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useClassroomDetail } from '../classrooms/classroomQueries';
-import { useSubmitAttendance } from './attendanceQueries';
+import { useSubmitAttendance, useCheckAttendanceSession } from './attendanceQueries';
 import type { Schedule } from '../../types/api';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 
 interface Props {
     isOpen: boolean;
@@ -28,64 +28,102 @@ const STATUSES = [
     { value: 'ABSENT', label: 'Alpa', color: 'bg-red-100 text-red-700 border-red-200' },
 ];
 
+// Helper untuk tanggal lokal (WIB aman) format YYYY-MM-DD
+const getTodayString = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export default function AttendanceModal({ isOpen, onClose, schedule, classroomId }: Props) {
-    const { data: classroom, isLoading: loadingStudents } = useClassroomDetail(
-        isOpen ? classroomId : null
-    );
-
-    const [attendanceMap, setAttendanceMap] = useState<Record<string, string>>({});
-
-    // Ref untuk melacak apakah kita sudah inisialisasi data untuk kelas ini
-    const loadedClassIdRef = useRef<string | null>(null);
-
-    // SOLUSI 1: Hapus useEffect reset (yang menyebabkan error).
-    // Pindahkan logika reset ke fungsi handleClose di bawah.
-
-    // Logic Inisialisasi (Mengisi default 'PRESENT')
-    useEffect(() => {
-        // Cek 1: Data siswa harus ada
-        // Cek 2: Pastikan kita belum melakukan inisialisasi untuk kelas ID ini agar tidak loop
-        if (classroom?.students && classroom.id !== loadedClassIdRef.current) {
-
-            const initialMap: Record<string, string> = {};
-            classroom.students.forEach(s => {
-                initialMap[s.id] = 'PRESENT';
-            });
-
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setAttendanceMap(initialMap);
-
-            // Tandai bahwa kelas ini sudah di-load
-            loadedClassIdRef.current = classroom.id;
-        }
-    }, [classroom]);
-
-    // SOLUSI 2: Fungsi Reset dijalankan saat user menutup modal
-    const handleClose = () => {
-        // 1. Reset Ref agar nanti kalau dibuka lagi bisa init ulang
-        loadedClassIdRef.current = null;
-
-        // 2. Reset State Map
-        setAttendanceMap({});
-
-        // 3. Panggil prop onClose dari parent
-        onClose();
-    };
-
-    const submitMutation = useSubmitAttendance(() => {
-        handleClose(); // Gunakan handleClose agar state ter-reset setelah sukses submit
-    });
-
-    const { register, handleSubmit } = useForm<FormValues>({
+    // State Default untuk tanggal (Local Time)
+    // 1. Setup Form
+    const { register, handleSubmit, watch, reset } = useForm<FormValues>({
         defaultValues: {
-            date: new Date().toISOString().split('T')[0],
+            date: getTodayString(),
             topic: '',
             notes: ''
         }
     });
 
-    // Key unik untuk me-reset form input saat modal dibuka/tutup
-    const formKey = isOpen ? `open-${schedule?.id}` : 'closed';
+    // Watch tanggal agar re-fetch saat user ganti tanggal
+    const selectedDate = watch('date');
+
+    // 2. Fetch Data
+    const { data: classroom, isLoading: loadingStudents } = useClassroomDetail(isOpen ? classroomId : null);
+
+    // Fetch Existing Attendance (Check ke server)
+    const { data: existingSession, isLoading: loadingCheck } = useCheckAttendanceSession(
+        isOpen ? schedule?.id : undefined,
+        selectedDate
+    );
+
+    const [attendanceMap, setAttendanceMap] = useState<Record<string, string>>({});
+
+    // Ref untuk mencegah loop inisialisasi (Safety)
+    const processedSessionRef = useRef<string | null>(null);
+
+    // 3. Logic Sinkronisasi State (Edit vs Create)
+    useEffect(() => {
+        if (!isOpen || !classroom?.students) return;
+
+        // Buat unique key untuk menandai sesi ini: ID_Jadwal + Tanggal + Status_Ada_Data
+        const sessionKey = `${schedule?.id}-${selectedDate}-${existingSession ? 'EDIT' : 'NEW'}`;
+
+        // Jika kita sudah memproses sesi ini, skip (mencegah re-render loop)
+        if (processedSessionRef.current === sessionKey) return;
+
+        if (existingSession) {
+
+            // Isi form header
+            reset({
+                date: selectedDate,
+                topic: existingSession.topic,
+                notes: existingSession.notes || ''
+            });
+
+            // Isi map status siswa
+            const newMap: Record<string, string> = {};
+            existingSession.details.forEach(d => {
+                newMap[d.student_id] = d.status;
+            });
+            setAttendanceMap(newMap);
+
+        } else {
+
+            // Reset form header (kecuali tanggal)
+            reset({
+                date: selectedDate,
+                topic: '',
+                notes: ''
+            });
+
+            // Default semua siswa PRESENT
+            const newMap: Record<string, string> = {};
+            classroom.students.forEach(s => {
+                newMap[s.id] = 'PRESENT';
+            });
+            setAttendanceMap(newMap);
+        }
+
+        // Tandai sudah diproses
+        processedSessionRef.current = sessionKey;
+
+    }, [isOpen, existingSession, classroom, reset, selectedDate, schedule?.id]);
+
+
+    // Reset saat modal ditutup
+    const handleClose = () => {
+        processedSessionRef.current = null; // Reset ref
+        onClose();
+        setAttendanceMap({});
+    };
+
+    const submitMutation = useSubmitAttendance(() => {
+        handleClose();
+    });
 
     const handleStatusChange = (studentId: string, status: string) => {
         setAttendanceMap(prev => ({ ...prev, [studentId]: status }));
@@ -99,11 +137,6 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
             status: attendanceMap[s.id] || 'PRESENT',
             notes: ''
         })) || [];
-
-        if (studentsPayload.length === 0) {
-            alert("Tidak ada siswa untuk diabsen.");
-            return;
-        }
 
         const payload = {
             schedule_id: schedule.id,
@@ -119,47 +152,51 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
     if (!schedule) return null;
 
     const studentList = classroom?.students || [];
+    const isFetching = loadingStudents || loadingCheck;
 
     return (
-        // Gunakan handleClose di sini, BUKAN onClose langsung
         <Modal isOpen={isOpen} onClose={handleClose} title={`Presensi: ${schedule.subject_name}`}>
-            <form
-                key={formKey}
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4 h-[70vh] flex flex-col"
-            >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 h-[70vh] flex flex-col">
                 <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 space-y-1">
-                    <p><strong>Kelas:</strong> {classroom?.name}</p>
+                    <div className="flex justify-between items-center">
+                        <p><strong>Kelas:</strong> {classroom?.name}</p>
+                        {existingSession ? (
+                            <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold border border-orange-200">
+                                Edit Mode
+                            </span>
+                        ) : (
+                            <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-200">
+                                Baru
+                            </span>
+                        )}
+                    </div>
                     <p><strong>Guru:</strong> {schedule.teacher_name}</p>
-                    <p><strong>Waktu:</strong> {schedule.day_name}, {schedule.start_time.substring(0,5)} - {schedule.end_time.substring(0,5)}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b pb-4">
-                    <Input
-                        label="Tanggal"
-                        type="date"
-                        {...register('date', { required: true })}
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                    />
-                    <Input
-                        label="Materi / Topik (Jurnal)"
-                        placeholder="Contoh: Bab 1 Pendahuluan"
-                        {...register('topic', { required: true })}
-                        defaultValue=""
-                    />
+                    {/* Register field date, onChange dihandle watch */}
+                    <Input label="Tanggal" type="date" {...register('date', { required: true })} />
+                    <Input label="Materi / Topik" placeholder="Contoh: Bab 1" {...register('topic', { required: true })} />
                 </div>
 
-                <div className="flex-1 overflow-y-auto pr-2">
-                    {loadingStudents ? (
-                        <p className="text-center py-4">Loading siswa...</p>
-                    ) : studentList.length === 0 ? (
-                        <p className="text-center py-8 text-gray-400 italic">Belum ada siswa di kelas ini.</p>
+                <div className="flex-1 overflow-y-auto pr-2 relative">
+                    {isFetching && (
+                        <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center backdrop-blur-sm">
+                            <div className="flex flex-col items-center gap-2">
+                                <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
+                                <span className="text-xs text-gray-500">Sinkronisasi data...</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {studentList.length === 0 ? (
+                        <p className="text-center py-8 text-gray-400 italic">Belum ada siswa.</p>
                     ) : (
                         <table className="w-full text-sm border-collapse">
                             <thead className="bg-gray-100 sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th className="px-3 py-2 text-left font-semibold text-gray-700">Nama Siswa</th>
-                                <th className="px-3 py-2 text-center font-semibold text-gray-700">Status Kehadiran</th>
+                                <th className="px-3 py-2 text-center font-semibold text-gray-700">Status</th>
                             </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -172,9 +209,7 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                                     <td className="px-3 py-3">
                                         <div className="flex justify-center gap-1">
                                             {STATUSES.map((status) => {
-                                                // Fallback visual agar tidak kosong saat ms inisialisasi
-                                                const currentStatus = attendanceMap[student.id] || 'PRESENT';
-                                                const isSelected = currentStatus === status.value;
+                                                const isSelected = (attendanceMap[student.id] || 'PRESENT') === status.value;
                                                 return (
                                                     <button
                                                         key={status.value}
@@ -203,7 +238,8 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                 <div className="pt-3 border-t flex justify-end gap-2 bg-white">
                     <Button type="button" variant="ghost" onClick={handleClose}>Batal</Button>
                     <Button type="submit" isLoading={submitMutation.isPending}>
-                        <Check size={16} className="mr-2" /> Simpan Presensi
+                        <Check size={16} className="mr-2" />
+                        {existingSession ? 'Update Presensi' : 'Simpan Presensi'}
                     </Button>
                 </div>
             </form>
