@@ -42,6 +42,7 @@ const Header = () => {
 
     // Close dropdown on route change
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveDropdown(null);
     }, [location.pathname]);
 
