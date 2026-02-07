@@ -17,7 +17,7 @@ export default function ParentFormModal({ isOpen, onClose, parentToEdit }: Paren
     const createMutation = useCreateParent(onClose);
     const updateMutation = useUpdateParent(onClose);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ParentFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<ParentFormInput>();
 
     // Efek: Isi form jika mode Edit (Whitelist Approach)
     useEffect(() => {
@@ -45,7 +45,22 @@ export default function ParentFormModal({ isOpen, onClose, parentToEdit }: Paren
     }, [isOpen, parentToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<ParentFormInput> = (data) => {
-        const payload = { ...data };
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                if (value === "" && key !== 'full_name' && key !== 'nik') {
+                    return [key, null];
+                }
+                return [key, value];
+            })
+        ) as unknown as ParentFormInput;
+
+        const handleError = (err: any) => {
+            // Check if error is "nik already exists"
+            // The structure is error.response.data.error (string)
+            if (err.response?.status === 409) {
+                setError('nik', { type: 'manual', message: 'NIK sudah digunakan' });
+            }
+        };
 
         // Format Tanggal: Kirim YYYY-MM-DD apa adanya
         // if (payload.date_of_birth) {
@@ -53,9 +68,9 @@ export default function ParentFormModal({ isOpen, onClose, parentToEdit }: Paren
         // }
 
         if (isEditMode && parentToEdit) {
-            updateMutation.mutate({ id: parentToEdit.id, data: payload });
+            updateMutation.mutate({ id: parentToEdit.id, data: payload }, { onError: handleError });
         } else {
-            createMutation.mutate(payload);
+            createMutation.mutate(payload, { onError: handleError });
         }
     };
 
@@ -75,7 +90,7 @@ export default function ParentFormModal({ isOpen, onClose, parentToEdit }: Paren
                 </div>
 
                 <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
-                <Input label="NIK" {...register('nik')} placeholder="16 digit NIK" />
+                <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>

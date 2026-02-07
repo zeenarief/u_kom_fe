@@ -17,7 +17,7 @@ export default function GuardianFormModal({ isOpen, onClose, guardianToEdit }: G
     const createMutation = useCreateGuardian(onClose);
     const updateMutation = useUpdateGuardian(onClose);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<GuardianFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<GuardianFormInput>();
 
     useEffect(() => {
         if (isOpen) {
@@ -39,10 +39,30 @@ export default function GuardianFormModal({ isOpen, onClose, guardianToEdit }: G
     }, [isOpen, guardianToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<GuardianFormInput> = (data) => {
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                if (value === "" && key !== 'full_name' && key !== 'nik' && key !== 'phone_number') {
+                    return [key, null];
+                }
+                return [key, value];
+            })
+        ) as unknown as GuardianFormInput;
+
+        const handleError = (err: any) => {
+            // Check if error is "nik already exists"
+            // The structure is error.response.data.error (string)
+            if (err.response?.status === 409 && err.response?.data?.error.message.includes('NIK')) {
+                setError('nik', { type: 'manual', message: 'NIK sudah digunakan' });
+            }
+            if (err.response?.status === 409 && err.response?.data?.error.message.includes('Phone number')) {
+                setError('phone_number', { type: 'manual', message: 'No. HP sudah digunakan' });
+            }
+        };
+
         if (isEditMode && guardianToEdit) {
-            updateMutation.mutate({ id: guardianToEdit.id, data });
+            updateMutation.mutate({ id: guardianToEdit.id, data: payload }, { onError: handleError });
         } else {
-            createMutation.mutate(data);
+            createMutation.mutate(payload, { onError: handleError });
         }
     };
 
@@ -55,7 +75,7 @@ export default function GuardianFormModal({ isOpen, onClose, guardianToEdit }: G
                 <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
 
                 <div className="grid grid-cols-2 gap-4">
-                    <Input label="NIK" {...register('nik')} />
+                    <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
                         <select {...register('gender')} className="w-full px-4 py-2 border rounded-lg outline-none bg-white">
