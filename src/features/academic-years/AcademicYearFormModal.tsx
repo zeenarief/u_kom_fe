@@ -18,7 +18,7 @@ export default function AcademicYearFormModal({ isOpen, onClose, dataToEdit }: F
     const createMutation = useCreateAcademicYear(onClose);
     const updateMutation = useUpdateAcademicYear(onClose);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<AcademicYearFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<AcademicYearFormInput>();
 
     useEffect(() => {
         if (isOpen) {
@@ -34,10 +34,20 @@ export default function AcademicYearFormModal({ isOpen, onClose, dataToEdit }: F
     }, [isOpen, dataToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<AcademicYearFormInput> = (data) => {
+
+        const handleError = (err: any) => {
+
+            if (err.response?.status === 400) {
+                setError('end_date', { type: 'manual', message: 'Tanggal selesai harus setelah tanggal mulai' });
+                return;
+            }
+        };
+
+
         if (isEdit && dataToEdit) {
-            updateMutation.mutate({ id: dataToEdit.id, data });
+            updateMutation.mutate({ id: dataToEdit.id, data: data }, { onError: handleError });
         } else {
-            createMutation.mutate(data);
+            createMutation.mutate(data, { onError: handleError });
         }
     };
 
