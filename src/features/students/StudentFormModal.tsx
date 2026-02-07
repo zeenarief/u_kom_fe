@@ -18,7 +18,7 @@ export default function StudentFormModal({ isOpen, onClose, studentToEdit }: Stu
     const createMutation = useCreateStudent(onClose);
     const updateMutation = useUpdateStudent(onClose);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<StudentFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<StudentFormInput>();
 
     // Efek: Isi form jika mode Edit
     useEffect(() => {
@@ -55,17 +55,23 @@ export default function StudentFormModal({ isOpen, onClose, studentToEdit }: Stu
     }, [isOpen, studentToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<StudentFormInput> = (data) => {
+
+        const handleError = (err: any) => {
+            // Check if error is "nik already exists"
+            // The structure is error.response.data.error (string)
+            if (err.response?.status === 409) {
+                setError('nik', { type: 'manual', message: 'NIK sudah digunakan' });
+            }
+        };
+
         // 1. Payload Date Only (YYYY-MM-DD) - Kirim apa adanya
         const payload = { ...data };
 
         // 2. Kirim Request
-
-
-        // 2. Kirim Request
         if (isEditMode && studentToEdit) {
-            updateMutation.mutate({ id: studentToEdit.id, data: payload });
+            updateMutation.mutate({ id: studentToEdit.id, data: payload }, { onError: handleError });
         } else {
-            createMutation.mutate(payload);
+            createMutation.mutate(payload, { onError: handleError });
         }
     };
 
@@ -87,7 +93,7 @@ export default function StudentFormModal({ isOpen, onClose, studentToEdit }: Stu
                 <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
 
                 <div className="grid grid-cols-2 gap-4">
-                    <Input label="NIK" {...register('nik')} placeholder="16 digit NIK" />
+                    <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
                     <Input label="No. KK" {...register('no_kk')} placeholder="16 digit KK" />
                 </div>
 
