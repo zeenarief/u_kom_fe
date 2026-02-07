@@ -8,7 +8,7 @@ const DashboardLayout = () => {
             <Header />
 
             {/* Main Content Wrapper */}
-            <main className="pt-20 px-6 pb-8 min-h-screen">
+            <main className="pt-20 px-4 md:px-6 pb-8 min-h-screen">
                 <div className="max-w-7xl mx-auto">
                     <Outlet />
                 </div>

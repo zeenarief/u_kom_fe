@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useDashboardStats } from './dashboardQueries';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // 2. Definisikan Interface untuk Props StatCard
 interface StatCardProps {
@@ -106,8 +106,8 @@ export default function DashboardHome() {
                                         data={genderData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
+                                        innerRadius="50%"
+                                        outerRadius="70%"
                                         fill="#8884d8"
                                         paddingAngle={5}
                                         dataKey="value"
@@ -118,7 +118,7 @@ export default function DashboardHome() {
                                         ))}
                                     </Pie>
                                     <Tooltip />
-                                    <Legend verticalAlign="bottom" height={36}/>
+                                    <Legend verticalAlign="bottom" height={36} />
                                 </PieChart>
                             </ResponsiveContainer>
                         ) : (
@@ -138,8 +138,8 @@ export default function DashboardHome() {
                             className="p-4 border rounded-lg hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer group"
                         >
                             <div className="flex justify-between items-start">
-                                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-white group-hover:shadow-sm transition"><GraduationCap size={20}/></div>
-                                <ArrowUpRight size={16} className="text-gray-400 group-hover:text-blue-500"/>
+                                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-white group-hover:shadow-sm transition"><GraduationCap size={20} /></div>
+                                <ArrowUpRight size={16} className="text-gray-400 group-hover:text-blue-500" />
                             </div>
                             <h4 className="font-bold text-gray-800 mt-3">Data Siswa</h4>
                             <p className="text-xs text-gray-500 mt-1">Lihat dan kelola data siswa.</p>
@@ -151,8 +151,8 @@ export default function DashboardHome() {
                             className="p-4 border rounded-lg hover:border-teal-400 hover:bg-teal-50 transition cursor-pointer group"
                         >
                             <div className="flex justify-between items-start">
-                                <div className="p-2 bg-teal-100 text-teal-600 rounded-lg group-hover:bg-white group-hover:shadow-sm transition"><Briefcase size={20}/></div>
-                                <ArrowUpRight size={16} className="text-gray-400 group-hover:text-teal-500"/>
+                                <div className="p-2 bg-teal-100 text-teal-600 rounded-lg group-hover:bg-white group-hover:shadow-sm transition"><Briefcase size={20} /></div>
+                                <ArrowUpRight size={16} className="text-gray-400 group-hover:text-teal-500" />
                             </div>
                             <h4 className="font-bold text-gray-800 mt-3">Data Guru</h4>
                             <p className="text-xs text-gray-500 mt-1">Lihat dan kelola data kepegawaian.</p>
