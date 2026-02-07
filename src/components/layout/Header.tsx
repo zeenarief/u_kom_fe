@@ -65,8 +65,8 @@ const Header = () => {
                 { label: 'Tahun Ajaran', path: '/dashboard/academic-years' },
                 { label: 'Data Kelas', path: '/dashboard/classrooms' },
                 { label: 'Mata Pelajaran', path: '/dashboard/subjects' },
-                { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
                 { label: 'Guru Pengampu', path: '/dashboard/assignments' },
+                { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
             ]
         },
         {

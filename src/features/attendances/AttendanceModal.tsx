@@ -40,7 +40,7 @@ const getTodayString = () => {
 export default function AttendanceModal({ isOpen, onClose, schedule, classroomId }: Props) {
     // State Default untuk tanggal (Local Time)
     // 1. Setup Form
-    const { register, handleSubmit, watch, reset } = useForm<FormValues>({
+    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormValues>({
         defaultValues: {
             date: getTodayString(),
             topic: '',
@@ -173,10 +173,13 @@ export default function AttendanceModal({ isOpen, onClose, schedule, classroomId
                     <p><strong>Guru:</strong> {schedule.teacher_name}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b pb-4">
-                    {/* Register field date, onChange dihandle watch */}
-                    <Input label="Tanggal" type="date" {...register('date', { required: true })} />
-                    <Input label="Materi / Topik" placeholder="Contoh: Bab 1" {...register('topic', { required: true })} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input label="Tanggal" type="date" {...register('date', { required: 'Tanggal wajib diisi' })} error={errors.date?.message} />
+                    <div></div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 border-b pb-4">
+                    <Input label="Materi / Topik" placeholder="Isi materi yang disampaikan hari ini" {...register('topic', { required: 'Materi / Topik wajib diisi' })} error={errors.topic?.message} />
                 </div>
 
                 <div className="flex-1 overflow-y-auto pr-2 relative">

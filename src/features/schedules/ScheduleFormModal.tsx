@@ -36,7 +36,7 @@ export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Prop
             // Check if error is "subject code already exists" or generic conflict
             const msg = err.response?.data?.message || err.response?.data?.error?.message || err.response?.data?.error;
 
-            if (msg === "subject code already exists" || msg?.includes("conflict")) {
+            if (err.response?.status === 409 || msg === "subject code already exists" || msg?.includes("conflict")) {
                 setError('teaching_assignment_id', { type: 'manual', message: 'Jadwal bentrok / Mapel sudah ada' });
             }
 
