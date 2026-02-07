@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Props) {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<ScheduleFormInput>();
+    const { register, handleSubmit, reset, setError, formState: { errors } } = useForm<ScheduleFormInput>();
 
     // 1. Ambil daftar Mapel+Guru yang tersedia di kelas ini
     const { data: assignments } = useAssignmentsByClass(classroomId);
@@ -24,7 +24,29 @@ export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Prop
     });
 
     const onSubmit: SubmitHandler<ScheduleFormInput> = (data) => {
-        createMutation.mutate(data);
+        // Sanitasi: Konversi string kosong ke null (best practice)
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                if (value === "") return [key, null];
+                return [key, value];
+            })
+        ) as unknown as ScheduleFormInput;
+
+        const handleError = (err: any) => {
+            // Check if error is "subject code already exists" or generic conflict
+            const msg = err.response?.data?.message || err.response?.data?.error?.message || err.response?.data?.error;
+
+            if (msg === "subject code already exists" || msg?.includes("conflict")) {
+                setError('teaching_assignment_id', { type: 'manual', message: 'Jadwal bentrok / Mapel sudah ada' });
+            }
+
+            // Handle Time Validation Error (400)
+            if (err.response?.status === 400 && msg?.toLowerCase().includes("end time must be greater than start time")) {
+                setError('end_time', { type: 'manual', message: 'Jam selesai harus lebih besar dari jam mulai' });
+            }
+        };
+
+        createMutation.mutate(payload, { onError: handleError });
     };
 
     return (
@@ -67,7 +89,7 @@ export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Prop
                         <option value="4">Kamis</option>
                         <option value="5">Jumat</option>
                         <option value="6">Sabtu</option>
-                        {/* <option value="7">Minggu</option> */}
+                        <option value="7">Ahad</option>
                     </select>
                 </div>
 
@@ -76,12 +98,12 @@ export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Prop
                     <Input
                         type="time"
                         label="Jam Mulai"
-                        {...register('start_time', { required: 'Wajib diisi' })}
+                        {...register('start_time', { required: 'Wajib diisi' })} error={errors.start_time?.message}
                     />
                     <Input
                         type="time"
                         label="Jam Selesai"
-                        {...register('end_time', { required: 'Wajib diisi' })}
+                        {...register('end_time', { required: 'Wajib diisi' })} error={errors.end_time?.message}
                     />
                 </div>
 

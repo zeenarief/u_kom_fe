@@ -18,7 +18,7 @@ export default function SubjectFormModal({ isOpen, onClose, dataToEdit }: Props)
     const createMutation = useCreateSubject(onClose);
     const updateMutation = useUpdateSubject(onClose);
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<SubjectFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<SubjectFormInput>();
 
     useEffect(() => {
         if (isOpen) {
@@ -37,10 +37,25 @@ export default function SubjectFormModal({ isOpen, onClose, dataToEdit }: Props)
         // Paksa kode jadi Uppercase
         data.code = data.code.toUpperCase();
 
+        // Sanitasi: Konversi empty string -> null
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                if (value === "") return [key, null];
+                return [key, value];
+            })
+        ) as unknown as SubjectFormInput;
+
+        const handleError = (err: any) => {
+            const msg = err.response?.data?.error || err.response?.data?.message;
+            if (msg === "subject code already exists") {
+                setError('code', { type: 'manual', message: 'Kode Mapel sudah digunakan' });
+            }
+        };
+
         if (isEdit && dataToEdit) {
-            updateMutation.mutate({ id: dataToEdit.id, data });
+            updateMutation.mutate({ id: dataToEdit.id, data: payload }, { onError: handleError });
         } else {
-            createMutation.mutate(data);
+            createMutation.mutate(payload, { onError: handleError });
         }
     };
 

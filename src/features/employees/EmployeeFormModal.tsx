@@ -16,7 +16,7 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
     const isEditMode = !!employeeToEdit;
     const createMutation = useCreateEmployee(onClose);
     const updateMutation = useUpdateEmployee(onClose);
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<EmployeeFormInput>();
+    const { register, handleSubmit, reset, setValue, setError, formState: { errors } } = useForm<EmployeeFormInput>();
 
     useEffect(() => {
         if (isOpen) {
@@ -34,17 +34,29 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
     }, [isOpen, employeeToEdit, setValue, reset]);
 
     const onSubmit: SubmitHandler<EmployeeFormInput> = (data) => {
-        // Pastikan string kosong dikirim sebagai undefined atau null jika perlu,
-        // tapi backend Go biasanya handle empty string ok.
-        // Format tanggal ISO
-        const payload = { ...data };
-        // Backend now accepts YYYY-MM-DD directly
+        // PERBAIKAN: Konversi string kosong ("") menjadi null
+        // Agar backend Go tidak error parsing tanggal, dan tidak kena unique constraint (NIP)
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                if (value === "" && key !== 'full_name' && key !== 'job_title' && key !== 'nik') {
+                    return [key, null];
+                }
+                return [key, value];
+            })
+        ) as unknown as EmployeeFormInput;
 
+        const handleError = (err: any) => {
+            // Check if error is "nik already exists"
+            // The structure is error.response.data.error (string)
+            if (err.response?.status === 409) {
+                setError('nik', { type: 'manual', message: 'NIK sudah digunakan' });
+            }
+        };
 
         if (isEditMode && employeeToEdit) {
-            updateMutation.mutate({ id: employeeToEdit.id, data: payload });
+            updateMutation.mutate({ id: employeeToEdit.id, data: payload }, { onError: handleError });
         } else {
-            createMutation.mutate(payload);
+            createMutation.mutate(payload, { onError: handleError });
         }
     };
 
@@ -56,11 +68,11 @@ export default function EmployeeFormModal({ isOpen, onClose, employeeToEdit }: P
 
                 <div className="grid grid-cols-2 gap-4">
                     <Input label="NIP" {...register('nip')} placeholder="Kosongi jika tidak ada" />
-                    <Input label="Jabatan" {...register('job_title', { required: 'Wajib diisi' })} placeholder="Guru Mapel / Staff TU" />
+                    <Input label="Jabatan" {...register('job_title', { required: 'Wajib diisi' })} error={errors.job_title?.message} placeholder="Guru Mapel / Staff TU" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                    <Input label="NIK" {...register('nik')} />
+                    <Input label="NIK" {...register('nik', { required: 'Wajib diisi' })} error={errors.nik?.message} placeholder="Isi 16 Digit NIK" />
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status Kepegawaian</label>
                         <select {...register('employment_status')} className="w-full px-4 py-2 border rounded-lg bg-white">

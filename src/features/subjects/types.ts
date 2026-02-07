@@ -11,6 +11,6 @@ export interface Subject {
 export interface SubjectFormInput {
     code: string;
     name: string;
-    type: string;
-    description: string;
+    type?: string | null;
+    description?: string | null;
 }

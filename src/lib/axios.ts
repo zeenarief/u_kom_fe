@@ -44,9 +44,10 @@ api.interceptors.response.use(
 
         // Handle 500 Internal Server Error
         if (error.response?.status === 500) {
+            const errorMsg = error.response?.data?.message || error.response?.data?.error?.message;
             showAlert(
                 "Server Error",
-                "Terjadi kesalahan internal pada server. Silakan hubungi admin.",
+                errorMsg || "Terjadi kesalahan internal pada server. Silakan hubungi admin.",
                 "error"
             );
         }

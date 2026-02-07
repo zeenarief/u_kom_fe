@@ -6,13 +6,14 @@ import Button from '../../components/ui/Button';
 import type { Classroom, ClassroomFormInput } from './types';
 
 import { useCreateClassroom, useUpdateClassroom } from './classroomQueries';
-import { useEmployees } from '../employees/employeeQueries'; // Asumsi Anda sudah punya ini
+import { useEmployees } from '../employees/employeeQueries';
+import Select from '../../components/ui/Select';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     dataToEdit?: Classroom | null;
-    academicYearId: string; // Kita butuh ID tahun ajaran yang sedang aktif dipilih
+    academicYearId: string;
 }
 
 export default function ClassroomFormModal({ isOpen, onClose, dataToEdit, academicYearId }: Props) {
@@ -64,32 +65,41 @@ export default function ClassroomFormModal({ isOpen, onClose, dataToEdit, academ
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={isEdit ? "Edit Kelas" : "Buat Kelas Baru"}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Input label="Nama Kelas" placeholder="X-IPA-1" {...register('name', { required: 'Wajib diisi' })} error={errors.name?.message} />
+                <Input label="Nama Kelas" placeholder="Kelas 7" {...register('name', { required: 'Wajib diisi' })} error={errors.name?.message} />
 
                 <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Tingkat</label>
-                        <select {...register('level', { required: true })} className="w-full px-4 py-2 border rounded-lg bg-white">
-                            <option value="7">Kelas 7</option>
-                            <option value="8">Kelas 8</option>
-                            <option value="9">Kelas 9</option>
-                            <option value="10">Kelas 10</option>
-                            <option value="11">Kelas 11</option>
-                            <option value="12">Kelas 12</option>
-                        </select>
-                    </div>
-                    <Input label="Jurusan" placeholder="IPA/IPS/Umum" {...register('major')} />
+                    <Select
+                        label="Tingkat"
+                        {...register('level', { required: 'Wajib dipilih' })}
+                        error={errors.level?.message}
+                    >
+                        <option value="">-- Pilih Tingkat --</option>
+                        <option value="1">Marhalah 1</option>
+                        <option value="2">Marhalah 2</option>
+                        <option value="3">Marhalah 3</option>
+                        <option value="7">Kelas 7</option>
+                        <option value="8">Kelas 8</option>
+                        <option value="9">Kelas 9</option>
+                        <option value="10">Kelas 10</option>
+                        <option value="11">Kelas 11</option>
+                        <option value="12">Kelas 12</option>
+                    </Select>
+                    <Input label="Jurusan" placeholder="Diniyyah/Umum" {...register('major', { required: 'Wajib diisi' })} error={errors.major?.message} />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Wali Kelas</label>
-                    <select {...register('homeroom_teacher_id')} className="w-full px-4 py-2 border rounded-lg bg-white">
-                        <option value="">-- Pilih Guru --</option>
-                        {employees?.map(emp => (
-                            <option key={emp.id} value={emp.id}>{emp.full_name} ({emp.nip || '-'})</option>
-                        ))}
-                    </select>
-                </div>
+                <Select
+                    label="Wali Kelas"
+                    {...register('homeroom_teacher_id', { required: 'Wajib dipilih' })}
+                    error={errors.homeroom_teacher_id?.message}
+                >
+                    <option value="">-- Pilih Guru --</option>
+                    {employees?.map(emp => (
+                        <option key={emp.id} value={emp.id}>
+                            {emp.full_name} ({emp.nip || '-'})
+                        </option>
+                    ))}
+                </Select>
+
 
                 <Input label="Deskripsi (Opsional)" {...register('description')} />
 

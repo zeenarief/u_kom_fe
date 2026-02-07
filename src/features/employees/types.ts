@@ -19,13 +19,13 @@ export interface Employee {
 
 export interface EmployeeFormInput {
     full_name: string;
-    nip?: string;
+    nip?: string | null;
     job_title: string;
-    nik?: string;
-    gender?: string;
-    phone_number?: string;
-    address?: string;
-    date_of_birth?: string;
-    join_date?: string;
-    employment_status?: string;
+    nik: string;
+    gender?: string | null;
+    phone_number?: string | null;
+    address?: string | null;
+    date_of_birth?: string | null;
+    join_date?: string | null;
+    employment_status?: string | null;
 }

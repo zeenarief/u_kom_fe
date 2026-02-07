@@ -10,7 +10,7 @@ export interface ApiResponse<T> {
 export interface ApiError {
     status: string;
     message: string;
-    error?: {
+    error?: string | {
         message?: string; // SimpleError
         errors?: Array<{ code: string; field: string; message: string }>; // ValidationError
     };
