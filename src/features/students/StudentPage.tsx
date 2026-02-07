@@ -1,6 +1,8 @@
+
 import { useState } from 'react';
 import { Plus, Trash2, Search, GraduationCap, Eye, Download, Printer } from 'lucide-react'; // Ganti Pencil dengan Eye
 import { useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF } from './studentQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Student } from './types';
 import Button from '../../components/ui/Button';
 import StudentFormModal from './StudentFormModal';
@@ -45,8 +47,15 @@ export default function StudentPage() {
         setIsFormOpen(true); // Buka modal form
     };
 
+    const { showAlert } = useAlertStore();
     const handleDelete = (id: string) => {
-        if (confirm('Yakin hapus data siswa ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin hapus data siswa ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     const handleExport = () => {

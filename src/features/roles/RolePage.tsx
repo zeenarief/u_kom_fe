@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import {Shield, Check, Plus, Pencil, Trash2, Save} from 'lucide-react';
-import {useRoles, usePermissions, useRoleDetail, useSyncRolePermissions, useDeleteRole} from './roleQueries';
+import { Shield, Check, Plus, Pencil, Trash2, Save } from 'lucide-react';
+import { useRoles, usePermissions, useRoleDetail, useSyncRolePermissions, useDeleteRole } from './roleQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Role, Permission, RoleDetail } from './types';
 import Button from '../../components/ui/Button';
 import RoleFormModal from './RoleFormModal';
@@ -73,9 +74,9 @@ const RolePermissionForm = ({ role, allPermissions, onSave, isSaving }: Permissi
                                             <Check size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none top-[1px] left-[1px]" />
                                         </div>
                                         <div>
-                                          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
-                                            {perm.name}
-                                          </span>
+                                            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                                                {perm.name}
+                                            </span>
                                             <p className="text-xs text-gray-400">{perm.description || 'Tidak ada deskripsi'}</p>
                                         </div>
                                     </label>
@@ -92,6 +93,7 @@ const RolePermissionForm = ({ role, allPermissions, onSave, isSaving }: Permissi
 
 // === KOMPONEN UTAMA ===
 export default function RolePage() {
+    const { showAlert } = useAlertStore();
     const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
 
     // State untuk Modal CRUD
@@ -120,10 +122,16 @@ export default function RolePage() {
 
     const handleDelete = (e: React.MouseEvent, roleId: string) => {
         e.stopPropagation();
-        if (window.confirm('Hapus role ini? User dengan role ini akan kehilangan akses.')) {
-            deleteMutation.mutate(roleId);
-            if (selectedRoleId === roleId) setSelectedRoleId(null); // Reset seleksi jika yang dihapus sedang dipilih
-        }
+        showAlert(
+            'Konfirmasi Hapus Role',
+            'Hapus role ini? User dengan role ini akan kehilangan akses.',
+            'warning',
+            () => {
+                deleteMutation.mutate(roleId);
+                if (selectedRoleId === roleId) setSelectedRoleId(null);
+            },
+            () => { }
+        );
     };
 
     const handleSavePerms = (roleId: string, permissions: string[]) => {
@@ -162,14 +170,13 @@ export default function RolePage() {
                             <div
                                 key={role.id}
                                 onClick={() => setSelectedRoleId(role.id)}
-                                className={`group w - full text - left px - 4 py - 3 rounded - lg flex items - center justify - between transition - colors cursor - pointer border ${
-    selectedRoleId === role.id
-        ? 'bg-blue-50 text-blue-700 border-blue-200'
-        : 'hover:bg-gray-50 text-gray-700 border-transparent'
-} `}
+                                className={`group w - full text - left px - 4 py - 3 rounded - lg flex items - center justify - between transition - colors cursor - pointer border ${selectedRoleId === role.id
+                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                        : 'hover:bg-gray-50 text-gray-700 border-transparent'
+                                    } `}
                             >
                                 <div className="flex items-center gap-3 overflow-hidden">
-                                    <Shield size={18} className={`shrink - 0 ${ selectedRoleId === role.id ? 'fill-blue-200' : '' } `}/>
+                                    <Shield size={18} className={`shrink - 0 ${selectedRoleId === role.id ? 'fill-blue-200' : ''} `} />
                                     <div className="truncate">
                                         <p className="font-medium text-sm">{role.name}</p>
                                         {/* Tampilkan deskripsi pendek jika ada */}
@@ -178,7 +185,7 @@ export default function RolePage() {
                                 </div>
 
                                 {/* Action Buttons (Muncul saat hover atau active) */}
-                                <div className={`flex items - center gap - 1 ${ selectedRoleId === role.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' } transition - opacity`}>
+                                <div className={`flex items - center gap - 1 ${selectedRoleId === role.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition - opacity`}>
                                     <button
                                         onClick={(e) => handleEdit(e, role)}
                                         className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-white rounded shadow-sm"

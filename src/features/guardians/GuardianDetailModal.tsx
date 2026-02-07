@@ -2,6 +2,7 @@ import { Edit, MapPin, Phone, ShieldCheck, Unlink } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useGuardianDetail, useUnlinkGuardianFromUser } from './guardianQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Guardian } from './types';
 import GuardianUserLinker from './GuardianUserLinker';
 
@@ -21,12 +22,17 @@ const DetailRow = ({ label, value }: { label: string; value?: string | null }) =
 export default function GuardianDetailModal({ guardianId, onClose, onEdit }: GuardianDetailModalProps) {
     const { data: guardian, isLoading, isError } = useGuardianDetail(guardianId);
     const unlinkMutation = useUnlinkGuardianFromUser();
+    const { showAlert } = useAlertStore();
 
     const handleUnlink = () => {
         if (!guardian) return;
-        if (confirm(`Putuskan akun ${ guardian.user?.username }?`)) {
-            unlinkMutation.mutate(guardian.id);
-        }
+        showAlert(
+            'Konfirmasi Putus Akun',
+            `Putuskan akun ${guardian.user?.username}?`,
+            'warning',
+            () => unlinkMutation.mutate(guardian.id),
+            () => { }
+        );
     };
 
     if (isLoading && guardianId) {
@@ -51,12 +57,12 @@ export default function GuardianDetailModal({ guardianId, onClose, onEdit }: Gua
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">{guardian.full_name}</h2>
                         <div className="flex gap-2 mt-1">
-                <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase font-semibold">
-                    {guardian.relationship_to_student || 'Wali'}
-                </span>
+                            <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase font-semibold">
+                                {guardian.relationship_to_student || 'Wali'}
+                            </span>
                             <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                    {guardian.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
-                </span>
+                                {guardian.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -64,7 +70,7 @@ export default function GuardianDetailModal({ guardianId, onClose, onEdit }: Gua
                 {/* Section Akun Sistem */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <ShieldCheck size={18} className="text-orange-500"/> Akun Sistem
+                        <ShieldCheck size={18} className="text-orange-500" /> Akun Sistem
                     </h3>
 
                     {guardian.user ? (
@@ -95,7 +101,7 @@ export default function GuardianDetailModal({ guardianId, onClose, onEdit }: Gua
                 {/* Kontak */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <Phone size={18} className="text-orange-500"/> Kontak & Identitas
+                        <Phone size={18} className="text-orange-500" /> Kontak & Identitas
                     </h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg">
                         <DetailRow label="No. Handphone" value={guardian.phone_number} />
@@ -108,7 +114,7 @@ export default function GuardianDetailModal({ guardianId, onClose, onEdit }: Gua
                 {/* Alamat */}
                 <div>
                     <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                        <MapPin size={18} className="text-orange-500"/> Alamat Domisili
+                        <MapPin size={18} className="text-orange-500" /> Alamat Domisili
                     </h3>
                     <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
                         <p className="font-medium">{guardian.address}</p>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Edit, BookOpen, Search } from 'lucide-react';
 import { useSubjects, useDeleteSubject } from './subjectQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Subject } from './types';
 import Button from '../../components/ui/Button';
 import SubjectFormModal from './SubjectFormModal';
@@ -17,6 +18,7 @@ export default function SubjectPage() {
 
     const { data: subjects, isLoading, isError } = useSubjects(debouncedSearch);
     const deleteMutation = useDeleteSubject();
+    const { showAlert } = useAlertStore();
 
     const handleCreate = () => {
         setEditData(null);
@@ -29,7 +31,13 @@ export default function SubjectPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Yakin hapus mata pelajaran ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin hapus mata pelajaran ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;

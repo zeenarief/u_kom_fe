@@ -3,6 +3,7 @@ import { formatDate } from '../../lib/date';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useExportStudentBiodata, useStudentDetail, useUnlinkStudentFromUser } from './studentQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Student } from './types';
 import UserLinker from "./UserLinker.tsx";
 import FamilyManager from './FamilyManager';
@@ -27,6 +28,7 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
     const exportBiodataMutation = useExportStudentBiodata(); // Init hook
 
     const unlinkMutation = useUnlinkStudentFromUser();
+    const { showAlert } = useAlertStore();
 
     // Handler Download
     const handlePrintBiodata = () => {
@@ -41,9 +43,13 @@ export default function StudentDetailModal({ studentId, onClose, onEdit }: Stude
 
     const handleUnlink = () => {
         if (!student) return;
-        if (confirm(`Yakin ingin memutuskan hubungan akun ${student.user?.username}? Siswa ini tidak akan bisa login lagi.`)) {
-            unlinkMutation.mutate(student.id);
-        }
+        showAlert(
+            'Konfirmasi Putus Akun',
+            `Yakin ingin memutuskan hubungan akun ${student.user?.username}? Siswa ini tidak akan bisa login lagi.`,
+            'warning',
+            () => unlinkMutation.mutate(student.id),
+            () => { }
+        );
     };
 
     // Jika Loading

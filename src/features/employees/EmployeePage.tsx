@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Briefcase, Eye } from 'lucide-react';
 import { useEmployees, useDeleteEmployee } from './employeeQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Employee } from './types';
 import Button from '../../components/ui/Button';
 import EmployeeFormModal from './EmployeeFormModal';
@@ -21,10 +22,19 @@ export default function EmployeePage() {
     const { data: employees, isLoading, isError } = useEmployees(debouncedSearch);
     const deleteMutation = useDeleteEmployee();
 
+    const { showAlert } = useAlertStore();
     const handleCreate = () => { setEmployeeToEdit(null); setIsFormOpen(true); };
     const handleViewDetail = (id: string) => { setDetailId(id); };
     const handleEditFromDetail = (e: Employee) => { setDetailId(null); setEmployeeToEdit(e); setIsFormOpen(true); };
-    const handleDelete = (id: string) => { if (confirm('Yakin hapus data ini?')) deleteMutation.mutate(id); };
+    const handleDelete = (id: string) => {
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin hapus data ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
+    };
 
     if (isError) return <div className="p-8 text-center text-red-500">Error memuat data.</div>;
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms } from '../classrooms/classroomQueries';
 import { useSchedulesByClass, useDeleteSchedule } from './scheduleQueries';
+import { useAlertStore } from '../../store/alertStore';
 import Button from '../../components/ui/Button';
 import { Plus, Trash2, Calendar, Clock, User, BookOpen, ClipboardList } from 'lucide-react';
 import ScheduleFormModal from './ScheduleFormModal';
@@ -28,9 +29,16 @@ export default function SchedulePage() {
     const { data: classrooms } = useClassrooms(selectedYear);
     const { data: schedules, isLoading } = useSchedulesByClass(selectedClassId);
     const deleteMutation = useDeleteSchedule(selectedClassId);
+    const { showAlert } = useAlertStore();
 
     const handleDelete = (id: string) => {
-        if (confirm('Hapus jadwal ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Hapus jadwal ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     // Helper: Grouping jadwal by Hari

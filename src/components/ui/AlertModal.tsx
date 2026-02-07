@@ -4,13 +4,18 @@ import { AlertCircle, Info } from 'lucide-react';
 import { useAlertStore } from '../../store/alertStore';
 
 const AlertModal: React.FC = () => {
-    const { isOpen, title, message, type, closeAlert, onOk } = useAlertStore();
+    const { isOpen, title, message, type, closeAlert, onOk, onCancel, confirmText, cancelText } = useAlertStore();
 
     if (!isOpen) return null;
 
     const handleOk = () => {
         closeAlert();
         if (onOk) onOk();
+    };
+
+    const handleCancel = () => {
+        closeAlert();
+        if (onCancel) onCancel();
     };
 
     const getIcon = () => {
@@ -51,13 +56,22 @@ const AlertModal: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="mt-6 w-full">
+                    <div className="mt-6 w-full flex gap-3">
+                        {onCancel && (
+                            <button
+                                type="button"
+                                className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm transition-colors"
+                                onClick={handleCancel}
+                            >
+                                {cancelText || 'Batal'}
+                            </button>
+                        )}
                         <button
                             type="button"
                             className={`inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm transition-colors ${getButtonColor()}`}
                             onClick={handleOk}
                         >
-                            OK
+                            {confirmText || 'OK'}
                         </button>
                     </div>
                 </div>

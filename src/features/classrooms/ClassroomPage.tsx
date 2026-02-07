@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms, useDeleteClassroom } from './classroomQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Classroom } from './types';
 
 import Button from '../../components/ui/Button';
@@ -40,10 +41,16 @@ export default function ClassroomPage() {
         setIsFormOpen(true);
     };
 
+    const { showAlert } = useAlertStore();
+
     const handleDelete = (id: string) => {
-        if (confirm('Hapus kelas ini? Data history siswa di kelas ini juga akan terhapus.')) {
-            deleteMutation.mutate(id);
-        }
+        showAlert(
+            'Konfirmasi Hapus',
+            'Hapus kelas ini? Data history siswa di kelas ini juga akan terhapus.',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { } // Cancel action
+        );
     };
 
     return (

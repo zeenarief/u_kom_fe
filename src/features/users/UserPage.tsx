@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Eye } from 'lucide-react';
 import { useUsers, useDeleteUser } from './userQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { User } from './types';
 import Button from '../../components/ui/Button';
 import UserFormModal from './UserFormModal';
@@ -19,6 +20,7 @@ export default function UserPage() {
 
     const { data: users, isLoading, isError } = useUsers(debouncedSearch);
     const deleteMutation = useDeleteUser();
+    const { showAlert } = useAlertStore();
 
     // -- Handlers --
     const handleCreate = () => {
@@ -37,9 +39,13 @@ export default function UserPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (window.confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-            deleteMutation.mutate(id);
-        }
+        showAlert(
+            'Konfirmasi Hapus User',
+            'Apakah Anda yakin ingin menghapus user ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;

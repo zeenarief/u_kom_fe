@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Users, Eye } from 'lucide-react';
 import { useParents, useDeleteParent } from './parentQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Parent } from './types';
 import Button from '../../components/ui/Button';
 import ParentFormModal from './ParentFormModal';
@@ -19,6 +20,7 @@ export default function ParentPage() {
 
     const { data: parents, isLoading, isError } = useParents(debouncedSearch);
     const deleteMutation = useDeleteParent();
+    const { showAlert } = useAlertStore();
 
     const handleCreate = () => {
         setParentToEdit(null);
@@ -36,7 +38,13 @@ export default function ParentPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Yakin hapus data ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin hapus data ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     if (isError) return <div className="p-8 text-center text-red-500">Gagal memuat data.</div>;

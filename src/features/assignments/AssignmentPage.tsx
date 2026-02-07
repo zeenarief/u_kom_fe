@@ -3,6 +3,7 @@ import { BookOpen, UserCheck, Trash2, GraduationCap, AlertCircle } from 'lucide-
 import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms } from '../classrooms/classroomQueries';
 import { useAssignmentsByClass, useDeleteAssignment } from './assignmentQueries';
+import { useAlertStore } from '../../store/alertStore';
 import AssignmentForm from './AssignmentForm';
 
 export default function AssignmentPage() {
@@ -26,9 +27,16 @@ export default function AssignmentPage() {
     const { data: assignments, isLoading } = useAssignmentsByClass(selectedClassId);
 
     const deleteMutation = useDeleteAssignment(selectedClassId);
+    const { showAlert } = useAlertStore();
 
     const handleDelete = (id: string) => {
-        if(confirm('Hapus guru pengampu ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Hapus guru pengampu ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     return (
@@ -83,7 +91,7 @@ export default function AssignmentPage() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
                     <p className="text-gray-500 text-sm">Memuat data...</p>
                 </div>
-            ): (
+            ) : (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     {/* Form Tambah */}
                     <AssignmentForm classroomId={selectedClassId} />
@@ -92,52 +100,52 @@ export default function AssignmentPage() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-gray-500">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3">Mata Pelajaran</th>
-                                <th className="px-6 py-3">Guru Pengampu</th>
-                                <th className="px-6 py-3">NIP / Info Guru</th>
-                                <th className="px-6 py-3 text-right">Aksi</th>
-                            </tr>
+                                <tr>
+                                    <th className="px-6 py-3">Mata Pelajaran</th>
+                                    <th className="px-6 py-3">Guru Pengampu</th>
+                                    <th className="px-6 py-3">NIP / Info Guru</th>
+                                    <th className="px-6 py-3 text-right">Aksi</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                            {assignments?.map((item) => (
-                                <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-gray-900">
-                                        <div className="flex items-center gap-2">
-                                            <BookOpen size={16} className="text-blue-500" />
-                                            {item.subject_name}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <UserCheck size={16} className="text-green-600" />
-                                            {item.teacher_name}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 font-mono text-xs">
-                                        {item.teacher_nip}
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => handleDelete(item.id)}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition-colors"
-                                            title="Hapus Penugasan"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {assignments?.length === 0 && (
-                                <tr>
-                                    <td colSpan={4} className="text-center py-8 text-gray-400">
-                                        <div className="flex flex-col items-center">
-                                            <AlertCircle className="h-8 w-8 mb-2 opacity-50" />
-                                            Belum ada guru yang ditugaskan di kelas ini.
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
+                                {assignments?.map((item) => (
+                                    <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-gray-900">
+                                            <div className="flex items-center gap-2">
+                                                <BookOpen size={16} className="text-blue-500" />
+                                                {item.subject_name}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <UserCheck size={16} className="text-green-600" />
+                                                {item.teacher_name}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-mono text-xs">
+                                            {item.teacher_nip}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => handleDelete(item.id)}
+                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition-colors"
+                                                title="Hapus Penugasan"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {assignments?.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="text-center py-8 text-gray-400">
+                                            <div className="flex flex-col items-center">
+                                                <AlertCircle className="h-8 w-8 mb-2 opacity-50" />
+                                                Belum ada guru yang ditugaskan di kelas ini.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

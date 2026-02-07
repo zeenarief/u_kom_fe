@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import type { Student } from './types';
 import { useSetGuardian, useRemoveGuardian } from './studentQueries';
 import { useGuardians } from '../guardians/guardianQueries';
+import { useAlertStore } from '../../store/alertStore';
 
 interface GuardianManagerProps {
     student: Student;
@@ -15,6 +16,7 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
 
     const setMutation = useSetGuardian();
     const removeMutation = useRemoveGuardian();
+    const { showAlert } = useAlertStore();
 
     // Ambil data Master Guardian
     const { data: allGuardians } = useGuardians();
@@ -33,9 +35,13 @@ export default function GuardianManager({ student }: GuardianManagerProps) {
     };
 
     const handleRemove = () => {
-        if (confirm('Hapus status wali utama?')) {
-            removeMutation.mutate(student.id);
-        }
+        showAlert(
+            'Konfirmasi',
+            'Hapus status wali utama?',
+            'warning',
+            () => removeMutation.mutate(student.id),
+            () => { }
+        );
     };
 
     // === KONDISI 1: Sudah ada Wali ===

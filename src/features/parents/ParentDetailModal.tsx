@@ -3,6 +3,7 @@ import { formatDate } from '../../lib/date';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useParentDetail, useUnlinkParentFromUser } from './parentQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Parent } from './types';
 import ParentUserLinker from './ParentUserLinker';
 
@@ -23,12 +24,17 @@ export default function ParentDetailModal({ parentId, onClose, onEdit }: ParentD
     const { data: parent, isLoading, isError } = useParentDetail(parentId);
 
     const unlinkMutation = useUnlinkParentFromUser();
+    const { showAlert } = useAlertStore();
 
     const handleUnlink = () => {
         if (!parent) return;
-        if (confirm(`Putuskan akun ${parent.user?.username}?`)) {
-            unlinkMutation.mutate(parent.id);
-        }
+        showAlert(
+            'Konfirmasi Putus Akun',
+            `Putuskan akun ${parent.user?.username}?`,
+            'warning',
+            () => unlinkMutation.mutate(parent.id),
+            () => { }
+        );
     };
 
     if (isLoading && parentId) {

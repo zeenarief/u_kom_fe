@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, Shield, Eye } from 'lucide-react'; // Ganti Pencil dengan Eye
 import { useGuardians, useDeleteGuardian } from './guardianQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Guardian } from './types';
 import Button from '../../components/ui/Button';
 import GuardianFormModal from './GuardianFormModal';
@@ -19,6 +20,7 @@ export default function GuardianPage() {
 
     const { data: guardians, isLoading, isError } = useGuardians(debouncedSearch);
     const deleteMutation = useDeleteGuardian();
+    const { showAlert } = useAlertStore();
 
     // Buka Form Create
     const handleCreate = () => {
@@ -39,9 +41,13 @@ export default function GuardianPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Yakin ingin menghapus data wali ini?')) {
-            deleteMutation.mutate(id);
-        }
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin ingin menghapus data wali ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     if (isError) return <div className="p-8 text-center text-red-500">Error memuat data.</div>;

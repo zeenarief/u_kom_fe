@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Edit, Calendar, CheckCircle2, XCircle } from 'lucide-react';
 import { useAcademicYears, useDeleteAcademicYear, useActivateAcademicYear } from './academicYearQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { AcademicYear } from './types';
 import Button from '../../components/ui/Button';
 import AcademicYearFormModal from './AcademicYearFormModal';
@@ -12,6 +13,7 @@ export default function AcademicYearPage() {
     const { data: years, isLoading, isError } = useAcademicYears();
     const deleteMutation = useDeleteAcademicYear();
     const activateMutation = useActivateAcademicYear();
+    const { showAlert } = useAlertStore();
 
     const handleCreate = () => {
         setEditData(null);
@@ -24,13 +26,23 @@ export default function AcademicYearPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Yakin hapus tahun ajaran ini?')) deleteMutation.mutate(id);
+        showAlert(
+            'Konfirmasi Hapus',
+            'Yakin hapus tahun ajaran ini?',
+            'warning',
+            () => deleteMutation.mutate(id),
+            () => { }
+        );
     };
 
     const handleActivate = (id: string) => {
-        if (confirm('Aktifkan tahun ajaran ini? Tahun ajaran lain akan otomatis non-aktif.')) {
-            activateMutation.mutate(id);
-        }
+        showAlert(
+            'Konfirmasi Aktivasi',
+            'Aktifkan tahun ajaran ini? Tahun ajaran lain akan otomatis non-aktif.',
+            'warning',
+            () => activateMutation.mutate(id),
+            () => { }
+        );
     };
 
     // Helper format tanggal indonesia

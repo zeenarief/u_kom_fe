@@ -3,6 +3,7 @@ import { formatDate } from '../../lib/date';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useEmployeeDetail, useUnlinkEmployeeFromUser } from './employeeQueries';
+import { useAlertStore } from '../../store/alertStore';
 import type { Employee } from './types';
 import EmployeeUserLinker from './EmployeeUserLinker';
 
@@ -22,10 +23,17 @@ const DetailRow = ({ label, value }: { label: string; value?: string | null }) =
 export default function EmployeeDetailModal({ employeeId, onClose, onEdit }: Props) {
     const { data: employee, isLoading, isError } = useEmployeeDetail(employeeId);
     const unlinkMutation = useUnlinkEmployeeFromUser();
+    const { showAlert } = useAlertStore();
 
     const handleUnlink = () => {
         if (!employee) return;
-        if (confirm(`Putuskan akun ${employee.user?.username}?`)) unlinkMutation.mutate(employee.id);
+        showAlert(
+            'Konfirmasi Putus Akun',
+            `Putuskan akun ${employee.user?.username}?`,
+            'warning',
+            () => unlinkMutation.mutate(employee.id),
+            () => { }
+        );
     };
 
     if (isLoading && employeeId) return <Modal isOpen={!!employeeId} onClose={onClose} title="Loading..."><div className="p-8 text-center">Mengambil data...</div></Modal>;

@@ -3,6 +3,7 @@ import { Search, Trash2, UserPlus } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { useClassroomDetail, useAddStudentsToClass, useRemoveStudentFromClass } from './classroomQueries';
+import { useAlertStore } from '../../store/alertStore';
 import { useStudents } from '../students/studentQueries';
 
 interface Props {
@@ -41,10 +42,16 @@ export default function ClassroomStudentsModal({ classroomId, onClose }: Props) 
         }
     };
 
+    const { showAlert } = useAlertStore();
+
     const handleRemove = (studentId: string) => {
-        if(confirm('Keluarkan siswa ini dari kelas?')) {
-            removeMutation.mutate(studentId);
-        }
+        showAlert(
+            'Konfirmasi',
+            'Keluarkan siswa ini dari kelas?',
+            'warning',
+            () => removeMutation.mutate(studentId),
+            () => { }
+        );
     };
 
     if (!classroomId) return null;
@@ -111,28 +118,28 @@ export default function ClassroomStudentsModal({ classroomId, onClose }: Props) 
                         ) : (
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-100 text-gray-600 sticky top-0">
-                                <tr>
-                                    <th className="px-4 py-2 text-left">Nama</th>
-                                    <th className="px-4 py-2 text-left">NISN</th>
-                                    <th className="px-4 py-2 text-center">Aksi</th>
-                                </tr>
+                                    <tr>
+                                        <th className="px-4 py-2 text-left">Nama</th>
+                                        <th className="px-4 py-2 text-left">NISN</th>
+                                        <th className="px-4 py-2 text-center">Aksi</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                {classroom.students.map(s => (
-                                    <tr key={s.id} className="bg-white">
-                                        <td className="px-4 py-2 font-medium">{s.full_name}</td>
-                                        <td className="px-4 py-2 text-gray-500">{s.nisn || '-'}</td>
-                                        <td className="px-4 py-2 text-center">
-                                            <button
-                                                onClick={() => handleRemove(s.id)}
-                                                className="text-red-500 hover:bg-red-50 p-1 rounded"
-                                                title="Keluarkan"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                    {classroom.students.map(s => (
+                                        <tr key={s.id} className="bg-white">
+                                            <td className="px-4 py-2 font-medium">{s.full_name}</td>
+                                            <td className="px-4 py-2 text-gray-500">{s.nisn || '-'}</td>
+                                            <td className="px-4 py-2 text-center">
+                                                <button
+                                                    onClick={() => handleRemove(s.id)}
+                                                    className="text-red-500 hover:bg-red-50 p-1 rounded"
+                                                    title="Keluarkan"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         )}
