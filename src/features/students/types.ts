@@ -21,6 +21,13 @@ export interface Student {
     province?: string;
     postal_code?: string;
 
+    // New fields from API
+    class_name?: string;
+    major?: string;
+    level?: string;
+    status?: string | 'ACTIVE' | 'GRADUATED' | 'DROPOUT' | 'UNASSIGNED'; // Adjust as needed
+    email?: string; // from user relation or direct
+
     user?: User;
 
     parents?: Array<{
