@@ -277,7 +277,7 @@ export const useExportStudentBiodata = () => {
         },
         // Parameter ke-2 di onSuccess adalah 'variables' (input yang kita kirim saat mutate)
         onSuccess: (response, variables) => {
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
             const link = document.createElement('a');
             link.href = url;
 
@@ -295,6 +295,38 @@ export const useExportStudentBiodata = () => {
         },
         onError: () => {
             toast.error('Gagal mengunduh biodata');
+        }
+    });
+};
+
+// === CETAK / PRINT BIODATA (PREVIEW) ===
+export const usePrintStudentBiodata = () => {
+    return useMutation({
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        mutationFn: async ({ id, name: _name }: { id: string; name: string }) => {
+            const response = await api.get(`/students/${id}/export/pdf`, {
+                responseType: 'blob',
+            });
+            return response;
+        },
+        onSuccess: (response) => {
+            // Buat Blob dengan tipe PDF
+            const file = new Blob([response.data], { type: 'application/pdf' });
+
+            // Buat URL dari Blob
+            const fileURL = URL.createObjectURL(file);
+
+            // Buka di tab baru (Browser PDF Viewer biasanya punya tombol print)
+            const pdfWindow = window.open(fileURL);
+
+            if (pdfWindow) {
+                toast.success('Dokumen siap dicetak');
+            } else {
+                toast.error('Pop-up diblokir. Izinkan pop-up untuk melihat dokumen.');
+            }
+        },
+        onError: () => {
+            toast.error('Gagal memuat preview cetak');
         }
     });
 };

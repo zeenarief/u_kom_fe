@@ -40,3 +40,26 @@ export const formatTimestamp = (isoString?: string | null): string => {
         minute: '2-digit',
     }).format(date);
 };
+
+/**
+ * Menghitung Usia berdasarkan Tanggal Lahir.
+ * Contoh: "2010-01-01" -> 14 (jika tahun ini 2024)
+ */
+export const calculateAge = (dateString?: string | null): number | null => {
+    if (!dateString) return null;
+
+    const today = new Date();
+    const birthDate = new Date(dateString);
+
+    if (isNaN(birthDate.getTime())) return null;
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+
+    // Jika belum ulang tahun di tahun ini, kurangi 1
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    return age;
+};

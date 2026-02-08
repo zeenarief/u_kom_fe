@@ -27,6 +27,10 @@ export interface Student {
     level?: string;
     status?: string | 'ACTIVE' | 'GRADUATED' | 'DROPOUT' | 'UNASSIGNED'; // Adjust as needed
     email?: string; // from user relation or direct
+    phone?: string;
+    enrollment_year?: string;
+    graduation_year?: string;
+    gpa?: number;
 
     user?: User;
 
