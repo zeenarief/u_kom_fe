@@ -23,9 +23,10 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
         if (initialData) {
             // 1. Kita definisikan field apa saja yang valid untuk Form ini (Whitelist)
             const fields: (keyof StudentFormInput)[] = [
-                'full_name', 'nisn', 'nim', 'gender', 'place_of_birth',
-                'date_of_birth', 'address', 'no_kk', 'nik', 'rt', 'rw',
-                'sub_district', 'district', 'city', 'province', 'postal_code'
+                'full_name', 'no_kk', 'nik', 'nisn', 'nim', 'gender',
+                'place_of_birth', 'date_of_birth', 'address', 'rt', 'rw',
+                'sub_district', 'district', 'city', 'province', 'postal_code',
+                'status', 'entry_year', 'graduation_year'
             ];
 
             fields.forEach((field) => {
@@ -71,8 +72,8 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                         <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
                             <Input label="No. KK" {...register('no_kk')} placeholder="16 digit KK" />
+                            <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -89,9 +90,9 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                                     <option value="female">Perempuan</option>
                                 </select>
                             </div>
-                            <Input label="Tanggal Lahir" type="date" {...register('date_of_birth')} />
+                            <Input label="Tempat Lahir" {...register('place_of_birth')} />
                         </div>
-                        <Input label="Tempat Lahir" {...register('place_of_birth')} />
+                        <Input label="Tanggal Lahir" type="date" {...register('date_of_birth')} />
                     </div>
                 </div>
 
@@ -119,6 +120,31 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                             <Input label="Provinsi" {...register('province')} />
                         </div>
                         <Input label="Kode Pos" {...register('postal_code')} />
+                    </div>
+                </div>
+
+                {/* --- SECTION 3: AKADEMIK & STATUS --- */}
+                <div>
+                    <div className="bg-blue-50 p-3 rounded-lg text-blue-800 font-semibold text-sm mb-4">
+                        Akademik & Status
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Status Siswa</label>
+                            <select {...register('status')} className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <option value="ACTIVE">Aktif (ACTIVE)</option>
+                                <option value="GRADUATED">Lulus (GRADUATED)</option>
+                                <option value="DROPOUT">Dropout (DROPOUT)</option>
+                                <option value="INACTIVE">Non-Aktif (INACTIVE)</option>
+                                <option value="">- Tidak Ada Status -</option>
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input label="Tahun Masuk" {...register('entry_year')} placeholder="Contoh: 2023" />
+                            <Input label="Tahun Lulus" {...register('graduation_year')} placeholder="Contoh: 2026" />
+                        </div>
                     </div>
                 </div>
 

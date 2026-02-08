@@ -5,11 +5,11 @@ import type { GuardianInfo } from '../guardians/types';
 export interface Student {
     id: string;
     full_name: string;
-    nisn?: string;
-    nim?: string;
-    gender?: 'male' | 'female';
     no_kk?: string;
     nik?: string;
+    nisn?: string;
+    nim?: string;
+    gender?: 'male' | 'female' | string;
     place_of_birth?: string;
     date_of_birth?: string;
     address?: string;
@@ -20,38 +20,40 @@ export interface Student {
     city?: string;         // Kota/Kab
     province?: string;
     postal_code?: string;
+    status?: string; // 'ACTIVE', 'GRADUATED', 'DROPOUT', 'INACTIVE'
+    entry_year?: string;
+    graduation_year?: string;
+    created_at?: string;
+    updated_at?: string;
 
-    // New fields from API
+    // Relations
+    user?: User | null;
+    parents?: Array<{
+        relationship_type: 'FATHER' | 'MOTHER' | string;
+        parent_info: Parent;
+    }>;
+    guardian?: GuardianInfo | null;
+
+    // Legacy fields being phased out or mapped if needed, keeping for safety if UI uses them
     class_name?: string;
     major?: string;
     level?: string;
-    status?: string | 'ACTIVE' | 'GRADUATED' | 'DROPOUT' | 'UNASSIGNED'; // Adjust as needed
-    email?: string; // from user relation or direct
+    email?: string; // specific student email if distinct from user
     phone?: string;
-    enrollment_year?: string;
-    graduation_year?: string;
     gpa?: number;
-
-    user?: User;
-
-    parents?: Array<{
-        relationship_type: string;
-        parent_info: Parent; // Detail orang tuanya
-    }>;
-
-    guardian?: GuardianInfo | null;
+    enrollment_year?: string; // mapped to entry_year
 }
 
 export interface StudentFormInput {
     full_name: string;
-    nisn?: string;
-    nim?: string;
-    gender?: 'male' | 'female';
-    place_of_birth?: string;
-    date_of_birth?: string;
-    address?: string;
     no_kk?: string;
     nik?: string;
+    nisn?: string;
+    nim?: string;
+    gender?: string;
+    place_of_birth?: string;
+    date_of_birth?: string; // YYYY-MM-DD
+    address?: string;
     rt?: string;
     rw?: string;
     sub_district?: string;
@@ -59,6 +61,9 @@ export interface StudentFormInput {
     city?: string;
     province?: string;
     postal_code?: string;
+    status?: string;
+    entry_year?: string;
+    graduation_year?: string;
 }
 
 export interface LinkUserRequest {

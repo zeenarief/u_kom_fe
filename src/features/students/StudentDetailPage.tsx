@@ -57,7 +57,7 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <DetailItem
                                 label="Jenis Kelamin"
-                                value={student.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
+                                value={student.gender === 'male' ? 'Laki-laki' : student.gender === 'female' ? 'Perempuan' : student.gender || '-'}
                                 icon={Heart}
                             />
                             <DetailItem
@@ -87,7 +87,7 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                         </div>
                         <DetailItem
                             label="Email"
-                            value={student.email}
+                            value={student.email} // Fallback to user email if direct email is empty handled in logic? user email is in student.user
                             icon={Mail}
                             type="email"
                         />
@@ -186,19 +186,19 @@ const AcademicInfoCard = ({ student }: { student: Student }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <DetailItem
                                 label="Kelas Saat Ini"
-                                value={student.class_name}
+                                value={student.class_name || '-'}
                                 icon={BookOpen}
                             />
                             <DetailItem
                                 label="Jurusan"
-                                value={student.major}
+                                value={student.major || '-'}
                                 icon={GraduationCap}
                             />
                         </div>
 
                         <DetailItem
                             label="Tingkat"
-                            value={student.level}
+                            value={student.level || '-'}
                         />
                     </div>
 
@@ -218,7 +218,7 @@ const AcademicInfoCard = ({ student }: { student: Student }) => {
 
                         <DetailItem
                             label="Tahun Masuk"
-                            value={student.enrollment_year || '-'}
+                            value={student.entry_year || '-'}
                         />
 
                         <DetailItem
@@ -226,10 +226,10 @@ const AcademicInfoCard = ({ student }: { student: Student }) => {
                             value={student.graduation_year || '-'}
                         />
 
+                        {/* GPA removed from recent DTO but keeping if legacy */}
                         <DetailItem
                             label="IPK/Nilai Akhir"
                             value={student.gpa || '-'}
-                            important
                         />
                     </div>
                 </div>
@@ -269,7 +269,7 @@ const AccountCard = ({ student, unlinkMutation, handleUnlink }: { student: Stude
                                             Email: {student.user.email}
                                         </p>
                                         <p className="text-xs text-green-600 mt-2">
-                                            Terakhir login: {formatDate(student.user.last_login)}
+                                            Terakhir login: {student.user.last_login ? formatDate(student.user.last_login) : 'Belum pernah login'}
                                         </p>
                                     </div>
                                 </div>
@@ -501,7 +501,7 @@ export default function StudentDetailPage() {
     }
 
     const tabs: TabItem[] = [
-        { id: 'overview', label: 'Overview', icon: User, count: 2 },
+        { id: 'overview', label: 'Overview', icon: User },
         { id: 'academic', label: 'Akademik', icon: School },
         { id: 'family', label: 'Keluarga', icon: Users },
         { id: 'account', label: 'Akun', icon: ShieldCheck },
