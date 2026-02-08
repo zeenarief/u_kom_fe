@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Download, Printer, Search, Users, Filter } from 'lucide-react';
+import { Plus, Download, Search, Users, Filter, ChevronDown, FileSpreadsheet, FileText } from 'lucide-react';
 import { useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF } from './studentQueries';
 import { useAlertStore } from '../../store/alertStore';
 import type { Student } from './types';
@@ -19,6 +19,9 @@ export default function StudentPage() {
 
     // State Modal Detail
     const [detailId, setDetailId] = useState<string | null>(null);
+
+    // Export Dropdown State
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     // Search State
     const [search, setSearch] = useState('');
@@ -110,25 +113,52 @@ export default function StudentPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    {/* TOMBOL PDF */}
-                    <Button
-                        variant="outline"
-                        onClick={() => exportPDFMutation.mutate()}
-                        isLoading={exportPDFMutation.isPending}
-                        className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
-                    >
-                        <Printer className="w-4 h-4 mr-2" /> PDF
-                    </Button>
+                    {/* EXPORT DROPDOWN */}
+                    <div className="relative">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsExportOpen(!isExportOpen)}
+                            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+                        >
+                            <Download className="w-4 h-4 mr-2" /> Export <ChevronDown className="w-3 h-3 ml-2" />
+                        </Button>
 
-                    {/* TOMBOL EXPORT */}
-                    <Button
-                        variant="outline"
-                        onClick={handleExport}
-                        isLoading={exportMutation.isPending}
-                        className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
-                    >
-                        <Download className="w-4 h-4 mr-2" /> Excel
-                    </Button>
+                        {isExportOpen && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-10"
+                                    onClick={() => setIsExportOpen(false)}
+                                ></div>
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-20 overflow-hidden">
+                                    <button
+                                        onClick={() => {
+                                            handleExport();
+                                            setIsExportOpen(false);
+                                        }}
+                                        disabled={exportMutation.isPending}
+                                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors disabled:opacity-50"
+                                    >
+                                        <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                                        Export Excel
+                                        {exportMutation.isPending && <span className="text-xs text-gray-400 ml-auto">...</span>}
+                                    </button>
+                                    <div className="border-t border-gray-50"></div>
+                                    <button
+                                        onClick={() => {
+                                            exportPDFMutation.mutate();
+                                            setIsExportOpen(false);
+                                        }}
+                                        disabled={exportPDFMutation.isPending}
+                                        className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors disabled:opacity-50"
+                                    >
+                                        <FileText className="w-4 h-4 text-red-600" />
+                                        Export PDF
+                                        {exportPDFMutation.isPending && <span className="text-xs text-gray-400 ml-auto">...</span>}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
 
                     <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700">
                         <Plus className="w-4 h-4 mr-2" /> Tambah Siswa

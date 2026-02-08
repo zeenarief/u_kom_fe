@@ -1,4 +1,4 @@
-import { GraduationCap, Eye, Trash2, MapPin, User, BookOpen, Calendar, Mail, Phone } from 'lucide-react';
+import { GraduationCap, Eye, Trash2, MapPin, User, BookOpen, Mail } from 'lucide-react';
 import type { Student } from './types';
 
 interface StudentCardProps {
