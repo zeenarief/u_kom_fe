@@ -7,6 +7,9 @@ import { useAuthStore } from './store/authStore';
 import type { JSX } from "react";
 import UserPage from "./features/users/UserPage";
 import StudentPage from "./features/students/StudentPage";
+import StudentDetailPage from "./features/students/StudentDetailPage";
+import StudentCreatePage from "./features/students/StudentCreatePage";
+import StudentEditPage from "./features/students/StudentEditPage";
 import RolePage from "./features/roles/RolePage";
 import ParentPage from "./features/parents/ParentPage.tsx";
 import GuardianPage from "./features/guardians/GuardianPage.tsx";
@@ -64,6 +67,9 @@ function App() {
                         {/* Child Routes: Nanti kita isi di sini */}
                         <Route path="users" element={<UserPage />} />
                         <Route path="students" element={<StudentPage />} />
+                        <Route path="students/create" element={<StudentCreatePage />} />
+                        <Route path="students/:id" element={<StudentDetailPage />} />
+                        <Route path="students/:id/edit" element={<StudentEditPage />} />
                         <Route path="parents" element={<ParentPage />} />
                         <Route path="guardians" element={<GuardianPage />} />
                         <Route path="employees" element={<EmployeePage />} />

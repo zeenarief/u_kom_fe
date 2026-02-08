@@ -1,24 +1,16 @@
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Plus, Download, Search, Users, Filter, ChevronDown, FileSpreadsheet, FileText } from 'lucide-react';
 import { useStudents, useDeleteStudent, useExportStudents, useExportStudentsPDF } from './studentQueries';
 import { useAlertStore } from '../../store/alertStore';
-import type { Student } from './types';
 import Button from '../../components/ui/Button';
-import StudentFormModal from './StudentFormModal';
-import StudentDetailModal from './StudentDetailModal';
 import StudentCard from './StudentCard';
 import { useDebounce } from '../../hooks/useDebounce';
 
 export default function StudentPage() {
+    const navigate = useNavigate();
     const exportMutation = useExportStudents();
     const exportPDFMutation = useExportStudentsPDF();
-
-    // State Modal Form (Create/Edit)
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
-
-    // State Modal Detail
-    const [detailId, setDetailId] = useState<string | null>(null);
 
     // Export Dropdown State
     const [isExportOpen, setIsExportOpen] = useState(false);
@@ -43,20 +35,12 @@ export default function StudentPage() {
 
     // 1. Buka Form Create
     const handleCreate = () => {
-        setStudentToEdit(null);
-        setIsFormOpen(true);
+        navigate('/dashboard/students/create');
     };
 
     // 2. Buka Detail (Klik Mata / Card)
     const handleViewDetail = (id: string) => {
-        setDetailId(id);
-    };
-
-    // 3. Callback dari Detail -> Edit (Klik tombol Edit di dalam detail)
-    const handleEditFromDetail = (student: Student) => {
-        setDetailId(null); // Tutup modal detail
-        setStudentToEdit(student); // Set data edit
-        setIsFormOpen(true); // Buka modal form
+        navigate(`/dashboard/students/${id}`);
     };
 
     const { showAlert } = useAlertStore();
@@ -304,18 +288,7 @@ export default function StudentPage() {
             )}
 
             {/* MODAL 1: Form Create/Edit */}
-            <StudentFormModal
-                isOpen={isFormOpen}
-                onClose={() => setIsFormOpen(false)}
-                studentToEdit={studentToEdit}
-            />
-
-            {/* MODAL 2: Detail Viewer */}
-            <StudentDetailModal
-                studentId={detailId}
-                onClose={() => setDetailId(null)}
-                onEdit={handleEditFromDetail}
-            />
+            {/* Removed: Using dedicated pages now */}
         </div>
     );
 }
