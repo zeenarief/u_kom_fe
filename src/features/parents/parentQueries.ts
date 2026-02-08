@@ -126,3 +126,60 @@ export const useUnlinkParentFromUser = () => {
         }
     });
 };
+
+// === EXPORT EXCEL ===
+export const useExportParents = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const response = await api.get('/parents/export/excel', {
+                responseType: 'blob',
+            });
+            return response;
+        },
+        onSuccess: (response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            const date = new Date().toISOString().split('T')[0];
+            link.setAttribute('download', `Parents_Export_${date}.xlsx`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('Data berhasil diunduh');
+        },
+        onError: () => {
+            toast.error('Gagal mengunduh file');
+        }
+    });
+};
+
+// === EXPORT PDF ===
+export const useExportParentsPDF = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const response = await api.get('/parents/export/pdf', {
+                responseType: 'blob',
+            });
+            return response;
+        },
+        onSuccess: (response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const date = new Date().toISOString().split('T')[0];
+            link.setAttribute('download', `Laporan_OrangTua_${date}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('PDF berhasil diunduh');
+        },
+        onError: () => {
+            toast.error('Gagal mengunduh PDF');
+        }
+    });
+};

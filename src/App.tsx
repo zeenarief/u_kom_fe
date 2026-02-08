@@ -12,6 +12,9 @@ import StudentCreatePage from "./features/students/StudentCreatePage";
 import StudentEditPage from "./features/students/StudentEditPage";
 import RolePage from "./features/roles/RolePage";
 import ParentPage from "./features/parents/ParentPage.tsx";
+import ParentCreatePage from "./features/parents/ParentCreatePage.tsx";
+import ParentDetailPage from "./features/parents/ParentDetailPage.tsx";
+import ParentEditPage from "./features/parents/ParentEditPage.tsx";
 import GuardianPage from "./features/guardians/GuardianPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
 import DashboardHome from "./features/dashboard/DashboardHome.tsx";
@@ -71,6 +74,9 @@ function App() {
                         <Route path="students/:id" element={<StudentDetailPage />} />
                         <Route path="students/:id/edit" element={<StudentEditPage />} />
                         <Route path="parents" element={<ParentPage />} />
+                        <Route path="parents/create" element={<ParentCreatePage />} />
+                        <Route path="parents/:id" element={<ParentDetailPage />} />
+                        <Route path="parents/:id/edit" element={<ParentEditPage />} />
                         <Route path="guardians" element={<GuardianPage />} />
                         <Route path="employees" element={<EmployeePage />} />
 

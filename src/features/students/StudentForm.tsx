@@ -136,8 +136,6 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                                 <option value="ACTIVE">Aktif (ACTIVE)</option>
                                 <option value="GRADUATED">Lulus (GRADUATED)</option>
                                 <option value="DROPOUT">Dropout (DROPOUT)</option>
-                                <option value="INACTIVE">Non-Aktif (INACTIVE)</option>
-                                <option value="">- Tidak Ada Status -</option>
                             </select>
                         </div>
 
