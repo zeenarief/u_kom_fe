@@ -38,8 +38,6 @@ export interface Student {
     class_name?: string;
     major?: string;
     level?: string;
-    email?: string; // specific student email if distinct from user
-    phone?: string;
     gpa?: number;
     enrollment_year?: string; // mapped to entry_year
 }

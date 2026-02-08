@@ -73,29 +73,15 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                     </div>
 
                     <div className="space-y-5">
-                        <div className="grid grid-cols-2 gap-4">
-                            <DetailItem
-                                label="NIK"
-                                value={student.nik}
-                                icon={FileText}
-                            />
-                            <DetailItem
-                                label="No. KK"
-                                value={student.no_kk}
-                                icon={FileText}
-                            />
-                        </div>
                         <DetailItem
-                            label="Email"
-                            value={student.email} // Fallback to user email if direct email is empty handled in logic? user email is in student.user
-                            icon={Mail}
-                            type="email"
+                            label="NIK"
+                            value={student.nik}
+                            icon={FileText}
                         />
                         <DetailItem
-                            label="Telepon"
-                            value={student.phone || '-'}
-                            icon={Phone}
-                            type="phone"
+                            label="No. KK"
+                            value={student.no_kk}
+                            icon={FileText}
                         />
                     </div>
                 </div>
@@ -568,12 +554,6 @@ export default function StudentDetailPage() {
                                     </div>
 
                                     <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                                        {student.email && (
-                                            <div className="flex items-center gap-2">
-                                                <Mail size={14} />
-                                                {student.email}
-                                            </div>
-                                        )}
                                         {student.city && (
                                             <div className="flex items-center gap-2">
                                                 <MapPin size={14} />

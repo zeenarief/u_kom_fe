@@ -1,4 +1,4 @@
-import { GraduationCap, Eye, Trash2, MapPin, User, BookOpen, Mail } from 'lucide-react';
+import { GraduationCap, Eye, Trash2, MapPin, User, BookOpen } from 'lucide-react';
 import type { Student } from './types';
 
 interface StudentCardProps {
@@ -30,9 +30,6 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
                         </div>
                         <div className="min-w-0">
                             <h3 className="font-bold text-gray-900 truncate text-sm">{student.full_name}</h3>
-                            <p className="text-xs text-gray-500 truncate flex items-center gap-1 mt-0.5">
-                                <Mail size={10} /> {student.email || '-'}
-                            </p>
                             <div className={`mt-1.5 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${getStatusColor(student.status)}`}>
                                 {student.status || 'UNASSIGNED'}
                             </div>
@@ -109,9 +106,6 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
                     </div>
                     <div className="min-w-0">
                         <h3 className="font-bold text-gray-900 truncate">{student.full_name}</h3>
-                        <p className="text-xs text-gray-500 truncate">
-                            {student.email || 'No email'}
-                        </p>
                     </div>
                 </div>
 
