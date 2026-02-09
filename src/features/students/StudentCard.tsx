@@ -31,7 +31,7 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
                         <div className="min-w-0">
                             <h3 className="font-bold text-gray-900 truncate text-sm">{student.full_name}</h3>
                             <div className={`mt-1.5 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${getStatusColor(student.status)}`}>
-                                {student.status || 'UNASSIGNED'}
+                                {student.status}
                             </div>
                         </div>
                     </div>
@@ -52,27 +52,18 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
 
                     <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-50">
                         <div>
-                            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Jurusan</p>
-                            <p className="text-xs text-gray-700 mt-0.5">{student.major || '-'}</p>
-                        </div>
-                        <div>
                             <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Gender</p>
                             <div className="flex items-center gap-1 text-xs text-gray-700 mt-0.5">
                                 <User size={12} /> {student.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
                             </div>
                         </div>
-                    </div>
-
-                    {/* Location */}
-                    <div>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Alamat</p>
-                        <div className="flex items-start gap-1.5 text-xs text-gray-600">
-                            <MapPin size={12} className="mt-0.5 flex-shrink-0 text-gray-400" />
-                            <span className="line-clamp-2">
+                        <div>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Alamat</p>
+                            <p className="text-xs text-gray-700 mt-0.5">
                                 {student.address ? `${student.address}, ` : ''}
                                 {student.district && `${student.district}, `}
                                 {student.city}
-                            </span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -112,10 +103,7 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
                 {/* NISN & NIM */}
                 <div className="col-span-2 min-w-0">
                     <div className="text-sm font-medium text-gray-900 truncate">
-                        {student.nisn || '-'}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate">
-                        {student.nim || 'No NIM'}
+                        {student.nisn || '-'} | {student.nim || '-'}
                     </div>
                 </div>
 
@@ -125,12 +113,6 @@ const StudentCard = ({ student, onViewDetail, onDelete }: StudentCardProps) => {
                         <BookOpen size={14} className="text-gray-400 flex-shrink-0" />
                         <div className="truncate">
                             <span className="font-medium">{student.class_name || '-'}</span>
-                            {student.major && (
-                                <>
-                                    <span className="text-gray-300 mx-2">|</span>
-                                    <span className="text-gray-500">{student.major}</span>
-                                </>
-                            )}
                         </div>
                     </div>
                 </div>

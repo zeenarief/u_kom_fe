@@ -22,7 +22,7 @@ export interface Student {
     postal_code?: string;
     status?: string; // 'ACTIVE', 'GRADUATED', 'DROPOUT'
     entry_year?: string;
-    graduation_year?: string;
+    exit_year?: string;
     created_at?: string;
     updated_at?: string;
 
@@ -61,7 +61,7 @@ export interface StudentFormInput {
     postal_code?: string;
     status?: string;
     entry_year?: string;
-    graduation_year?: string;
+    exit_year?: string;
 }
 
 export interface LinkUserRequest {

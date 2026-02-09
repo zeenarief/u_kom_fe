@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     User, MapPin, ShieldCheck, Printer,
     ArrowLeft, Users, GraduationCap, School, Edit,
-    Mail, Phone, Calendar, BookOpen, Home, Heart, FileText,
+    Calendar, BookOpen, Home, Heart, FileText,
     CheckCircle, XCircle, AlertCircle, Download,
     type LucideIcon
 } from 'lucide-react';
@@ -208,8 +208,8 @@ const AcademicInfoCard = ({ student }: { student: Student }) => {
                         />
 
                         <DetailItem
-                            label="Tahun Lulus"
-                            value={student.graduation_year || '-'}
+                            label="Tahun Keluar"
+                            value={student.exit_year || '-'}
                         />
 
                         {/* GPA removed from recent DTO but keeping if legacy */}
@@ -415,6 +415,7 @@ export default function StudentDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'overview' | 'family' | 'academic' | 'account'>('overview');
+    const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 
     const { data: student, isLoading, isError } = useStudentDetail(id || null);
     const exportBiodataMutation = useExportStudentBiodata();
@@ -500,14 +501,17 @@ export default function StudentDetailPage() {
             {/* Navigation Header */}
             <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="py-4">
+                    <div className="flex items-center justify-between py-3">
                         <button
                             onClick={() => navigate('/dashboard/students')}
-                            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium group"
+                            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all font-medium group"
                         >
-                            <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-0.5 transition-transform" />
-                            Kembali ke Daftar Siswa
+                            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                            <span className="hidden sm:inline">Daftar Siswa</span>
                         </button>
+                        <div className="text-xs text-gray-500 font-medium">
+                            Detail Siswa
+                        </div>
                     </div>
                 </div>
             </div>
@@ -519,9 +523,9 @@ export default function StudentDetailPage() {
                     <div className="p-6 md:p-8">
                         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                             {/* Avatar & Basic Info */}
-                            <div className="flex items-start gap-5">
+                            <div className="flex items-center gap-5">
                                 <div className="relative">
-                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-3xl border-4 border-white shadow-lg">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-3xl border-4 border-white shadow-lg">
                                         {student.full_name.charAt(0)}
                                     </div>
                                     <div className="absolute -bottom-2 -right-2">
@@ -533,60 +537,82 @@ export default function StudentDetailPage() {
 
                                 <div className="flex-1">
                                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{student.full_name}</h1>
-                                    <div className="flex flex-wrap gap-3 mt-3">
-                                        {student.major && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                                                <GraduationCap size={14} />
-                                                {student.major}
-                                            </div>
-                                        )}
-                                        {student.class_name && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                                                <BookOpen size={14} />
-                                                Kelas {student.class_name}
-                                            </div>
-                                        )}
-                                        {student.nisn && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-sm font-medium font-mono">
-                                                {student.nisn}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                                        {student.city && (
-                                            <div className="flex items-center gap-2">
-                                                <MapPin size={14} />
-                                                {student.district}, {student.city}
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="lg:ml-auto flex flex-wrap gap-3">
+                            <div className="lg:ml-auto flex flex-wrap gap-2">
+                                {/* Download Dropdown */}
+                                <div className="relative">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    >
+                                        <Download size={16} className="mr-2" />
+                                        Unduh
+                                        <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </Button>
+
+                                    {isDownloadOpen && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-10"
+                                                onClick={() => setIsDownloadOpen(false)}
+                                            ></div>
+                                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 z-20 overflow-hidden">
+                                                <button
+                                                    onClick={() => {
+                                                        handleExportBiodata();
+                                                        setIsDownloadOpen(false);
+                                                    }}
+                                                    disabled={exportBiodataMutation.isPending}
+                                                    className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
+                                                        <Download size={16} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-gray-900">Export PDF</div>
+                                                        <div className="text-xs text-gray-500">Unduh biodata siswa</div>
+                                                    </div>
+                                                    {exportBiodataMutation.isPending && (
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                                    )}
+                                                </button>
+                                                <div className="border-t border-gray-100"></div>
+                                                <button
+                                                    onClick={() => {
+                                                        handlePrintBiodata();
+                                                        setIsDownloadOpen(false);
+                                                    }}
+                                                    disabled={printMutation.isPending}
+                                                    className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 flex-shrink-0">
+                                                        <Printer size={16} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-gray-900">Cetak Biodata</div>
+                                                        <div className="text-xs text-gray-500">Buka di tab baru</div>
+                                                    </div>
+                                                    {printMutation.isPending && (
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Edit Button */}
                                 <Button
-                                    variant="outline"
                                     onClick={() => navigate(`/dashboard/students/${id}/edit`)}
-                                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                                >
-                                    <Edit size={16} className="mr-2" /> Edit Data
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={handleExportBiodata}
-                                    isLoading={exportBiodataMutation.isPending}
-                                    className="bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
-                                >
-                                    <Download size={16} className="mr-2" /> Export Biodata
-                                </Button>
-                                <Button
-                                    onClick={handlePrintBiodata}
-                                    isLoading={printMutation.isPending}
                                     className="bg-blue-600 hover:bg-blue-700"
                                 >
-                                    <Printer size={16} className="mr-2" /> Cetak
+                                    <Edit size={16} className="mr-2" /> Edit Data
                                 </Button>
                             </div>
                         </div>

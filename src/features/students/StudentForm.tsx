@@ -26,7 +26,7 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                 'full_name', 'no_kk', 'nik', 'nisn', 'nim', 'gender',
                 'place_of_birth', 'date_of_birth', 'address', 'rt', 'rw',
                 'sub_district', 'district', 'city', 'province', 'postal_code',
-                'status', 'entry_year', 'graduation_year'
+                'status', 'entry_year', 'exit_year'
             ];
 
             fields.forEach((field) => {
@@ -142,7 +142,7 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input label="Tahun Masuk" {...register('entry_year')} placeholder="Contoh: 2023" />
-                            <Input label="Tahun Lulus" {...register('graduation_year')} placeholder="Contoh: 2026" />
+                            <Input label="Tahun Keluar" {...register('exit_year')} placeholder="Contoh: 2026" />
                         </div>
                     </div>
                 </div>
