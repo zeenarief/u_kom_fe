@@ -16,6 +16,9 @@ import ParentCreatePage from "./features/parents/ParentCreatePage.tsx";
 import ParentDetailPage from "./features/parents/ParentDetailPage.tsx";
 import ParentEditPage from "./features/parents/ParentEditPage.tsx";
 import GuardianPage from "./features/guardians/GuardianPage.tsx";
+import GuardianCreatePage from "./features/guardians/GuardianCreatePage.tsx";
+import GuardianDetailPage from "./features/guardians/GuardianDetailPage.tsx";
+import GuardianEditPage from "./features/guardians/GuardianEditPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
 import DashboardHome from "./features/dashboard/DashboardHome.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
@@ -78,6 +81,9 @@ function App() {
                         <Route path="parents/:id" element={<ParentDetailPage />} />
                         <Route path="parents/:id/edit" element={<ParentEditPage />} />
                         <Route path="guardians" element={<GuardianPage />} />
+                        <Route path="guardians/create" element={<GuardianCreatePage />} />
+                        <Route path="guardians/:id" element={<GuardianDetailPage />} />
+                        <Route path="guardians/:id/edit" element={<GuardianEditPage />} />
                         <Route path="employees" element={<EmployeePage />} />
 
                         <Route path="academic-years" element={<AcademicYearPage />} />

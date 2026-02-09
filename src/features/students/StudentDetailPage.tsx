@@ -10,9 +10,9 @@ import {
 import { formatDate, calculateAge } from '../../lib/date';
 import Button from '../../components/ui/Button';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import { useStudentDetail, useExportStudentBiodata, useUnlinkStudentFromUser, usePrintStudentBiodata } from './studentQueries';
+import { useStudentDetail, useExportStudentBiodata, useUnlinkStudentFromUser, usePrintStudentBiodata, useLinkStudentToUser } from './studentQueries';
 import { useAlertStore } from '../../store/alertStore';
-import UserLinker from "./UserLinker";
+import UserAccountSection from '../../components/common/UserAccountSection';
 import FamilyManager from './FamilyManager';
 import GuardianManager from './GuardianManager';
 import type { Student } from './types';
@@ -221,80 +221,7 @@ const AcademicInfoCard = ({ student }: { student: Student }) => {
     );
 };
 
-const AccountCard = ({ student, unlinkMutation, handleUnlink }: { student: Student, unlinkMutation: { isPending: boolean }, handleUnlink: () => void }) => {
-
-    return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="border-b border-gray-100 px-6 py-4 bg-gray-50">
-                <div className="flex items-center gap-2">
-                    <ShieldCheck size={18} className="text-blue-600" />
-                    <h3 className="font-semibold text-gray-900">Akun Sistem</h3>
-                </div>
-            </div>
-            <div className="p-6">
-                {student.user ? (
-                    <div className="max-w-2xl">
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                <div className="flex items-center gap-4 flex-1">
-                                    <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold text-2xl border-4 border-white shadow-sm">
-                                        {student.user.username.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-green-900 flex items-center gap-2">
-                                            Akun Terhubung
-                                            <CheckCircle size={16} className="text-green-600" />
-                                        </p>
-                                        <p className="text-sm text-green-800 mt-1 font-medium">
-                                            Username: <span className="font-mono bg-green-100 px-2 py-0.5 rounded">{student.user.username}</span>
-                                        </p>
-                                        <p className="text-sm text-green-700 mt-1">
-                                            Email: {student.user.email}
-                                        </p>
-                                        <p className="text-xs text-green-600 mt-2">
-                                            Terakhir login: {student.user.last_login ? formatDate(student.user.last_login) : 'Belum pernah login'}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <Button
-                                    variant="outline"
-                                    onClick={handleUnlink}
-                                    isLoading={unlinkMutation.isPending}
-                                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 w-full sm:w-auto"
-                                >
-                                    Putuskan Akun
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-sm text-gray-700">
-                                <span className="font-medium">Note:</span> Memutuskan akun akan menghapus akses login siswa ini ke sistem. Data pribadi siswa akan tetap tersimpan.
-                            </p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="max-w-2xl">
-                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 mb-4">
-                            <div className="flex items-center gap-3">
-                                <AlertCircle size={20} className="text-amber-600 flex-shrink-0" />
-                                <div>
-                                    <p className="text-sm font-bold text-amber-900">Akun Belum Terhubung</p>
-                                    <p className="text-sm text-amber-800 mt-0.5">
-                                        Siswa ini belum memiliki akses login ke sistem. Hubungkan dengan akun user untuk mengaktifkan fitur online.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <UserLinker studentId={student.id} />
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
+// AccountCard replaced with common UserAccountSection component
 
 // Helper Component
 const DetailItem = ({
@@ -418,6 +345,7 @@ export default function StudentDetailPage() {
     const exportBiodataMutation = useExportStudentBiodata();
     const printMutation = usePrintStudentBiodata();
     const unlinkMutation = useUnlinkStudentFromUser();
+    const linkMutation = useLinkStudentToUser();
     const { showAlert } = useAlertStore();
 
     // HANDLER: Download PDF
@@ -449,6 +377,10 @@ export default function StudentDetailPage() {
             () => unlinkMutation.mutate(student.id),
             () => { }
         );
+    };
+
+    const handleLink = (studentId: string, userId: string) => {
+        linkMutation.mutate({ studentId, userId });
     };
 
     if (isLoading) {
@@ -672,10 +604,15 @@ export default function StudentDetailPage() {
                     )}
 
                     {activeTab === 'account' && (
-                        <AccountCard
-                            student={student}
-                            unlinkMutation={unlinkMutation}
-                            handleUnlink={handleUnlink}
+                        <UserAccountSection
+                            user={student.user}
+                            entityId={student.id}
+                            entityType="student"
+                            themeColor="blue"
+                            onLink={handleLink}
+                            onUnlink={handleUnlink}
+                            linkLoading={linkMutation.isPending}
+                            unlinkLoading={unlinkMutation.isPending}
                         />
                     )}
                 </div>

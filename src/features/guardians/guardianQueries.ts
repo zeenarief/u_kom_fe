@@ -126,3 +126,57 @@ export const useUnlinkGuardianFromUser = () => {
         }
     });
 };
+
+// === EXPORT TO EXCEL ===
+export const useExportGuardiansExcel = () => {
+    return useMutation({
+        mutationFn: async (filters?: { q?: string }) => {
+            const response = await api.get('/guardians/export/excel', {
+                params: filters,
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `guardians_${new Date().toISOString().split('T')[0]}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        },
+        onSuccess: () => {
+            toast.success('Data berhasil diexport ke Excel');
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal export Excel');
+        }
+    });
+};
+
+// === EXPORT TO PDF ===
+export const useExportGuardiansPDF = () => {
+    return useMutation({
+        mutationFn: async (filters?: { q?: string }) => {
+            const response = await api.get('/guardians/export/pdf', {
+                params: filters,
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `guardians_${new Date().toISOString().split('T')[0]}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        },
+        onSuccess: () => {
+            toast.success('Data berhasil diexport ke PDF');
+        },
+        onError: (err) => {
+            const error = err as AxiosError<ApiError>;
+            toast.error(error.response?.data?.message || 'Gagal export PDF');
+        }
+    });
+};

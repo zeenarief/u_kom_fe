@@ -1,9 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Edit, User, MapPin, Briefcase, Phone, Users } from 'lucide-react';
-import { formatDate } from '../../lib/date';
+import { Edit, User, MapPin, Phone, Users, Shield } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import { useParentDetail, useUnlinkParentFromUser, useLinkParentToUser } from './parentQueries';
+import { useGuardianDetail, useUnlinkGuardianFromUser, useLinkGuardianToUser } from './guardianQueries';
 import { useAlertStore } from '../../store/alertStore';
 import UserAccountSection from '../../components/common/UserAccountSection';
 
@@ -14,50 +13,50 @@ const DetailRow = ({ label, value }: { label: string; value?: string | null }) =
     </div>
 );
 
-export default function ParentDetailPage() {
+export default function GuardianDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { data: parent, isLoading, isError } = useParentDetail(id || null);
-    const unlinkMutation = useUnlinkParentFromUser();
-    const linkMutation = useLinkParentToUser();
+    const { data: guardian, isLoading, isError } = useGuardianDetail(id || null);
+    const unlinkMutation = useUnlinkGuardianFromUser();
+    const linkMutation = useLinkGuardianToUser();
     const { showAlert } = useAlertStore();
 
     const handleEdit = () => {
-        navigate(`/dashboard/parents/${id}/edit`);
+        navigate(`/dashboard/guardians/${id}/edit`);
     };
 
     const handleUnlink = () => {
-        if (!parent) return;
+        if (!guardian) return;
         showAlert(
             'Konfirmasi Putus Akun',
-            `Yakin ingin memutuskan hubungan akun "${parent.user?.username}" dengan orang tua "${parent.full_name}"?`,
+            `Yakin ingin memutuskan hubungan akun "${guardian.user?.username}" dengan wali "${guardian.full_name}"?`,
             'warning',
-            () => unlinkMutation.mutate(parent.id),
+            () => unlinkMutation.mutate(guardian.id),
             () => { }
         );
     };
 
-    const handleLink = (parentId: string, userId: string) => {
-        linkMutation.mutate({ parentId, userId });
+    const handleLink = (guardianId: string, userId: string) => {
+        linkMutation.mutate({ guardianId, userId });
     };
 
     if (isLoading) {
         return (
             <div className="max-w-4xl mx-auto py-8 px-4">
                 <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                    <p className="mt-3 text-gray-500">Memuat data orang tua...</p>
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                    <p className="mt-3 text-gray-500">Memuat data wali...</p>
                 </div>
             </div>
         );
     }
 
-    if (isError || !parent) {
+    if (isError || !guardian) {
         return (
             <div className="max-w-4xl mx-auto py-8 px-4">
                 <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                    <p className="text-red-500">Data orang tua tidak ditemukan.</p>
-                    <Button onClick={() => navigate('/dashboard/parents')} className="mt-4">
+                    <p className="text-red-500">Data wali tidak ditemukan.</p>
+                    <Button onClick={() => navigate('/dashboard/guardians')} className="mt-4">
                         Kembali ke Daftar
                     </Button>
                 </div>
@@ -75,8 +74,8 @@ export default function ParentDetailPage() {
                     <div className="px-6 py-4 border-b border-gray-200">
                         <Breadcrumb
                             items={[
-                                { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
-                                { label: parent.full_name }
+                                { label: 'Wali', href: '/dashboard/guardians', icon: Users },
+                                { label: guardian.full_name }
                             ]}
                         />
                     </div>
@@ -86,20 +85,22 @@ export default function ParentDetailPage() {
                             {/* Avatar & Basic Info */}
                             <div className="flex items-center gap-5">
                                 <div className="relative">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center text-purple-700 font-bold text-3xl border-4 border-white shadow-lg">
-                                        {parent.full_name.charAt(0)}
+                                    <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full flex items-center justify-center text-orange-700 font-bold text-3xl border-4 border-white shadow-lg">
+                                        <Shield size={32} />
                                     </div>
                                 </div>
 
                                 <div className="flex-1">
-                                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{parent.full_name}</h1>
+                                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{guardian.full_name}</h1>
                                     <div className="flex gap-2 mt-2">
-                                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                            {parent.life_status === 'alive' ? '✓ Hidup' : '✝ Meninggal'}
+                                        <span className="text-xs px-2.5 py-1 rounded-full bg-orange-100 text-orange-700 font-medium uppercase">
+                                            {guardian.relationship_to_student || 'Wali'}
                                         </span>
-                                        <span className="text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 font-medium uppercase">
-                                            {parent.marital_status || '-'}
-                                        </span>
+                                        {guardian.gender && (
+                                            <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 font-medium">
+                                                {guardian.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +110,7 @@ export default function ParentDetailPage() {
                                 {/* Edit Button */}
                                 <Button
                                     onClick={handleEdit}
-                                    className="bg-purple-600 hover:bg-purple-700"
+                                    className="bg-orange-600 hover:bg-orange-700"
                                 >
                                     <Edit size={16} className="mr-2" /> Edit Data
                                 </Button>
@@ -125,58 +126,51 @@ export default function ParentDetailPage() {
                         {/* Kontak */}
                         <div>
                             <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                                <Phone size={18} className="text-purple-500" /> Kontak
+                                <Phone size={18} className="text-orange-500" /> Kontak
                             </h3>
                             <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg">
-                                <DetailRow label="No. Handphone" value={parent.phone_number} />
-                                <DetailRow label="Email" value={parent.email} />
-                            </div>
-                        </div>
-
-                        {/* Pekerjaan */}
-                        <div>
-                            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                                <Briefcase size={18} className="text-purple-500" /> Pekerjaan & Pendidikan
-                            </h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <DetailRow label="Pekerjaan" value={parent.occupation} />
-                                <DetailRow label="Penghasilan" value={parent.income_range} />
-                                <DetailRow label="Pendidikan Terakhir" value={parent.education_level} />
+                                <DetailRow label="No. Handphone" value={guardian.phone_number} />
+                                <DetailRow label="Email" value={guardian.email} />
                             </div>
                         </div>
 
                         {/* Data Pribadi */}
                         <div>
                             <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                                <User size={18} className="text-purple-500" /> Data Pribadi
+                                <User size={18} className="text-orange-500" /> Data Pribadi
                             </h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <DetailRow label="NIK" value={parent.nik} />
-                                <DetailRow label="Gender" value={parent.gender === 'male' ? 'Laki-laki' : parent.gender === 'female' ? 'Perempuan' : '-'} />
-                                <DetailRow label="Tempat Lahir" value={parent.place_of_birth} />
-                                <DetailRow label="Tanggal Lahir" value={formatDate(parent.date_of_birth)} />
+                                <DetailRow label="NIK" value={guardian.nik} />
+                                <DetailRow label="Gender" value={guardian.gender === 'male' ? 'Laki-laki' : guardian.gender === 'female' ? 'Perempuan' : '-'} />
+                                <DetailRow label="Hubungan dengan Siswa" value={guardian.relationship_to_student} />
                             </div>
                         </div>
 
                         {/* Alamat */}
                         <div>
                             <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-3 pb-2 border-b">
-                                <MapPin size={18} className="text-purple-500" /> Alamat
+                                <MapPin size={18} className="text-orange-500" /> Alamat
                             </h3>
                             <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                                <p>{parent.address}</p>
-                                <p>RT {parent.rt} / RW {parent.rw}</p>
-                                <p>{parent.sub_district}, {parent.district}</p>
-                                <p>{parent.city}, {parent.province} {parent.postal_code}</p>
+                                <p>{guardian.address || '-'}</p>
+                                {(guardian.rt || guardian.rw) && (
+                                    <p>RT {guardian.rt || '-'} / RW {guardian.rw || '-'}</p>
+                                )}
+                                {guardian.sub_district && guardian.district && (
+                                    <p>{guardian.sub_district}, {guardian.district}</p>
+                                )}
+                                {guardian.city && guardian.province && (
+                                    <p>{guardian.city}, {guardian.province} {guardian.postal_code || ''}</p>
+                                )}
                             </div>
                         </div>
 
                         {/* Akun Sistem */}
                         <UserAccountSection
-                            user={parent.user}
-                            entityId={parent.id}
-                            entityType="parent"
-                            themeColor="purple"
+                            user={guardian.user}
+                            entityId={guardian.id}
+                            entityType="guardian"
+                            themeColor="orange"
                             onLink={handleLink}
                             onUnlink={handleUnlink}
                             linkLoading={linkMutation.isPending}
