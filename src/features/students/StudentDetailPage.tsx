@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     User, MapPin, ShieldCheck, Printer,
     ArrowLeft, Users, GraduationCap, School, Edit,
-    Calendar, BookOpen, Home, Heart, FileText,
+    BookOpen, Home, FileText,
     CheckCircle, XCircle, AlertCircle, Download,
     type LucideIcon
 } from 'lucide-react';
@@ -58,7 +58,6 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                             <DetailItem
                                 label="Jenis Kelamin"
                                 value={student.gender === 'male' ? 'Laki-laki' : student.gender === 'female' ? 'Perempuan' : student.gender || '-'}
-                                icon={Heart}
                             />
                             <DetailItem
                                 label="Usia"
@@ -68,7 +67,6 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                         <DetailItem
                             label="Tempat, Tanggal Lahir"
                             value={`${student.place_of_birth || '-'}, ${formatDate(student.date_of_birth)}`}
-                            icon={Calendar}
                         />
                     </div>
 
@@ -76,12 +74,10 @@ const PersonalInfoCard = ({ student }: { student: Student }) => {
                         <DetailItem
                             label="NIK"
                             value={student.nik}
-                            icon={FileText}
                         />
                         <DetailItem
                             label="No. KK"
                             value={student.no_kk}
-                            icon={FileText}
                         />
                     </div>
                 </div>
@@ -498,28 +494,26 @@ export default function StudentDetailPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-8">
-            {/* Navigation Header */}
-            <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between py-3">
-                        <button
-                            onClick={() => navigate('/dashboard/students')}
-                            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all font-medium group"
-                        >
-                            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                            <span className="hidden sm:inline">Daftar Siswa</span>
-                        </button>
-                        <div className="text-xs text-gray-500 font-medium">
-                            Detail Siswa
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Student Header */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+
+                    <div className="mx-3 flex items-center justify-between py-3.5">
+                        {/* Back Button - Clean & Modern */}
+                        <button
+                            onClick={() => navigate('/dashboard/students')}
+                            className="group inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-all duration-200"
+                        >
+                            <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
+                            <span className="hidden sm:inline">Daftar Siswa</span>
+                        </button>
+
+                        {/* Title */}
+                        <div className="w-40 sm:w-48"></div>
+
+                    </div>
+
                     <div className="p-6 md:p-8">
                         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                             {/* Avatar & Basic Info */}
