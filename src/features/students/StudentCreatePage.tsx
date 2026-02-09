@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { Users, Plus } from 'lucide-react';
 import { useCreateStudent } from './studentQueries';
 import StudentForm from './StudentForm';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import { useAlertStore } from '../../store/alertStore';
 import type { StudentFormInput } from './types';
 
@@ -36,11 +38,23 @@ export default function StudentCreatePage() {
 
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
-            <StudentForm
-                title="Tambah Siswa Baru"
-                onSubmit={handleSubmit}
-                isLoading={createMutation.isPending}
-            />
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                <div className="px-6 py-4 border-b border-gray-100">
+                    <Breadcrumb
+                        items={[
+                            { label: 'Siswa', href: '/dashboard/students', icon: Users },
+                            { label: 'Tambah Baru', icon: Plus }
+                        ]}
+                    />
+                </div>
+                <div className="p-6">
+                    <StudentForm
+                        title="Tambah Siswa Baru"
+                        onSubmit={handleSubmit}
+                        isLoading={createMutation.isPending}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

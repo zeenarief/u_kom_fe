@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { Users, Edit } from 'lucide-react';
 import { useUpdateParent, useParentDetail } from './parentQueries';
 import ParentForm from './ParentForm';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import { useAlertStore } from '../../store/alertStore';
 import type { ParentFormInput } from './types';
 
@@ -34,13 +36,26 @@ export default function ParentEditPage() {
 
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
-            <ParentForm
-                title="Edit Data Orang Tua"
-                initialData={parent}
-                onSubmit={handleSubmit}
-                isLoading={updateMutation.isPending}
-                isEditMode={true}
-            />
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                <div className="px-6 py-4 border-b border-gray-100">
+                    <Breadcrumb
+                        items={[
+                            { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
+                            { label: parent.full_name, href: `/dashboard/parents/${id}` },
+                            { label: 'Edit', icon: Edit }
+                        ]}
+                    />
+                </div>
+                <div className="p-6">
+                    <ParentForm
+                        title="Edit Data Orang Tua"
+                        initialData={parent}
+                        onSubmit={handleSubmit}
+                        isLoading={updateMutation.isPending}
+                        isEditMode={true}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

@@ -3,18 +3,16 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import type { Student, StudentFormInput } from './types';
-import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface StudentFormProps {
     initialData?: Student | null;
     onSubmit: (data: StudentFormInput) => void;
     isLoading: boolean;
-    title: string;
     isEditMode?: boolean;
 }
 
-export default function StudentForm({ initialData, onSubmit, isLoading, title, isEditMode = false }: StudentFormProps) {
+export default function StudentForm({ initialData, onSubmit, isLoading, isEditMode = false }: StudentFormProps) {
     const navigate = useNavigate();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<StudentFormInput>();
 
@@ -48,19 +46,9 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="border-b border-gray-200 px-6 py-4 flex items-center gap-4">
-                <button
-                    type="button"
-                    onClick={() => navigate(-1)}
-                    className="p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <ArrowLeft size={20} />
-                </button>
-                <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-            </div>
+        <div className="bg-white rounded-xl shadow-sm">
 
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit(handleFormSubmit)} className="px-6 space-y-6">
 
                 {/* --- SECTION 1: DATA PRIBADI --- */}
                 <div>
@@ -69,19 +57,19 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                     </div>
 
                     <div className="space-y-4">
-                        <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input label="No. KK" {...register('no_kk')} placeholder="16 digit KK" />
+                            <Input label="Nama Lengkap" {...register('full_name', { required: 'Wajib diisi' })} error={errors.full_name?.message} />
                             <Input label="NIK" {...register('nik')} error={errors.nik?.message} placeholder="16 digit NIK" />
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <Input label="NISN" {...register('nisn')} />
                             <Input label="NIM" {...register('nim')} />
+                            <div className="col-span-2">
+                                <Input label="No. KK" {...register('no_kk')} placeholder="16 digit KK" />
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
                                 <select {...register('gender')} className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
@@ -91,8 +79,8 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                                 </select>
                             </div>
                             <Input label="Tempat Lahir" {...register('place_of_birth')} />
+                            <Input label="Tanggal Lahir" type="date" {...register('date_of_birth')} />
                         </div>
-                        <Input label="Tanggal Lahir" type="date" {...register('date_of_birth')} />
                     </div>
                 </div>
 
@@ -103,23 +91,24 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                     </div>
 
                     <div className="space-y-4">
-                        <Input label="Jalan / Alamat" {...register('address')} placeholder="Jl. Mawar No. 12" />
-
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-8 gap-4">
+                            <div className="col-span-4">
+                                <Input label="Jalan / Alamat" {...register('address')} placeholder="Jl. Mawar No. 12" />
+                            </div>
                             <Input label="RT" {...register('rt')} maxLength={3} />
                             <Input label="RW" {...register('rw')} maxLength={3} />
+                            <div className="col-span-2">
+                                <Input label="Kelurahan" {...register('sub_district')} />
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input label="Kelurahan" {...register('sub_district')} />
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <Input label="Kecamatan" {...register('district')} />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input label="Kota/Kab" {...register('city')} />
                             <Input label="Provinsi" {...register('province')} />
+                            <Input label="Kode Pos" {...register('postal_code')} />
+
                         </div>
-                        <Input label="Kode Pos" {...register('postal_code')} />
                     </div>
                 </div>
 
@@ -130,17 +119,16 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                     </div>
 
                     <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status Siswa</label>
-                            <select {...register('status')} className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                                <option value="INACTIVE">Tidak Aktif (INACTIVE)</option>
-                                <option value="ACTIVE">Aktif (ACTIVE)</option>
-                                <option value="GRADUATED">Lulus (GRADUATED)</option>
-                                <option value="DROPOUT">Dropout (DROPOUT)</option>
-                            </select>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Status Siswa</label>
+                                <select {...register('status')} className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                    <option value="INACTIVE">Tidak Aktif (INACTIVE)</option>
+                                    <option value="ACTIVE">Aktif (ACTIVE)</option>
+                                    <option value="GRADUATED">Lulus (GRADUATED)</option>
+                                    <option value="DROPOUT">Dropout (DROPOUT)</option>
+                                </select>
+                            </div>
                             <Input label="Tahun Masuk" {...register('entry_year')} placeholder="Contoh: 2023" />
                             <Input label="Tahun Keluar" {...register('exit_year')} placeholder="Contoh: 2026" />
                         </div>

@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Edit, User, MapPin, Briefcase, Phone, ShieldCheck, Unlink, ArrowLeft, Trash2 } from 'lucide-react';
+import { Edit, User, MapPin, Briefcase, Phone, ShieldCheck, Unlink, Trash2, Users } from 'lucide-react';
 import { formatDate } from '../../lib/date';
 import Button from '../../components/ui/Button';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import { useParentDetail, useUnlinkParentFromUser, useDeleteParent } from './parentQueries';
 import { useAlertStore } from '../../store/alertStore';
 import ParentUserLinker from './ParentUserLinker';
@@ -79,18 +80,14 @@ export default function ParentDetailPage() {
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                {/* Header */}
-                <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button
-                            type="button"
-                            onClick={() => navigate('/dashboard/parents')}
-                            className="p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                            <ArrowLeft size={20} />
-                        </button>
-                        <h1 className="text-xl font-bold text-gray-900">Detail Orang Tua</h1>
-                    </div>
+                {/* Breadcrumb */}
+                <div className="px-6 py-4 border-b border-gray-100">
+                    <Breadcrumb
+                        items={[
+                            { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
+                            { label: parent.full_name }
+                        ]}
+                    />
                 </div>
 
                 <div className="p-6 space-y-6">

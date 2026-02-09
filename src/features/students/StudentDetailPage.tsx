@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { formatDate, calculateAge } from '../../lib/date';
 import Button from '../../components/ui/Button';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import { useStudentDetail, useExportStudentBiodata, useUnlinkStudentFromUser, usePrintStudentBiodata } from './studentQueries';
 import { useAlertStore } from '../../store/alertStore';
 import UserLinker from "./UserLinker";
@@ -498,20 +499,13 @@ export default function StudentDetailPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Student Header */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-
-                    <div className="mx-3 flex items-center justify-between py-3.5">
-                        {/* Back Button - Clean & Modern */}
-                        <button
-                            onClick={() => navigate('/dashboard/students')}
-                            className="group inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-all duration-200"
-                        >
-                            <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
-                            <span className="hidden sm:inline">Daftar Siswa</span>
-                        </button>
-
-                        {/* Title */}
-                        <div className="w-40 sm:w-48"></div>
-
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <Breadcrumb
+                            items={[
+                                { label: 'Siswa', href: '/dashboard/students', icon: Users },
+                                { label: student.full_name }
+                            ]}
+                        />
                     </div>
 
                     <div className="p-6 md:p-8">
