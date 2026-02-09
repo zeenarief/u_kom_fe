@@ -28,10 +28,6 @@ export default function EmployeeCreatePage() {
                         />
                     </div>
                     <div className="p-6">
-                        <div className="mb-6">
-                            <h1 className="text-2xl font-bold text-gray-900">Tambah Pegawai Baru</h1>
-                            <p className="text-sm text-gray-500 mt-1">Lengkapi form di bawah untuk menambahkan pegawai baru ke sistem.</p>
-                        </div>
                         <EmployeeForm
                             onSubmit={handleSubmit}
                             isLoading={createMutation.isPending}

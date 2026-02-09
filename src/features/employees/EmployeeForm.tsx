@@ -128,6 +128,7 @@ export default function EmployeeForm({ initialData, onSubmit, isLoading, isEditM
                                     <option value="Honorer">Honorer</option>
                                     <option value="Tetap">Tetap</option>
                                     <option value="Kontrak">Kontrak</option>
+                                    <option value="Magang">Magang</option>
                                 </select>
                             </div>
                             <Input
@@ -146,16 +147,21 @@ export default function EmployeeForm({ initialData, onSubmit, isLoading, isEditM
                     </div>
 
                     <div className="space-y-4">
-                        <Input
-                            label="No. HP"
-                            {...register('phone_number')}
-                            placeholder="08xxxxxxxxxx"
-                        />
-                        <Input
-                            label="Alamat Lengkap"
-                            {...register('address')}
-                            placeholder="Jl. Contoh No. 123"
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <Input
+                                label="No. HP"
+                                {...register('phone_number')}
+                                placeholder="08xxxxxxxxxx"
+                            />
+                            <div className="col-span-2">
+                                <Input
+                                    label="Alamat Lengkap"
+                                    {...register('address')}
+                                    placeholder="Jl. Contoh No. 123"
+                                />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
