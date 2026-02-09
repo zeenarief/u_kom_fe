@@ -1,4 +1,4 @@
-import { Users, Eye, Trash2, MapPin, Phone, Briefcase } from 'lucide-react';
+import { Users, Eye, Trash2, Phone, Briefcase } from 'lucide-react';
 import type { Parent } from './types';
 
 interface ParentCardProps {

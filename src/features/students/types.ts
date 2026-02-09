@@ -20,7 +20,7 @@ export interface Student {
     city?: string;         // Kota/Kab
     province?: string;
     postal_code?: string;
-    status?: string; // 'ACTIVE', 'GRADUATED', 'DROPOUT', 'INACTIVE'
+    status?: string; // 'ACTIVE', 'GRADUATED', 'DROPOUT'
     entry_year?: string;
     graduation_year?: string;
     created_at?: string;

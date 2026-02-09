@@ -133,6 +133,7 @@ export default function StudentForm({ initialData, onSubmit, isLoading, title, i
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Status Siswa</label>
                             <select {...register('status')} className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <option value="INACTIVE">Tidak Aktif (INACTIVE)</option>
                                 <option value="ACTIVE">Aktif (ACTIVE)</option>
                                 <option value="GRADUATED">Lulus (GRADUATED)</option>
                                 <option value="DROPOUT">Dropout (DROPOUT)</option>

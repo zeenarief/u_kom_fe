@@ -176,6 +176,7 @@ export default function StudentPage() {
                                 className="appearance-none pl-9 pr-8 py-2.5 text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white cursor-pointer min-w-32"
                             >
                                 <option value="ALL">Semua Status</option>
+                                <option value="INACTIVE">Tidak Aktif</option>
                                 <option value="ACTIVE">Aktif</option>
                                 <option value="GRADUATED">Lulus</option>
                                 <option value="DROPOUT">Dropout</option>
@@ -286,9 +287,6 @@ export default function StudentPage() {
                     )}
                 </>
             )}
-
-            {/* MODAL 1: Form Create/Edit */}
-            {/* Removed: Using dedicated pages now */}
         </div>
     );
 }
