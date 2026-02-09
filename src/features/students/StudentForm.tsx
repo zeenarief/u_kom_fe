@@ -42,7 +42,18 @@ export default function StudentForm({ initialData, onSubmit, isLoading, isEditMo
     }, [initialData, setValue]);
 
     const handleFormSubmit: SubmitHandler<StudentFormInput> = (data) => {
-        onSubmit(data);
+        // Convert empty strings to null (except required fields)
+        const payload = Object.fromEntries(
+            Object.entries(data).map(([key, value]) => {
+                // Keep required fields as-is, convert empty optional fields to null
+                if (value === "" && key !== 'full_name' && key !== 'nik') {
+                    return [key, null];
+                }
+                return [key, value];
+            })
+        ) as unknown as StudentFormInput;
+
+        onSubmit(payload);
     };
 
     return (

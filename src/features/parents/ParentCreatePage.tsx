@@ -30,22 +30,24 @@ export default function ParentCreatePage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-                <div className="px-6 py-4 border-b border-gray-100">
-                    <Breadcrumb
-                        items={[
-                            { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
-                            { label: 'Tambah Baru', icon: Plus }
-                        ]}
-                    />
-                </div>
-                <div className="p-6">
-                    <ParentForm
-                        title="Tambah Orang Tua Baru"
-                        onSubmit={handleSubmit}
-                        isLoading={createMutation.isPending}
-                    />
+        <div className="min-h-screen bg-gray-50 pb-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <Breadcrumb
+                            items={[
+                                { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
+                                { label: 'Tambah Baru', icon: Plus }
+                            ]}
+                        />
+                    </div>
+                    <div className="p-6">
+                        <ParentForm
+                            title="Tambah Orang Tua Baru"
+                            onSubmit={handleSubmit}
+                            isLoading={createMutation.isPending}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
