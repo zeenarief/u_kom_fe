@@ -13,8 +13,8 @@ interface User {
 interface UserAccountSectionProps {
     user?: User | null;
     entityId: string;
-    entityType: 'student' | 'parent' | 'guardian';
-    themeColor: 'blue' | 'purple' | 'orange';
+    entityType: 'student' | 'parent' | 'guardian' | 'employee';
+    themeColor: 'blue' | 'purple' | 'orange' | 'teal';
     onLink: (entityId: string, userId: string) => void;
     onUnlink: () => void;
     linkLoading?: boolean;
@@ -50,6 +50,19 @@ const themeConfig = {
     },
     orange: {
         iconColor: 'text-orange-600',
+        gradientBg: 'from-green-50 to-emerald-50',
+        border: 'border-green-200',
+        avatarBg: 'bg-green-100',
+        avatarText: 'text-green-700',
+        titleText: 'text-green-900',
+        usernameText: 'text-green-800',
+        usernameBg: 'bg-green-100',
+        emailText: 'text-green-700',
+        lastLoginText: 'text-green-600',
+        checkIcon: 'text-green-600',
+    },
+    teal: {
+        iconColor: 'text-teal-600',
         gradientBg: 'from-green-50 to-emerald-50',
         border: 'border-green-200',
         avatarBg: 'bg-green-100',

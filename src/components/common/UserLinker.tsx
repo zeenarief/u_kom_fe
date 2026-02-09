@@ -5,7 +5,7 @@ import { Link } from 'lucide-react';
 
 interface UserLinkerProps {
     entityId: string;
-    entityType: 'student' | 'parent' | 'guardian';
+    entityType: 'student' | 'parent' | 'guardian' | 'employee';
     onLink: (entityId: string, userId: string) => void;
     isLoading?: boolean;
 }
@@ -22,7 +22,8 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
     const entityLabels = {
         student: 'Siswa',
         parent: 'Orang Tua',
-        guardian: 'Wali'
+        guardian: 'Wali',
+        employee: 'Pegawai'
     };
 
     return (

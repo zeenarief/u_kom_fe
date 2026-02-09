@@ -20,6 +20,9 @@ import GuardianCreatePage from "./features/guardians/GuardianCreatePage.tsx";
 import GuardianDetailPage from "./features/guardians/GuardianDetailPage.tsx";
 import GuardianEditPage from "./features/guardians/GuardianEditPage.tsx";
 import EmployeePage from "./features/employees/EmployeePage.tsx";
+import EmployeeCreatePage from "./features/employees/EmployeeCreatePage.tsx";
+import EmployeeDetailPage from "./features/employees/EmployeeDetailPage.tsx";
+import EmployeeEditPage from "./features/employees/EmployeeEditPage.tsx";
 import DashboardHome from "./features/dashboard/DashboardHome.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import AcademicYearPage from "./features/academic-years/AcademicYearPage.tsx";
@@ -85,6 +88,9 @@ function App() {
                         <Route path="guardians/:id" element={<GuardianDetailPage />} />
                         <Route path="guardians/:id/edit" element={<GuardianEditPage />} />
                         <Route path="employees" element={<EmployeePage />} />
+                        <Route path="employees/create" element={<EmployeeCreatePage />} />
+                        <Route path="employees/:id" element={<EmployeeDetailPage />} />
+                        <Route path="employees/:id/edit" element={<EmployeeEditPage />} />
 
                         <Route path="academic-years" element={<AcademicYearPage />} />
                         <Route path="classrooms" element={<ClassroomPage />} />
