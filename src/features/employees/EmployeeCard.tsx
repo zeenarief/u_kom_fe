@@ -104,6 +104,20 @@ const EmployeeCard = ({ employee, onViewDetail, onDelete }: EmployeeCardProps) =
                     </div>
                 </div>
 
+                {/* NIP */}
+                <div className="col-span-3 flex justify-center">
+                    {employee.nip ? (
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                                <User size={12} className="text-green-600" />
+                            </div>
+                            <span className="text-xs text-green-700 font-medium">{employee.nip}</span>
+                        </div>
+                    ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                    )}
+                </div>
+
                 {/* Jabatan */}
                 <div className="col-span-2 min-w-0">
                     <div className="text-sm font-medium text-gray-900 truncate">
@@ -112,32 +126,18 @@ const EmployeeCard = ({ employee, onViewDetail, onDelete }: EmployeeCardProps) =
                 </div>
 
                 {/* Status Kepegawaian */}
-                <div className="col-span-2 min-w-0">
+                <div className="col-span-1 min-w-0">
                     <div className={`text-xs px-3 py-1.5 rounded-full font-bold uppercase border inline-flex ${getStatusColor(employee.employment_status)}`}>
                         {employee.employment_status || 'Tidak Ada'}
                     </div>
                 </div>
 
                 {/* Kontak */}
-                <div className="col-span-2 min-w-0">
+                <div className="col-span-2 flex justify-center">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Phone size={14} className="text-gray-400 flex-shrink-0" />
                         <span className="truncate">{employee.phone_number || '-'}</span>
                     </div>
-                </div>
-
-                {/* Akun */}
-                <div className="col-span-2 flex justify-center">
-                    {employee.user ? (
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                <User size={12} className="text-green-600" />
-                            </div>
-                            <span className="text-xs text-green-700 font-medium">Terhubung</span>
-                        </div>
-                    ) : (
-                        <span className="text-xs text-gray-400">Belum</span>
-                    )}
                 </div>
 
                 {/* Actions */}

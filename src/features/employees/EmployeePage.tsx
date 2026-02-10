@@ -209,10 +209,10 @@ export default function EmployeePage() {
             {/* Table Header for Desktop */}
             <div className="hidden md:grid md:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700">
                 <div className="col-span-3">IDENTITAS PEGAWAI</div>
+                <div className="col-span-3 text-center">NIP</div>
                 <div className="col-span-2">JABATAN</div>
-                <div className="col-span-2">STATUS</div>
-                <div className="col-span-2">KONTAK</div>
-                <div className="col-span-2 text-center">AKUN</div>
+                <div className="col-span-1">STATUS</div>
+                <div className="col-span-2 text-center">KONTAK</div>
                 <div className="col-span-1 text-right">AKSI</div>
             </div>
 

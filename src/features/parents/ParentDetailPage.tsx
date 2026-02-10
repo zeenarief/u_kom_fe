@@ -95,7 +95,7 @@ export default function ParentDetailPage() {
                                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{parent.full_name}</h1>
                                     <div className="flex gap-2 mt-2">
                                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${parent.life_status === 'alive' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                            {parent.life_status === 'alive' ? '✓ Hidup' : '✝ Meninggal'}
+                                            {parent.life_status === 'alive' ? 'Hidup' : 'Meninggal'}
                                         </span>
                                         <span className="text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 font-medium uppercase">
                                             {parent.marital_status || '-'}
