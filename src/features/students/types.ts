@@ -25,6 +25,8 @@ export interface Student {
     exit_year?: string;
     created_at?: string;
     updated_at?: string;
+    birth_certificate_file?: string | null; // URL path from backend
+    family_card_file?: string | null;       // URL path from backend
 
     // Relations
     user?: User | null;
@@ -62,6 +64,8 @@ export interface StudentFormInput {
     status?: string;
     entry_year?: string;
     exit_year?: string;
+    birth_certificate_file?: FileList | null;
+    family_card_file?: FileList | null;
 }
 
 export interface LinkUserRequest {

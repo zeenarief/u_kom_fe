@@ -42,7 +42,22 @@ export const useCreateStudent = (onSuccessCallback?: () => void) => {
 
     return useMutation({
         mutationFn: async (data: StudentFormInput) => {
-            return await api.post('/students', data);
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                if (value === null || value === undefined) return;
+
+                if (key === 'birth_certificate_file' || key === 'family_card_file') {
+                    if (value instanceof FileList && value.length > 0) {
+                        formData.append(key, value[0]);
+                    }
+                } else {
+                    formData.append(key, value as string);
+                }
+            });
+
+            return await api.post('/students', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
         },
         onSuccess: () => {
             toast.success('Data siswa berhasil disimpan');
@@ -63,7 +78,26 @@ export const useUpdateStudent = (onSuccessCallback?: () => void) => {
 
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: StudentFormInput }) => {
-            return await api.put(`/students/${id}`, data);
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                // For update, we might normally send _method='PUT' if backend requires it for multipart
+                // But assuming standard PUT support for now.
+                if (value === null || value === undefined) return;
+
+                if (key === 'birth_certificate_file' || key === 'family_card_file') {
+                    if (value instanceof FileList && value.length > 0) {
+                        formData.append(key, value[0]);
+                    }
+                } else {
+                    formData.append(key, value as string);
+                }
+            });
+            // Some backends (like PHP/Laravel) have trouble with PUT + Multipart.
+            // If that happens, we might need POST + _method: PUT.
+            // For now, keeping as PUT.
+            return await api.post(`/students/${id}?_method=PUT`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
         },
         onSuccess: () => {
             toast.success('Data siswa berhasil diperbarui');

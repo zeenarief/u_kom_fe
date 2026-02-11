@@ -146,6 +146,44 @@ export default function StudentForm({ initialData, onSubmit, isLoading, isEditMo
                     </div>
                 </div>
 
+                {/* --- SECTION 4: DOKUMEN PENDUKUNG --- */}
+                <div>
+                    <div className="bg-blue-50 p-3 rounded-lg text-blue-800 font-semibold text-sm mb-4">
+                        Dokumen Pendukung
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <Input
+                                    label="Akta Kelahiran (PDF/Image)"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('birth_certificate_file')}
+                                />
+                                {isEditMode && initialData?.birth_certificate_file && (
+                                    <div className="mt-1 text-xs text-gray-500">
+                                        File saat ini: <a href={initialData.birth_certificate_file} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Lihat</a>
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <Input
+                                    label="Kartu Keluarga (PDF/Image)"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('family_card_file')}
+                                />
+                                {isEditMode && initialData?.family_card_file && (
+                                    <div className="mt-1 text-xs text-gray-500">
+                                        File saat ini: <a href={initialData.family_card_file} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Lihat</a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* FOOTER BUTTONS */}
                 <div className="pt-6 flex justify-end gap-3 border-t">
                     <Button type="button" variant="ghost" onClick={() => navigate(-1)}>Batal</Button>
