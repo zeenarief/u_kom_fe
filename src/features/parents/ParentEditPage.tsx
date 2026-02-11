@@ -35,25 +35,26 @@ export default function ParentEditPage() {
     if (!parent) return <div className="p-8 text-center text-red-500">Data orang tua tidak ditemukan.</div>;
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-                <div className="px-6 py-4 border-b border-gray-100">
-                    <Breadcrumb
-                        items={[
-                            { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
-                            { label: parent.full_name, href: `/dashboard/parents/${id}` },
-                            { label: 'Edit', icon: Edit }
-                        ]}
-                    />
-                </div>
-                <div className="p-6">
-                    <ParentForm
-                        title="Edit Data Orang Tua"
-                        initialData={parent}
-                        onSubmit={handleSubmit}
-                        isLoading={updateMutation.isPending}
-                        isEditMode={true}
-                    />
+        <div className="min-h-screen bg-gray-50 pb-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <Breadcrumb
+                            items={[
+                                { label: 'Orang Tua', href: '/dashboard/parents', icon: Users },
+                                { label: parent.full_name, href: `/dashboard/parents/${id}` },
+                                { label: 'Edit', icon: Edit }
+                            ]}
+                        />
+                    </div>
+                    <div className="p-6">
+                        <ParentForm
+                            initialData={parent}
+                            onSubmit={handleSubmit}
+                            isLoading={updateMutation.isPending}
+                            isEditMode={true}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

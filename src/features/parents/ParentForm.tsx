@@ -3,18 +3,16 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import type { Parent, ParentFormInput } from './types';
-import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ParentFormProps {
     initialData?: Parent | null;
     onSubmit: (data: ParentFormInput) => void;
     isLoading: boolean;
-    title: string;
     isEditMode?: boolean;
 }
 
-export default function ParentForm({ initialData, onSubmit, isLoading, title, isEditMode = false }: ParentFormProps) {
+export default function ParentForm({ initialData, onSubmit, isLoading, isEditMode = false }: ParentFormProps) {
     const navigate = useNavigate();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<ParentFormInput>();
 
@@ -54,16 +52,6 @@ export default function ParentForm({ initialData, onSubmit, isLoading, title, is
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="border-b border-gray-200 px-6 py-4 flex items-center gap-4">
-                <button
-                    type="button"
-                    onClick={() => navigate(-1)}
-                    className="p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <ArrowLeft size={20} />
-                </button>
-                <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-            </div>
 
             <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-6">
 

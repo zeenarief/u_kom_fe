@@ -43,7 +43,6 @@ export default function ParentCreatePage() {
                     </div>
                     <div className="p-6">
                         <ParentForm
-                            title="Tambah Orang Tua Baru"
                             onSubmit={handleSubmit}
                             isLoading={createMutation.isPending}
                         />
