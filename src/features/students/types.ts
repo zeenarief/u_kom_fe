@@ -25,8 +25,16 @@ export interface Student {
     exit_year?: string;
     created_at?: string;
     updated_at?: string;
-    birth_certificate_file?: string | null; // URL path from backend
-    family_card_file?: string | null;       // URL path from backend
+
+    // File URLs from backend
+    birth_certificate_file_url?: string | null;
+    family_card_file_url?: string | null;
+    parent_statement_file_url?: string | null;
+    student_statement_file_url?: string | null;
+    health_insurance_file_url?: string | null;
+    diploma_certificate_file_url?: string | null;
+    graduation_certificate_file_url?: string | null;
+    financial_hardship_letter_file_url?: string | null;
 
     // Relations
     user?: User | null;
@@ -64,8 +72,16 @@ export interface StudentFormInput {
     status?: string;
     entry_year?: string;
     exit_year?: string;
+
+    // File Inputs
     birth_certificate_file?: FileList | null;
     family_card_file?: FileList | null;
+    parent_statement_file?: FileList | null;
+    student_statement_file?: FileList | null;
+    health_insurance_file?: FileList | null;
+    diploma_certificate_file?: FileList | null;
+    graduation_certificate_file?: FileList | null;
+    financial_hardship_letter_file?: FileList | null;
 }
 
 export interface LinkUserRequest {

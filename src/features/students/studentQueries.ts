@@ -43,10 +43,21 @@ export const useCreateStudent = (onSuccessCallback?: () => void) => {
     return useMutation({
         mutationFn: async (data: StudentFormInput) => {
             const formData = new FormData();
+            const fileKeys = [
+                'birth_certificate_file',
+                'family_card_file',
+                'parent_statement_file',
+                'student_statement_file',
+                'health_insurance_file',
+                'diploma_certificate_file',
+                'graduation_certificate_file',
+                'financial_hardship_letter_file'
+            ];
+
             Object.entries(data).forEach(([key, value]) => {
                 if (value === null || value === undefined) return;
 
-                if (key === 'birth_certificate_file' || key === 'family_card_file') {
+                if (fileKeys.includes(key)) {
                     if (value instanceof FileList && value.length > 0) {
                         formData.append(key, value[0]);
                     }
@@ -79,12 +90,21 @@ export const useUpdateStudent = (onSuccessCallback?: () => void) => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: StudentFormInput }) => {
             const formData = new FormData();
+            const fileKeys = [
+                'birth_certificate_file',
+                'family_card_file',
+                'parent_statement_file',
+                'student_statement_file',
+                'health_insurance_file',
+                'diploma_certificate_file',
+                'graduation_certificate_file',
+                'financial_hardship_letter_file'
+            ];
+
             Object.entries(data).forEach(([key, value]) => {
-                // For update, we might normally send _method='PUT' if backend requires it for multipart
-                // But assuming standard PUT support for now.
                 if (value === null || value === undefined) return;
 
-                if (key === 'birth_certificate_file' || key === 'family_card_file') {
+                if (fileKeys.includes(key)) {
                     if (value instanceof FileList && value.length > 0) {
                         formData.append(key, value[0]);
                     }
@@ -92,10 +112,7 @@ export const useUpdateStudent = (onSuccessCallback?: () => void) => {
                     formData.append(key, value as string);
                 }
             });
-            // Some backends (like PHP/Laravel) have trouble with PUT + Multipart.
-            // If that happens, we might need POST + _method: PUT.
-            // For now, keeping as PUT.
-            return await api.post(`/students/${id}?_method=PUT`, formData, {
+            return await api.put(`/students/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
         },

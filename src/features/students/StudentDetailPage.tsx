@@ -17,6 +17,7 @@ import FamilyManager from './FamilyManager';
 import GuardianManager from './GuardianManager';
 import type { Student } from './types';
 import Badge from '../../components/ui/Badge';
+import SecureFilePreview from '../../components/common/SecureFilePreview';
 
 // Helper untuk status badge
 const getStatusConfig = (status?: string) => {
@@ -338,7 +339,7 @@ const StudentStats = ({ student }: { student: Student }) => {
 export default function StudentDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState<'overview' | 'family' | 'academic' | 'account'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'family' | 'academic' | 'documents' | 'account'>('overview');
     const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 
     const { data: student, isLoading, isError } = useStudentDetail(id || null);
@@ -410,7 +411,7 @@ export default function StudentDetailPage() {
     }
 
     interface TabItem {
-        id: 'overview' | 'family' | 'academic' | 'account';
+        id: 'overview' | 'family' | 'academic' | 'documents' | 'account';
         label: string;
         icon: LucideIcon;
         count?: number;
@@ -420,6 +421,7 @@ export default function StudentDetailPage() {
         { id: 'overview', label: 'Overview', icon: User },
         { id: 'academic', label: 'Akademik', icon: School },
         { id: 'family', label: 'Keluarga', icon: Users },
+        { id: 'documents', label: 'Dokumen', icon: FileText },
         { id: 'account', label: 'Akun', icon: ShieldCheck },
     ];
 
@@ -600,6 +602,67 @@ export default function StudentDetailPage() {
                         <div className="space-y-6">
                             <FamilyManager student={student} />
                             <GuardianManager student={student} />
+                        </div>
+                    )}
+
+                    {activeTab === 'documents' && (
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-100 px-6 py-4 bg-gray-50">
+                                <div className="flex items-center gap-2">
+                                    <FileText size={18} className="text-blue-600" />
+                                    <h3 className="font-semibold text-gray-900">Dokumen Pendukung</h3>
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                {(!student.birth_certificate_file_url &&
+                                    !student.family_card_file_url &&
+                                    !student.parent_statement_file_url &&
+                                    !student.student_statement_file_url &&
+                                    !student.health_insurance_file_url &&
+                                    !student.diploma_certificate_file_url &&
+                                    !student.graduation_certificate_file_url &&
+                                    !student.financial_hardship_letter_file_url
+                                ) ? (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <FileText size={48} className="mx-auto mb-3 text-gray-300" />
+                                        <p>Belum ada dokumen yang diunggah</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {[
+                                            { label: 'Akta Kelahiran', url: student.birth_certificate_file_url, color: 'blue' },
+                                            { label: 'Kartu Keluarga', url: student.family_card_file_url, color: 'purple' },
+                                            { label: 'Surat Pernyataan Orang Tua', url: student.parent_statement_file_url, color: 'green' },
+                                            { label: 'Surat Pernyataan Siswa', url: student.student_statement_file_url, color: 'orange' },
+                                            { label: 'Kartu Asuransi Kesehatan', url: student.health_insurance_file_url, color: 'red' },
+                                            { label: 'Ijazah Terakhir', url: student.diploma_certificate_file_url, color: 'indigo' },
+                                            { label: 'Surat Keterangan Lulus', url: student.graduation_certificate_file_url, color: 'pink' },
+                                            { label: 'Surat Keterangan Tidak Mampu', url: student.financial_hardship_letter_file_url, color: 'teal' },
+                                        ].map((doc, idx) => (
+                                            <div key={idx} className="border rounded-lg p-4 bg-gray-50/50">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div>
+                                                        <h4 className="font-medium text-gray-900">{doc.label}</h4>
+                                                        <p className="text-sm text-gray-500 mt-1">
+                                                            {doc.url ? 'Dokumen tersedia' : 'Belum diunggah'}
+                                                        </p>
+                                                    </div>
+                                                    <div className={`p-2 rounded-lg ${doc.url ? `bg-${doc.color}-100 text-${doc.color}-600` : 'bg-gray-100 text-gray-400'}`}>
+                                                        <FileText size={20} />
+                                                    </div>
+                                                </div>
+                                                {doc.url && (
+                                                    <SecureFilePreview
+                                                        url={doc.url}
+                                                        buttonText="Lihat Dokumen"
+                                                        className="w-full justify-center bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 h-10 rounded-lg"
+                                                    />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 

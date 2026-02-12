@@ -4,6 +4,7 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import type { Student, StudentFormInput } from './types';
 import { useNavigate } from 'react-router-dom';
+import SecureFilePreview from '../../components/common/SecureFilePreview';
 
 interface StudentFormProps {
     initialData?: Student | null;
@@ -153,7 +154,8 @@ export default function StudentForm({ initialData, onSubmit, isLoading, isEditMo
                     </div>
 
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Akta Kelahiran */}
                             <div>
                                 <Input
                                     label="Akta Kelahiran (PDF/Image)"
@@ -161,12 +163,14 @@ export default function StudentForm({ initialData, onSubmit, isLoading, isEditMo
                                     accept="application/pdf,image/*"
                                     {...register('birth_certificate_file')}
                                 />
-                                {isEditMode && initialData?.birth_certificate_file && (
-                                    <div className="mt-1 text-xs text-gray-500">
-                                        File saat ini: <a href={initialData.birth_certificate_file} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Lihat</a>
+                                {isEditMode && initialData?.birth_certificate_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.birth_certificate_file_url} buttonText="Lihat Document" />
                                     </div>
                                 )}
                             </div>
+
+                            {/* Kartu Keluarga */}
                             <div>
                                 <Input
                                     label="Kartu Keluarga (PDF/Image)"
@@ -174,9 +178,99 @@ export default function StudentForm({ initialData, onSubmit, isLoading, isEditMo
                                     accept="application/pdf,image/*"
                                     {...register('family_card_file')}
                                 />
-                                {isEditMode && initialData?.family_card_file && (
-                                    <div className="mt-1 text-xs text-gray-500">
-                                        File saat ini: <a href={initialData.family_card_file} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Lihat</a>
+                                {isEditMode && initialData?.family_card_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.family_card_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Surat Pernyataan Orang Tua */}
+                            <div>
+                                <Input
+                                    label="Surat Pernyataan Orang Tua"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('parent_statement_file')}
+                                />
+                                {isEditMode && initialData?.parent_statement_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.parent_statement_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Surat Pernyataan Siswa */}
+                            <div>
+                                <Input
+                                    label="Surat Pernyataan Siswa"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('student_statement_file')}
+                                />
+                                {isEditMode && initialData?.student_statement_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.student_statement_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Kartu Asuransi Kesehatan */}
+                            <div>
+                                <Input
+                                    label="Kartu Asuransi Kesehatan"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('health_insurance_file')}
+                                />
+                                {isEditMode && initialData?.health_insurance_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.health_insurance_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Ijazah Terakhir */}
+                            <div>
+                                <Input
+                                    label="Ijazah Terakhir"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('diploma_certificate_file')}
+                                />
+                                {isEditMode && initialData?.diploma_certificate_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.diploma_certificate_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Surat Keterangan Lulus */}
+                            <div>
+                                <Input
+                                    label="Surat Keterangan Lulus"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('graduation_certificate_file')}
+                                />
+                                {isEditMode && initialData?.graduation_certificate_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.graduation_certificate_file_url} buttonText="Lihat Document" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Surat Keterangan Tidak Mampu */}
+                            <div>
+                                <Input
+                                    label="Surat Keterangan Tidak Mampu"
+                                    type="file"
+                                    accept="application/pdf,image/*"
+                                    {...register('financial_hardship_letter_file')}
+                                />
+                                {isEditMode && initialData?.financial_hardship_letter_file_url && (
+                                    <div className="mt-1 text-xs">
+                                        File saat ini: <SecureFilePreview url={initialData.financial_hardship_letter_file_url} buttonText="Lihat Document" />
                                     </div>
                                 )}
                             </div>
