@@ -53,8 +53,8 @@ export default function UserDetailModal({ userId, onClose, onEdit }: Props) {
                             <span className="block text-xs font-medium text-gray-500 uppercase tracking-wide">Roles</span>
                             <div className="flex flex-wrap gap-2 mt-1">
                                 {user.roles && user.roles.length > 0 ? user.roles.map(r => (
-                                    <span key={r.id} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium border border-blue-200">
-                                        {r.name}
+                                    <span key={r} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium border border-blue-200">
+                                        {r}
                                     </span>
                                 )) : <span className="text-gray-400 italic text-sm">Tidak ada role</span>}
                             </div>

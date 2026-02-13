@@ -31,7 +31,7 @@ const ProfilePage = () => {
         return 'from-gray-700 to-gray-900';
     };
 
-    const gradientClass = getGradient(user.roles?.[0]?.name);
+    const gradientClass = getGradient(user.roles?.[0]);
 
     return (
         <div className="max-w-5xl mx-auto space-y-6 pb-12">
@@ -58,7 +58,7 @@ const ProfilePage = () => {
                             {/* Role Badge on Avatar */}
                             <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 translate-x-1/4 translate-y-1/4">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border-2 border-white shadow-sm bg-white text-gray-800`}>
-                                    {user.roles?.[0]?.name || 'User'}
+                                    {user.roles?.[0] || 'User'}
                                 </span>
                             </div>
                         </div>
@@ -132,9 +132,9 @@ const ProfilePage = () => {
                                 <p className="text-sm text-gray-500 mb-2">Peran Saat Ini</p>
                                 <div className="flex flex-wrap gap-2">
                                     {user.roles.map((role) => (
-                                        <div key={role.id} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium border border-indigo-100">
+                                        <div key={role} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium border border-indigo-100">
                                             <Shield size={14} />
-                                            {role.name}
+                                            {role}
                                         </div>
                                     ))}
                                 </div>

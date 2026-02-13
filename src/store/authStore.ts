@@ -24,12 +24,16 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
 
             setAuth: (data) =>
-                set({
-                    user: data.user,
+                set((state) => ({
+                    user: {
+                        ...data.user,
+                        // Preserve existing roles if backend returns null/undefined (common in refresh token response)
+                        roles: data.user.roles || state.user?.roles || [],
+                    },
                     accessToken: data.access_token,
                     refreshToken: data.refresh_token,
                     isAuthenticated: true,
-                }),
+                })),
 
             logout: () =>
                 set({

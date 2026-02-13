@@ -61,6 +61,11 @@ export const useCreateStudent = (onSuccessCallback?: () => void) => {
                     if (value instanceof FileList && value.length > 0) {
                         formData.append(key, value[0]);
                     }
+                } else if (key === 'date_of_birth' && typeof value === 'string') {
+                    // Backend expects JSON string for dates, so we wrap in quotes
+                    // Format: "YYYY-MM-DDT00:00:00Z"
+                    const dateVal = new Date(value).toISOString();
+                    formData.append(key, `"${dateVal}"`);
                 } else {
                     formData.append(key, value as string);
                 }
@@ -108,6 +113,10 @@ export const useUpdateStudent = (onSuccessCallback?: () => void) => {
                     if (value instanceof FileList && value.length > 0) {
                         formData.append(key, value[0]);
                     }
+                } else if (key === 'date_of_birth' && typeof value === 'string') {
+                    // Backend expects JSON string for dates, so we wrap in quotes
+                    const dateVal = new Date(value).toISOString();
+                    formData.append(key, `"${dateVal}"`);
                 } else {
                     formData.append(key, value as string);
                 }

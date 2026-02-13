@@ -108,8 +108,8 @@ export default function UserPage() {
                                     <td className="px-6 py-4">
                                         <div className="flex flex-wrap gap-1">
                                             {user.roles?.map(role => (
-                                                <span key={role.id} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">
-                                                    {role.name}
+                                                <span key={role} className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">
+                                                    {role}
                                                 </span>
                                             ))}
                                         </div>

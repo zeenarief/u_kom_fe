@@ -49,8 +49,11 @@ export default function UserFormModal({ isOpen, onClose, userToEdit }: Props) {
                 setValue('email', userToEdit.email);
 
                 // Ambil semua role ID dan masukkan ke form
-                if (userToEdit.roles && userToEdit.roles.length > 0) {
-                    const currentRoleIds = userToEdit.roles.map(r => r.id);
+                // Ambil semua role ID dan masukkan ke form
+                if (userToEdit.roles && userToEdit.roles.length > 0 && roles) {
+                    const currentRoleIds = roles
+                        .filter(r => userToEdit.roles.includes(r.name))
+                        .map(r => r.id);
                     setValue('role_ids', currentRoleIds);
                 } else {
                     setValue('role_ids', []);
@@ -67,7 +70,7 @@ export default function UserFormModal({ isOpen, onClose, userToEdit }: Props) {
                 });
             }
         }
-    }, [isOpen, userToEdit, setValue, reset]);
+    }, [isOpen, userToEdit, setValue, reset, roles]);
 
     const onSubmit: SubmitHandler<UserFormInput> = (data) => {
         // Validasi Manual: Pastikan minimal 1 role dipilih (karena checkbox html kadang tricky)

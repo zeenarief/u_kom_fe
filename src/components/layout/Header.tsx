@@ -62,34 +62,59 @@ const Header = () => {
     const isActive = (path: string) => location.pathname === path;
     const isGroupActive = (paths: string[]) => paths.some(path => location.pathname.startsWith(path));
 
-    const navGroups = [
-        {
-            name: 'Akademik',
-            items: [
-                { label: 'Tahun Ajaran', path: '/dashboard/academic-years' },
-                { label: 'Data Kelas', path: '/dashboard/classrooms' },
-                { label: 'Mata Pelajaran', path: '/dashboard/subjects' },
-                { label: 'Guru Pengampu', path: '/dashboard/assignments' },
-                { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
-            ]
-        },
-        {
-            name: 'Kesiswaan',
-            items: [
-                { label: 'Data Siswa', path: '/dashboard/students' },
-                { label: 'Data Orang Tua', path: '/dashboard/parents' },
-                { label: 'Data Wali', path: '/dashboard/guardians' },
-            ]
-        },
-        {
-            name: 'Kepegawaian & User',
-            items: [ // "Manajemen" renamed to be more descriptive based on content
-                { label: 'Guru & Tendik', path: '/dashboard/employees' },
-                { label: 'Manajemen User', path: '/dashboard/users' },
-                { label: 'Role & Izin', path: '/dashboard/roles' },
-            ]
+    // --- Dynamic Nav Menu ---
+    const getNavGroups = () => {
+        // 1. Menu untuk SISWA
+        if (user?.profile_context?.type === 'student') {
+            return [
+                {
+                    name: 'Menu Siswa',
+                    items: [
+                        { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
+                        { label: 'Tugas & PR', path: '/dashboard/assignments' },
+                        { label: 'Nilai Akademik', path: '/dashboard/grades' }, // Placeholder
+                    ]
+                }
+            ];
         }
-    ];
+
+        // 2. Menu untuk ADMIN (Default)
+        // Jika roles mengandung admin, tampilkan semua
+        if (user?.roles?.includes('admin')) {
+            return [
+                {
+                    name: 'Akademik',
+                    items: [
+                        { label: 'Tahun Ajaran', path: '/dashboard/academic-years' },
+                        { label: 'Data Kelas', path: '/dashboard/classrooms' },
+                        { label: 'Mata Pelajaran', path: '/dashboard/subjects' },
+                        { label: 'Guru Pengampu', path: '/dashboard/assignments' },
+                        { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
+                    ]
+                },
+                {
+                    name: 'Kesiswaan',
+                    items: [
+                        { label: 'Data Siswa', path: '/dashboard/students' },
+                        { label: 'Data Orang Tua', path: '/dashboard/parents' },
+                        { label: 'Data Wali', path: '/dashboard/guardians' },
+                    ]
+                },
+                {
+                    name: 'Kepegawaian & User',
+                    items: [
+                        { label: 'Guru & Tendik', path: '/dashboard/employees' },
+                        { label: 'Manajemen User', path: '/dashboard/users' },
+                        { label: 'Role & Izin', path: '/dashboard/roles' },
+                    ]
+                }
+            ];
+        }
+
+        return [];
+    };
+
+    const navGroups = getNavGroups();
 
     return (
         <header className="h-16 bg-white border-b border-gray-200 fixed top-0 right-0 left-0 z-50 shadow-sm">
@@ -102,53 +127,55 @@ const Header = () => {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-2" ref={navRef}>
-                        <Link
-                            to="/dashboard"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/dashboard'
-                                ? 'bg-blue-50 text-blue-700'
-                                : 'text-gray-600 hover:bg-gray-50 text-gray-700'
-                                }`}
-                        >
-                            Dashboard
-                        </Link>
+                    {navGroups.length > 0 && (
+                        <nav className="hidden md:flex items-center gap-2" ref={navRef}>
+                            <Link
+                                to="/dashboard"
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/dashboard'
+                                    ? 'bg-blue-50 text-blue-700'
+                                    : 'text-gray-600 hover:bg-gray-50 text-gray-700'
+                                    }`}
+                            >
+                                Dashboard
+                            </Link>
 
-                        {navGroups.map((group) => {
-                            const groupActive = isGroupActive(group.items.map(i => i.path));
+                            {navGroups.map((group) => {
+                                const groupActive = isGroupActive(group.items.map(i => i.path));
 
-                            return (
-                                <div key={group.name} className="relative">
-                                    <button
-                                        onClick={() => toggleDropdown(group.name)}
-                                        className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${groupActive || activeDropdown === group.name
-                                            ? 'bg-blue-50 text-blue-700'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                            }`}
-                                    >
-                                        {group.name}
-                                        <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === group.name ? 'rotate-180' : ''}`} />
-                                    </button>
+                                return (
+                                    <div key={group.name} className="relative">
+                                        <button
+                                            onClick={() => toggleDropdown(group.name)}
+                                            className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${groupActive || activeDropdown === group.name
+                                                ? 'bg-blue-50 text-blue-700'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                }`}
+                                        >
+                                            {group.name}
+                                            <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === group.name ? 'rotate-180' : ''}`} />
+                                        </button>
 
-                                    {activeDropdown === group.name && (
-                                        <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
-                                            {group.items.map((item) => (
-                                                <Link
-                                                    key={item.path}
-                                                    to={item.path}
-                                                    className={`block px-4 py-2 text-sm ${isActive(item.path)
-                                                        ? 'bg-blue-50 text-blue-700'
-                                                        : 'text-gray-700 hover:bg-gray-50'
-                                                        }`}
-                                                >
-                                                    {item.label}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </nav>
+                                        {activeDropdown === group.name && (
+                                            <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                                {group.items.map((item) => (
+                                                    <Link
+                                                        key={item.path}
+                                                        to={item.path}
+                                                        className={`block px-4 py-2 text-sm ${isActive(item.path)
+                                                            ? 'bg-blue-50 text-blue-700'
+                                                            : 'text-gray-700 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        {item.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </nav>
+                    )}
                 </div>
 
                 {/* Right Side Actions */}
@@ -161,7 +188,7 @@ const Header = () => {
                         >
                             <div>
                                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-500">{user?.roles?.[0]?.name || 'User'}</p>
+                                <p className="text-xs text-gray-500">{user?.roles?.[0] || 'User'}</p>
                             </div>
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
                                 <UserIcon size={16} />
@@ -211,55 +238,57 @@ const Header = () => {
                             </div>
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-500">{user?.roles?.[0]?.name || 'User'}</p>
+                                <p className="text-xs text-gray-500">{user?.roles?.[0] || 'User'}</p>
                             </div>
                         </div>
 
                         {/* Navigation Links */}
-                        <div className="space-y-1">
-                            <Link
-                                to="/dashboard"
-                                className={`block px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/dashboard'
-                                    ? 'bg-blue-50 text-blue-700'
-                                    : 'text-gray-700 hover:bg-gray-50'
-                                    }`}
-                            >
-                                Dashboard
-                            </Link>
+                        {navGroups.length > 0 && (
+                            <div className="space-y-1">
+                                <Link
+                                    to="/dashboard"
+                                    className={`block px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/dashboard'
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    Dashboard
+                                </Link>
 
-                            {navGroups.map((group) => {
-                                const isExpanded = activeDropdown === group.name;
+                                {navGroups.map((group) => {
+                                    const isExpanded = activeDropdown === group.name;
 
-                                return (
-                                    <div key={group.name} className="space-y-1">
-                                        <button
-                                            onClick={() => toggleDropdown(group.name)}
-                                            className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md"
-                                        >
-                                            {group.name}
-                                            <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                                        </button>
+                                    return (
+                                        <div key={group.name} className="space-y-1">
+                                            <button
+                                                onClick={() => toggleDropdown(group.name)}
+                                                className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                                            >
+                                                {group.name}
+                                                <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                                            </button>
 
-                                        {isExpanded && (
-                                            <div className="pl-4 space-y-1 border-l-2 border-gray-100 ml-3">
-                                                {group.items.map((item) => (
-                                                    <Link
-                                                        key={item.path}
-                                                        to={item.path}
-                                                        className={`block px-3 py-2 rounded-md text-sm ${isActive(item.path)
-                                                            ? 'text-blue-700 font-medium'
-                                                            : 'text-gray-600 hover:text-gray-900'
-                                                            }`}
-                                                    >
-                                                        {item.label}
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            {isExpanded && (
+                                                <div className="pl-4 space-y-1 border-l-2 border-gray-100 ml-3">
+                                                    {group.items.map((item) => (
+                                                        <Link
+                                                            key={item.path}
+                                                            to={item.path}
+                                                            className={`block px-3 py-2 rounded-md text-sm ${isActive(item.path)
+                                                                ? 'text-blue-700 font-medium'
+                                                                : 'text-gray-600 hover:text-gray-900'
+                                                                }`}
+                                                        >
+                                                            {item.label}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         <div className="border-t border-gray-100 pt-4 space-y-2">
                             <Link
