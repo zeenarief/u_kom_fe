@@ -5,7 +5,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const Header = () => {
-    const { user, logout } = useAuthStore();
+    const { user, logout, activeRole, setActiveRole } = useAuthStore();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -62,71 +62,145 @@ const Header = () => {
     const isActive = (path: string) => location.pathname === path;
     const isGroupActive = (paths: string[]) => paths.some(path => location.pathname.startsWith(path));
 
-    // --- Dynamic Nav Menu ---
+    // --- Role Detection Logic ---
+    // Flatten all available roles for the switcher
+    const getAvailableRoles = () => {
+        const roles: { id: string; label: string }[] = [];
+
+        // 1. Student
+        if (user?.profile_context?.type === 'student' || user?.roles?.includes('student')) {
+            roles.push({ id: 'student', label: 'Siswa' });
+        }
+
+        // 2. Parent
+        if (['parent', 'guardian'].includes(user?.profile_context?.type || '') || user?.roles?.some(r => ['parent', 'guardian'].includes(r))) {
+            roles.push({ id: 'parent', label: 'Wali Murid' });
+        }
+
+        // 3. Employee Roles
+        if (user?.roles?.includes('teacher') || user?.roles?.includes('guru')) {
+            roles.push({ id: 'teacher', label: 'Guru' });
+        }
+        if (user?.roles?.includes('finance_admin') || user?.roles?.includes('admin-keuangan')) {
+            roles.push({ id: 'finance_admin', label: 'Keuangan' });
+        }
+        if (user?.roles?.includes('education_admin') || user?.roles?.includes('admin-pendidikan')) {
+            roles.push({ id: 'education_admin', label: 'Pendidikan' });
+        }
+
+        // 4. Admin
+        if (user?.roles?.includes('admin') || user?.profile_context?.type === 'admin') {
+            roles.push({ id: 'admin', label: 'Admin' });
+        }
+
+        // Fallback for generic employee if no specific role found
+        if (roles.length === 0 && user?.profile_context?.type === 'employee') {
+            roles.push({ id: 'employee', label: 'Karyawan' });
+        }
+
+        return roles;
+    };
+
+    const availableRoles = getAvailableRoles();
+
+    // --- Dynamic Nav Menu based on ACTIVE ROLE ---
     const getNavGroups = () => {
-        // 1. Menu untuk SISWA
-        if (user?.profile_context?.type === 'student') {
-            return [
-                {
+        const groups: { name: string; items: { label: string; path: string }[] }[] = [];
+
+        switch (activeRole) {
+            case 'student':
+                groups.push({
                     name: 'Menu Siswa',
                     items: [
                         { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
                         { label: 'Tugas & PR', path: '/dashboard/assignments' },
-                        { label: 'Nilai Akademik', path: '/dashboard/grades' }, // Placeholder
+                        { label: 'Nilai Akademik', path: '/dashboard/grades' },
                     ]
-                }
-            ];
-        }
+                });
+                break;
 
-        // 2. Menu untuk PARENT / GUARDIAN
-        const contextType = user?.profile_context?.type;
-        if (contextType === 'parent' || contextType === 'guardian') {
-            return [
-                {
+            case 'parent':
+            case 'guardian':
+                groups.push({
                     name: 'Menu Orang Tua',
                     items: [
-                        { label: 'Anak Saya', path: '/dashboard/my-children' }, // Placeholder
-                        { label: 'Tagihan SPP', path: '/dashboard/payments' }, // Placeholder
-                        { label: 'Pengumuman', path: '/dashboard/announcements' }, // Placeholder
+                        { label: 'Anak Saya', path: '/dashboard/my-children' },
+                        { label: 'Tagihan SPP', path: '/dashboard/payments' },
+                        { label: 'Pengumuman', path: '/dashboard/announcements' },
                     ]
-                }
-            ];
-        }
+                });
+                break;
 
-        // 3. Menu untuk ADMIN (Default)
-        // Jika roles mengandung admin, tampilkan semua
-        if (user?.roles?.includes('admin')) {
-            return [
-                {
-                    name: 'Akademik',
+            case 'teacher':
+            case 'guru':
+                groups.push({
+                    name: 'Menu Guru',
                     items: [
-                        { label: 'Tahun Ajaran', path: '/dashboard/academic-years' },
-                        { label: 'Data Kelas', path: '/dashboard/classrooms' },
-                        { label: 'Mata Pelajaran', path: '/dashboard/subjects' },
-                        { label: 'Guru Pengampu', path: '/dashboard/assignments' },
-                        { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
+                        { label: 'Jadwal Mengajar', path: '/dashboard/schedules' },
+                        { label: 'Input Nilai', path: '/dashboard/grades' },
+                        { label: 'Absensi Siswa', path: '/dashboard/attendance' }
                     ]
-                },
-                {
-                    name: 'Kesiswaan',
+                });
+                break;
+
+            case 'finance_admin':
+            case 'admin-keuangan':
+            case 'finance':
+                groups.push({
+                    name: 'Menu Keuangan',
+                    items: [
+                        { label: 'Input Pembayaran', path: '/dashboard/payments/input' },
+                        { label: 'Laporan Keuangan', path: '/dashboard/reports/finance' }
+                    ]
+                });
+                break;
+
+            case 'education_admin':
+            case 'admin-pendidikan':
+            case 'education':
+                groups.push({
+                    name: 'Menu Pendidikan',
                     items: [
                         { label: 'Data Siswa', path: '/dashboard/students' },
-                        { label: 'Data Orang Tua', path: '/dashboard/parents' },
-                        { label: 'Data Wali', path: '/dashboard/guardians' },
+                        { label: 'Kurikulum', path: '/dashboard/curriculum' },
+                        { label: 'Data Guru', path: '/dashboard/employees' }
                     ]
-                },
-                {
-                    name: 'Kepegawaian & User',
-                    items: [
-                        { label: 'Guru & Tendik', path: '/dashboard/employees' },
-                        { label: 'Manajemen User', path: '/dashboard/users' },
-                        { label: 'Role & Izin', path: '/dashboard/roles' },
-                    ]
-                }
-            ];
+                });
+                break;
+
+            case 'admin':
+                groups.push(
+                    {
+                        name: 'Akademik',
+                        items: [
+                            { label: 'Tahun Ajaran', path: '/dashboard/academic-years' },
+                            { label: 'Data Kelas', path: '/dashboard/classrooms' },
+                            { label: 'Mata Pelajaran', path: '/dashboard/subjects' },
+                            { label: 'Guru Pengampu', path: '/dashboard/assignments' },
+                            { label: 'Jadwal Pelajaran', path: '/dashboard/schedules' },
+                        ]
+                    },
+                    {
+                        name: 'Kesiswaan',
+                        items: [
+                            { label: 'Data Siswa', path: '/dashboard/students' },
+                            { label: 'Data Orang Tua', path: '/dashboard/parents' },
+                            { label: 'Data Wali', path: '/dashboard/guardians' },
+                        ]
+                    },
+                    {
+                        name: 'Kepegawaian & User',
+                        items: [
+                            { label: 'Guru & Tendik', path: '/dashboard/employees' },
+                            { label: 'Manajemen User', path: '/dashboard/users' },
+                            { label: 'Role & Izin', path: '/dashboard/roles' },
+                        ]
+                    }
+                );
+                break;
         }
 
-        return [];
+        return groups;
     };
 
     const navGroups = getNavGroups();
@@ -195,6 +269,45 @@ const Header = () => {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-2">
+                    {/* Role Switcher (Visible if > 1 role) */}
+                    {availableRoles.length > 1 && (
+                        <div className="relative hidden md:block">
+                            <button
+                                onClick={() => toggleDropdown('role-switcher')}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
+                            >
+                                <span className="opacity-70">Akses:</span>
+                                <span>{availableRoles.find(r => r.id === activeRole)?.label || 'Pilih Role'}</span>
+                                <ChevronDown size={14} />
+                            </button>
+
+                            {activeDropdown === 'role-switcher' && (
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                        Ganti Akun Akses
+                                    </div>
+                                    {availableRoles.map((role) => (
+                                        <button
+                                            key={role.id}
+                                            onClick={() => {
+                                                setActiveRole(role.id);
+                                                setActiveDropdown(null);
+                                                navigate('/dashboard'); // Reset to home when switching
+                                                toast.success(`Mode akses: ${role.label}`);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm ${activeRole === role.id
+                                                ? 'bg-blue-50 text-blue-700 font-medium'
+                                                : 'text-gray-700 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            {role.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* User Menu (Desktop) */}
                     <div className="relative hidden md:block" ref={userMenuRef}>
                         <button
@@ -203,7 +316,7 @@ const Header = () => {
                         >
                             <div>
                                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-500">{user?.roles?.[0] || 'User'}</p>
+                                {/* <p className="text-xs text-gray-500">{activeRole || user?.roles?.[0] || 'User'}</p> */}
                             </div>
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
                                 <UserIcon size={16} />
@@ -253,9 +366,36 @@ const Header = () => {
                             </div>
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-500">{user?.roles?.[0] || 'User'}</p>
+                                <p className="text-xs text-gray-500">{activeRole || 'User'}</p>
                             </div>
                         </div>
+
+                        {/* Mobile Role Switcher */}
+                        {availableRoles.length > 1 && (
+                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <p className="text-xs font-semibold text-blue-600 uppercase mb-2">Ganti Akun Akses</p>
+                                <div className="space-y-1">
+                                    {availableRoles.map((role) => (
+                                        <button
+                                            key={role.id}
+                                            onClick={() => {
+                                                setActiveRole(role.id);
+                                                setIsMobileMenuOpen(false);
+                                                navigate('/dashboard');
+                                                toast.success(`Mode akses: ${role.label}`);
+                                            }}
+                                            className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${activeRole === role.id
+                                                ? 'bg-white text-blue-700 shadow-sm font-medium'
+                                                : 'text-blue-600 hover:bg-blue-100'
+                                                }`}
+                                        >
+                                            {role.label}
+                                            {activeRole === role.id && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Navigation Links */}
                         {navGroups.length > 0 && (

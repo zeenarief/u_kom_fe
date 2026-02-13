@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore } from '../../../store/authStore';
 import { BookOpen, Calendar, Clock, GraduationCap } from 'lucide-react';
 
 const StudentDashboard = () => {

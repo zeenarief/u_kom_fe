@@ -9,9 +9,11 @@ interface AuthState {
     accessToken: string | null;
     refreshToken: string | null;
     isAuthenticated: boolean;
+    activeRole: string | null; // Currently selected role context
 
     // Actions
     setAuth: (data: AuthResponse) => void;
+    setActiveRole: (role: string) => void;
     logout: () => void;
 }
 
@@ -22,18 +24,33 @@ export const useAuthStore = create<AuthState>()(
             accessToken: null,
             refreshToken: null,
             isAuthenticated: false,
+            activeRole: null, // Default null
 
             setAuth: (data) =>
-                set((state) => ({
-                    user: {
-                        ...data.user,
-                        // Preserve existing roles if backend returns null/undefined (common in refresh token response)
-                        roles: data.user.roles || state.user?.roles || [],
-                    },
-                    accessToken: data.access_token,
-                    refreshToken: data.refresh_token,
-                    isAuthenticated: true,
-                })),
+                set((state) => {
+                    const roles = data.user.roles || state.user?.roles || [];
+                    const profileType = data.user.profile_context?.type;
+
+                    // Determine initial active role
+                    // Priority: profile_context.type -> first role -> null
+                    let initialRole = profileType;
+                    if (!initialRole && roles.length > 0) {
+                        initialRole = roles[0];
+                    }
+
+                    return {
+                        user: {
+                            ...data.user,
+                            roles: roles,
+                        },
+                        accessToken: data.access_token,
+                        refreshToken: data.refresh_token,
+                        isAuthenticated: true,
+                        activeRole: initialRole || null,
+                    };
+                }),
+
+            setActiveRole: (role) => set({ activeRole: role }),
 
             logout: () =>
                 set({
@@ -41,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
                     accessToken: null,
                     refreshToken: null,
                     isAuthenticated: false,
+                    activeRole: null,
                 }),
         }),
         {
