@@ -78,7 +78,22 @@ const Header = () => {
             ];
         }
 
-        // 2. Menu untuk ADMIN (Default)
+        // 2. Menu untuk PARENT / GUARDIAN
+        const contextType = user?.profile_context?.type;
+        if (contextType === 'parent' || contextType === 'guardian') {
+            return [
+                {
+                    name: 'Menu Orang Tua',
+                    items: [
+                        { label: 'Anak Saya', path: '/dashboard/my-children' }, // Placeholder
+                        { label: 'Tagihan SPP', path: '/dashboard/payments' }, // Placeholder
+                        { label: 'Pengumuman', path: '/dashboard/announcements' }, // Placeholder
+                    ]
+                }
+            ];
+        }
+
+        // 3. Menu untuk ADMIN (Default)
         // Jika roles mengandung admin, tampilkan semua
         if (user?.roles?.includes('admin')) {
             return [

@@ -34,38 +34,9 @@ import ProfilePage from "./features/profile/ProfilePage.tsx";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    const { isAuthenticated, user } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
 
     if (!isAuthenticated) return <Navigate to="/login" replace />;
-
-    // Helper untuk cek role admin
-    // const isAdmin = user?.roles?.includes('admin');
-
-    // REMOVED: Strict admin check.
-    // Dashboard sekarang bisa diakses oleh student/parent/employee.
-    // Pembatasan fitur akan dilakukan di level Halaman/Komponen.
-
-    /* 
-    if (!isAdmin) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-                <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
-                    <h1 className="text-2xl font-bold text-red-600 mb-2">Akses Ditolak</h1>
-                    <p className="text-gray-600 mb-6">Maaf, halaman ini hanya dapat diakses oleh Administrator.</p>
-                    <button
-                        onClick={() => {
-                            useAuthStore.getState().logout();
-                            window.location.href = '/login';
-                        }}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        );
-    }
-    */
 
     return children;
 };
