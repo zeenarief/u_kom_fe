@@ -8,9 +8,12 @@ import { Plus, Trash2, Calendar, Clock, User, BookOpen, ClipboardList } from 'lu
 import ScheduleFormModal from './ScheduleFormModal';
 import AttendanceModal from '../../attendances/AttendanceModal';
 import type { Schedule } from './types';
-
+import { useAuthStore } from '../../../store/authStore';
 
 export default function SchedulePage() {
+    const { activeRole } = useAuthStore();
+    const isAdminOrTeacher = ['admin', 'teacher', 'guru', 'education', 'education_admin'].includes(activeRole || '');
+
     const [selectedYear, setSelectedYear] = useState<string>('');
     const [selectedClassId, setSelectedClassId] = useState<string>('');
 
@@ -92,13 +95,15 @@ export default function SchedulePage() {
                     </select>
                 </div>
                 <div className="flex items-end">
-                    <Button
-                        onClick={() => setIsFormOpen(true)}
-                        disabled={!selectedClassId}
-                        className="w-full"
-                    >
-                        <Plus className="w-4 h-4 mr-2" /> Tambah Jadwal
-                    </Button>
+                    {isAdminOrTeacher && (
+                        <Button
+                            onClick={() => setIsFormOpen(true)}
+                            disabled={!selectedClassId}
+                            className="w-full"
+                        >
+                            <Plus className="w-4 h-4 mr-2" /> Tambah Jadwal
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -145,24 +150,28 @@ export default function SchedulePage() {
                                             </div>
 
                                             {/* ACTION BUTTONS */}
-                                            <div className="mt-3 flex gap-2 border-t border-blue-200 pt-2">
-                                                {/* Tombol Absen */}
-                                                <button
-                                                    onClick={() => setAttendanceSchedule(s)}
-                                                    className="flex-1 flex items-center justify-center gap-1 text-xs bg-white border border-blue-200 text-blue-700 py-1.5 rounded hover:bg-blue-100 transition-colors shadow-sm"
-                                                >
-                                                    <ClipboardList size={14} />
-                                                    Isi Absen
-                                                </button>
-                                            </div>
+                                            {isAdminOrTeacher && (
+                                                <div className="mt-3 flex gap-2 border-t border-blue-200 pt-2">
+                                                    {/* Tombol Absen */}
+                                                    <button
+                                                        onClick={() => setAttendanceSchedule(s)}
+                                                        className="flex-1 flex items-center justify-center gap-1 text-xs bg-white border border-blue-200 text-blue-700 py-1.5 rounded hover:bg-blue-100 transition-colors shadow-sm"
+                                                    >
+                                                        <ClipboardList size={14} />
+                                                        Isi Absen
+                                                    </button>
+                                                </div>
+                                            )}
 
                                             {/* Delete Button (Top Right) */}
-                                            <button
-                                                onClick={() => handleDelete(s.id)}
-                                                className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
+                                            {isAdminOrTeacher && (
+                                                <button
+                                                    onClick={() => handleDelete(s.id)}
+                                                    className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
                                         </div>
                                     ))
                                 )}

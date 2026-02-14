@@ -16,6 +16,7 @@ const Header = () => {
     const navRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const roleSwitcherRef = useRef<HTMLDivElement>(null);
 
     const handleLogout = () => {
         logout();
@@ -32,9 +33,10 @@ const Header = () => {
             const isInsideNav = navRef.current?.contains(target);
             const isInsideUserMenu = userMenuRef.current?.contains(target);
             const isInsideMobileMenu = mobileMenuRef.current?.contains(target);
+            const isInsideRoleSwitcher = roleSwitcherRef.current?.contains(target);
 
             // If click is NOT inside any menu, close dropdowns
-            if (!isInsideNav && !isInsideUserMenu && !isInsideMobileMenu) {
+            if (!isInsideNav && !isInsideUserMenu && !isInsideMobileMenu && !isInsideRoleSwitcher) {
                 setActiveDropdown(null);
             }
         };
@@ -234,7 +236,7 @@ const Header = () => {
                 <div className="flex items-center gap-2">
                     {/* Role Switcher (Visible if > 1 role) */}
                     {availableRoles.length > 1 && (
-                        <div className="relative hidden md:block">
+                        <div className="relative hidden md:block" ref={roleSwitcherRef}>
                             <button
                                 onClick={() => toggleDropdown('role-switcher')}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"

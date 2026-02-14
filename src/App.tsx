@@ -6,6 +6,9 @@ import LoginPage from './pages/LoginPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import { useAuthStore } from './store/authStore';
 import type { JSX } from "react";
+import RoleGuard from './components/auth/RoleGuard';
+
+// Feature Pages
 import UserPage from "./features/admin/users/UserPage";
 import StudentPage from "./features/admin/students/StudentPage";
 import StudentDetailPage from "./features/admin/students/StudentDetailPage";
@@ -32,6 +35,8 @@ import SubjectPage from "./features/admin/subjects/SubjectPage.tsx";
 import AssignmentPage from "./features/admin/assignments/AssignmentPage.tsx";
 import SchedulePage from "./features/admin/schedules/SchedulePage.tsx";
 import ProfilePage from "./features/profile/ProfilePage.tsx";
+
+// Teacher Pages
 import TeacherClassesPage from "./features/teacher/TeacherClassesPage.tsx";
 import TeacherGradePage from "./features/teacher/TeacherGradePage.tsx";
 import TeacherAttendancePage from "./features/teacher/TeacherAttendancePage.tsx";
@@ -39,6 +44,7 @@ import TeacherScoreInputPage from "./features/teacher/TeacherScoreInputPage.tsx"
 import TeacherSchedulePage from "./features/teacher/TeacherSchedulePage.tsx";
 import TeacherAttendanceInputPage from "./features/teacher/TeacherAttendanceInputPage.tsx";
 import TeacherClassLayout from "./features/teacher/TeacherClassLayout.tsx";
+
 const ScheduleWrapper = () => {
     const { activeRole } = useAuthStore();
     return activeRole === 'teacher' ? <TeacherSchedulePage /> : <SchedulePage />;
@@ -92,54 +98,66 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
-                        {/* Index Route: Yang tampil saat buka /dashboard */}
+                        {/* Index Route: Dashboard Home (Role based dispatcher) */}
                         <Route index element={<DashboardHome />} />
 
-                        {/* Child Routes: Nanti kita isi di sini */}
-                        <Route path="users" element={<UserPage />} />
-                        <Route path="students" element={<StudentPage />} />
-                        <Route path="students/create" element={<StudentCreatePage />} />
-                        <Route path="students/:id" element={<StudentDetailPage />} />
-                        <Route path="students/:id/edit" element={<StudentEditPage />} />
-                        <Route path="parents" element={<ParentPage />} />
-                        <Route path="parents/create" element={<ParentCreatePage />} />
-                        <Route path="parents/:id" element={<ParentDetailPage />} />
-                        <Route path="parents/:id/edit" element={<ParentEditPage />} />
-                        <Route path="guardians" element={<GuardianPage />} />
-                        <Route path="guardians/create" element={<GuardianCreatePage />} />
-                        <Route path="guardians/:id" element={<GuardianDetailPage />} />
-                        <Route path="guardians/:id/edit" element={<GuardianEditPage />} />
-                        <Route path="employees" element={<EmployeePage />} />
-                        <Route path="employees/create" element={<EmployeeCreatePage />} />
-                        <Route path="employees/:id" element={<EmployeeDetailPage />} />
-                        <Route path="employees/:id/edit" element={<EmployeeEditPage />} />
-
-                        <Route path="academic-years" element={<AcademicYearPage />} />
-                        <Route path="classrooms" element={<ClassroomPage />} />
-                        <Route path="subjects" element={<SubjectPage />} />
+                        {/* Shared/Common Routes */}
+                        <Route path="profile" element={<ProfilePage />} />
                         <Route path="assignments" element={<AssignmentPage />} />
                         <Route path="schedules" element={<ScheduleWrapper />} />
 
-                        <Route path="roles" element={<RolePage />} />
-                        <Route path="profile" element={<ProfilePage />} />
+                        {/* Admin Only Routes */}
+                        <Route element={<RoleGuard allowedRoles={['admin']} />}>
+                            <Route path="users" element={<UserPage />} />
+                            <Route path="roles" element={<RolePage />} />
 
-                        {/* Teacher Classes List (Entry Point) */}
-                        <Route path="classes" element={<TeacherClassesPage />} />
-                        <Route path="grades" element={<TeacherClassesPage />} />
-                        <Route path="attendance" element={<TeacherClassesPage />} />
+                            {/* Academic Data */}
+                            <Route path="academic-years" element={<AcademicYearPage />} />
+                            <Route path="classrooms" element={<ClassroomPage />} />
+                            <Route path="subjects" element={<SubjectPage />} />
 
-                        {/* Wrapper for Class-Specific Pages (Layout Pattern) */}
-                        <Route path="class/:assignmentId" element={<TeacherClassLayout />}>
-                            <Route path="attendance" element={<TeacherAttendancePage />} />
-                            <Route path="grades" element={<TeacherGradePage />} />
+                            {/* People Management */}
+                            <Route path="students" element={<StudentPage />} />
+                            <Route path="students/create" element={<StudentCreatePage />} />
+                            <Route path="students/:id" element={<StudentDetailPage />} />
+                            <Route path="students/:id/edit" element={<StudentEditPage />} />
+
+                            <Route path="parents" element={<ParentPage />} />
+                            <Route path="parents/create" element={<ParentCreatePage />} />
+                            <Route path="parents/:id" element={<ParentDetailPage />} />
+                            <Route path="parents/:id/edit" element={<ParentEditPage />} />
+
+                            <Route path="guardians" element={<GuardianPage />} />
+                            <Route path="guardians/create" element={<GuardianCreatePage />} />
+                            <Route path="guardians/:id" element={<GuardianDetailPage />} />
+                            <Route path="guardians/:id/edit" element={<GuardianEditPage />} />
+
+                            <Route path="employees" element={<EmployeePage />} />
+                            <Route path="employees/create" element={<EmployeeCreatePage />} />
+                            <Route path="employees/:id" element={<EmployeeDetailPage />} />
+                            <Route path="employees/:id/edit" element={<EmployeeEditPage />} />
                         </Route>
 
-                        {/* Legacy Redirects or Direct Links (Optional: Keep for backward compatibility or remove) */}
-                        {/* Ideally we move everything to /class/:id/... structure */}
+                        {/* Teacher Routes - Partially protected by layout, but adding explicit guard is better */}
+                        <Route element={<RoleGuard allowedRoles={['teacher', 'guru', 'admin']} />}>
+                            {/* Note: Admin usually can access teacher pages too, or maybe not. 
+                                Keeping admin here just in case they need to view. 
+                                If not, remove 'admin'. TeacherClassLayout might also handle it.
+                            */}
+                            <Route path="classes" element={<TeacherClassesPage />} />
+                            <Route path="grades" element={<TeacherClassesPage />} />
+                            <Route path="attendance" element={<TeacherClassesPage />} />
 
-                        {/* Sub-pages that might not fit in the main layout tabs or need full screen */}
-                        <Route path="grades/assessment/:assessmentId" element={<TeacherScoreInputPage />} />
-                        <Route path="class/:assignmentId/attendance/input" element={<TeacherAttendanceInputPage />} />
+                            {/* Class Specific Routes */}
+                            <Route path="class/:assignmentId" element={<TeacherClassLayout />}>
+                                <Route path="attendance" element={<TeacherAttendancePage />} />
+                                <Route path="grades" element={<TeacherGradePage />} />
+                            </Route>
+
+                            <Route path="grades/assessment/:assessmentId" element={<TeacherScoreInputPage />} />
+                            <Route path="class/:assignmentId/attendance/input" element={<TeacherAttendanceInputPage />} />
+                        </Route>
+
                     </Route>
 
                     {/* Default Redirect */}

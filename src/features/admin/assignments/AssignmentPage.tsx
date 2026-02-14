@@ -4,6 +4,7 @@ import { useAcademicYears } from '../academic-years/academicYearQueries';
 import { useClassrooms } from '../classrooms/classroomQueries';
 import { useAssignmentsByClass, useDeleteAssignment } from './assignmentQueries';
 import { useAlertStore } from '../../../store/alertStore';
+import { useAuthStore } from '../../../store/authStore';
 import AssignmentForm from './AssignmentForm';
 
 export default function AssignmentPage() {
@@ -28,6 +29,25 @@ export default function AssignmentPage() {
 
     const deleteMutation = useDeleteAssignment(selectedClassId);
     const { showAlert } = useAlertStore();
+    const { activeRole } = useAuthStore(); // Use auth store
+
+    // Restrict access for students/parents
+    const isAllowed = ['admin', 'teacher', 'guru', 'education', 'education_admin'].includes(activeRole || '');
+
+    if (!isAllowed) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+                <div className="bg-blue-50 p-4 rounded-full mb-4">
+                    <BookOpen className="w-12 h-12 text-blue-500" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Fitur Dalam Pengembangan</h2>
+                <p className="text-gray-500 max-w-md">
+                    Halaman Tugas & PR untuk siswa sedang dalam tahap pengembangan.
+                    Silakan hubungi guru untuk informasi tugas.
+                </p>
+            </div>
+        );
+    }
 
     const handleDelete = (id: string) => {
         showAlert(
