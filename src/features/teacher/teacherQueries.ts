@@ -230,7 +230,7 @@ export const useTeachingAssignmentSchedules = (assignmentId: string | undefined)
         queryKey: ['schedules', 'assignment', assignmentId],
         queryFn: async () => {
             if (!assignmentId) throw new Error("Assignment ID required");
-            const { data } = await axiosInstance.get<{ data: Schedule[] }>(`/schedules/teaching-assignment/${assignmentId}`);
+            const { data } = await axiosInstance.get<{ data: Schedule[] }>(`/schedules/by-teaching-assignment/${assignmentId}`);
             return data.data;
         },
         enabled: !!assignmentId,
@@ -272,11 +272,40 @@ export const useSubmitAttendance = () => {
     });
 };
 
+
 export const useDeleteAttendance = () => {
     return useMutation({
         mutationFn: async (id: string) => {
             const response = await axiosInstance.delete(`/attendances/${id}`);
             return response.data;
+        },
+    });
+};
+
+// --- Dashboard ---
+
+export interface TeacherDashboardStats {
+    total_classes_today: number;
+    total_students: number;
+    pending_attendance: number;
+}
+
+export const useTeacherDashboardStats = () => {
+    return useQuery({
+        queryKey: ['teacher-dashboard-stats'],
+        queryFn: async () => {
+            const { data } = await axiosInstance.get<{ data: TeacherDashboardStats }>('/dashboard/teacher/stats');
+            return data.data;
+        },
+    });
+};
+
+export const useTeacherTodaySchedule = () => {
+    return useQuery({
+        queryKey: ['teacher-today-schedule'],
+        queryFn: async () => {
+            const { data } = await axiosInstance.get<{ data: Schedule[] }>('/schedules/teacher/today');
+            return data.data;
         },
     });
 };

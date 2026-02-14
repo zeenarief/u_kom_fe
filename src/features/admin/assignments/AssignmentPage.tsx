@@ -113,17 +113,17 @@ export default function AssignmentPage() {
                                         <td className="px-6 py-4 font-medium text-gray-900">
                                             <div className="flex items-center gap-2">
                                                 <BookOpen size={16} className="text-blue-500" />
-                                                {item.subject_name}
+                                                {item.subject.name}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <UserCheck size={16} className="text-green-600" />
-                                                {item.teacher_name}
+                                                {item.teacher.user.name}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 font-mono text-xs">
-                                            {item.teacher_nip}
+                                            {item.teacher.nip}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <button

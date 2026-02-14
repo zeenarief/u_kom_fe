@@ -63,7 +63,7 @@ export default function ScheduleFormModal({ isOpen, onClose, classroomId }: Prop
                         <option value="">-- Pilih Mapel --</option>
                         {assignments?.map(a => (
                             <option key={a.id} value={a.id}>
-                                {a.subject_name} ({a.teacher_name})
+                                {a.subject.name} ({a.teacher.user.name})
                             </option>
                         ))}
                     </select>
