@@ -60,14 +60,14 @@ const TeacherClassesPage = () => {
 
                             <div className="flex gap-2">
                                 <Link
-                                    to={`/dashboard/grades/${assignment.id}`}
+                                    to={`/dashboard/class/${assignment.id}/grades`}
                                     className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                                 >
                                     Input Nilai
                                     <ArrowRight size={16} />
                                 </Link>
                                 <Link
-                                    to={`/dashboard/attendance/${assignment.id}`}
+                                    to={`/dashboard/class/${assignment.id}/attendance`}
                                     className="flex-1 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                                 >
                                     Absensi

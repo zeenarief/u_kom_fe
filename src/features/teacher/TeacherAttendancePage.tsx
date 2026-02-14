@@ -1,29 +1,42 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
-import { useAttendanceHistory, useTeacherAssignments } from './teacherQueries';
-import { Plus, ArrowLeft, Calendar, FileText } from 'lucide-react';
+import { useAttendanceHistory, useDeleteAttendance } from './teacherQueries';
+import { Plus, Calendar, FileText, Trash2, Edit } from 'lucide-react'; // Changed Eye to Edit for clarity in context
 import Button from '../../components/ui/Button';
+import toast from 'react-hot-toast';
+import { useAlertStore } from '../../store/alertStore';
 
 const TeacherAttendancePage = () => {
     const { assignmentId } = useParams();
+    const queryClient = useQueryClient();
     const { data: history, isLoading } = useAttendanceHistory(assignmentId);
+    const deleteAttendanceMutation = useDeleteAttendance();
+    const { showAlert } = useAlertStore();
 
-    // Optional: Get assignment details for header title
-    const { data: assignments } = useTeacherAssignments();
-    const currentAssignment = assignments?.find(a => a.id === assignmentId);
+    const handleDelete = (id: string, topic: string) => {
+        showAlert(
+            'Hapus Absensi',
+            `Apakah Anda yakin ingin menghapus data absensi "${topic}"? Data yang dihapus tidak dapat dikembalikan.`,
+            'warning',
+            () => {
+                deleteAttendanceMutation.mutate(id, {
+                    onSuccess: () => {
+                        toast.success("Data absensi berhasil dihapus");
+                        queryClient.invalidateQueries({ queryKey: ['attendance-history', assignmentId] });
+                    },
+                    onError: () => {
+                        toast.error("Gagal menghapus data absensi");
+                    }
+                });
+            },
+            () => { }
+        );
+    };
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex items-center gap-2">
-                    <Link to="/dashboard/classes" className="text-gray-500 hover:text-gray-700">
-                        <ArrowLeft size={20} />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Riwayat Absensi</h1>
-                        <p className="text-sm text-gray-500">Pelajaran: {currentAssignment?.subject?.name} - {currentAssignment?.classroom?.name}</p>
-                    </div>
-                </div>
-                <Link to={`/dashboard/attendance/${assignmentId}/input`}>
+            <div className="flex justify-end">
+                <Link to={`/dashboard/class/${assignmentId}/attendance/input`}>
                     <Button className="flex items-center gap-2">
                         <Plus size={16} />
                         Input Kehadiran
@@ -42,10 +55,7 @@ const TeacherAttendancePage = () => {
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Topik / Materi
                                 </th>
-                                {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Jadwal
-                                </th> */}
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Aksi
                                 </th>
                             </tr>
@@ -53,13 +63,13 @@ const TeacherAttendancePage = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
                                         Loading data...
                                     </td>
                                 </tr>
                             ) : history?.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
                                         Belum ada riwayat absensi.
                                     </td>
                                 </tr>
@@ -83,16 +93,24 @@ const TeacherAttendancePage = () => {
                                                 <span className="font-medium">{session.topic}</span>
                                             </div>
                                         </td>
-                                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {session.subject_name} - {session.classroom_name}
-                                        </td> */}
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link
-                                                to={`/dashboard/attendance/${assignmentId}/input?schedule_id=${session.schedule_id || ''}&date=${new Date(session.date).toLocaleDateString('en-CA')}`}
-                                                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            >
-                                                Edit
-                                            </Link>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <Link
+                                                    to={`/dashboard/class/${assignmentId}/attendance/input?schedule_id=${session.schedule_id || ''}&date=${session.date}`}
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Edit Absensi"
+                                                >
+                                                    <Edit size={18} />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(session.id, session.topic)}
+                                                    disabled={deleteAttendanceMutation.isPending}
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Hapus Riwayat"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

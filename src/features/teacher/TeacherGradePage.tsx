@@ -1,30 +1,46 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTeacherAssessments, type Assessment } from './teacherQueries';
-import { FileText, Plus, Calendar, ArrowLeft } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTeacherAssessments, useDeleteAssessment, type Assessment } from './teacherQueries';
+import { FileText, Plus, Calendar, Trash2, Edit } from 'lucide-react';
 import CreateAssessmentModal from './components/CreateAssessmentModal';
+import toast from 'react-hot-toast';
+import { useAlertStore } from '../../store/alertStore';
 
 const TeacherGradePage = () => {
     const { assignmentId } = useParams();
+    const queryClient = useQueryClient();
     const { data: assessments, isLoading, isError } = useTeacherAssessments(assignmentId);
+    const deleteAssessmentMutation = useDeleteAssessment();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const { showAlert } = useAlertStore();
+
+    const handleDelete = (id: string, title: string) => {
+        showAlert(
+            'Hapus Penilaian',
+            `Apakah Anda yakin ingin menghapus penilaian "${title}"? Semua nilai siswa yang terkait juga akan dihapus. Data tidak dapat dikembalikan.`,
+            'warning',
+            () => {
+                deleteAssessmentMutation.mutate(id, {
+                    onSuccess: () => {
+                        toast.success("Penilaian berhasil dihapus");
+                        queryClient.invalidateQueries({ queryKey: ['assessments', assignmentId] });
+                    },
+                    onError: () => {
+                        toast.error("Gagal menghapus penilaian");
+                    }
+                });
+            },
+            () => { }
+        );
+    };
 
     if (isLoading) return <div className="p-6">Loading assessments...</div>;
     if (isError) return <div className="p-6 text-red-600">Failed to load assessments.</div>;
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Link to="/dashboard/classes" className="text-gray-500 hover:text-gray-700">
-                            <ArrowLeft size={20} />
-                        </Link>
-                        <h1 className="text-2xl font-bold text-gray-900">Daftar Penilaian</h1>
-                    </div>
-                    <p className="text-gray-500 text-sm ml-7">Kelola tugas, ujian, dan input nilai siswa.</p>
-                </div>
-
+            <div className="flex justify-end">
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -49,8 +65,8 @@ const TeacherGradePage = () => {
                                     <FileText size={20} />
                                 </div>
                                 <span className={`px-2 py-1 rounded text-xs font-medium ${assessment.type === 'FINAL_EXAM' || assessment.type === 'MID_EXAM'
-                                        ? 'bg-red-100 text-red-700'
-                                        : 'bg-green-100 text-green-700'
+                                    ? 'bg-red-100 text-red-700'
+                                    : 'bg-green-100 text-green-700'
                                     }`}>
                                     {assessment.type}
                                 </span>
@@ -62,13 +78,22 @@ const TeacherGradePage = () => {
                                 <span>{new Date(assessment.date).toLocaleDateString('id-ID')}</span>
                             </div>
 
-                            <div className="border-t border-gray-100 pt-4 mt-4">
+                            <div className="border-t border-gray-100 pt-4 mt-4 flex items-center justify-end gap-2">
                                 <Link
                                     to={`/dashboard/grades/assessment/${assessment.id}`}
-                                    className="block w-full text-center text-blue-600 font-medium text-sm hover:underline"
+                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Input / Edit Nilai"
                                 >
-                                    Input / Edit Nilai
+                                    <Edit size={20} />
                                 </Link>
+                                <button
+                                    onClick={() => handleDelete(assessment.id, assessment.title)}
+                                    disabled={deleteAssessmentMutation.isPending}
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Hapus Penilaian"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
                             </div>
                         </div>
                     ))}

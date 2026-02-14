@@ -135,7 +135,7 @@ const TeacherScoreInputPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <Link to={`/dashboard/grades/${assessment.teaching_assignment_id}`} className="text-gray-500 hover:text-gray-700">
+                        <Link to={`/dashboard/class/${assessment.teaching_assignment_id}/grades`} className="text-gray-500 hover:text-gray-700">
                             <ArrowLeft size={20} />
                         </Link>
                         <h1 className="text-2xl font-bold text-gray-900">Input Nilai: {assessment.title}</h1>

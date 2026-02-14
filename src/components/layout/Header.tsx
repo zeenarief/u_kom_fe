@@ -28,12 +28,13 @@ const Header = () => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
 
-            // Check if click is outside nav AND outside user menu AND outside mobile menu
-            const outsideNav = navRef.current && !navRef.current.contains(target);
-            const outsideUserMenu = userMenuRef.current && !userMenuRef.current.contains(target);
-            const outsideMobileMenu = mobileMenuRef.current && !mobileMenuRef.current.contains(target);
+            // Check if click is inside any of the menus
+            const isInsideNav = navRef.current?.contains(target);
+            const isInsideUserMenu = userMenuRef.current?.contains(target);
+            const isInsideMobileMenu = mobileMenuRef.current?.contains(target);
 
-            if (outsideNav && outsideUserMenu && outsideMobileMenu) {
+            // If click is NOT inside any menu, close dropdowns
+            if (!isInsideNav && !isInsideUserMenu && !isInsideMobileMenu) {
                 setActiveDropdown(null);
             }
         };
@@ -100,8 +101,7 @@ const Header = () => {
                     name: 'Menu Guru',
                     items: [
                         { label: 'Jadwal Mengajar', path: '/dashboard/schedules' },
-                        { label: 'Input Nilai', path: '/dashboard/grades' },
-                        { label: 'Absensi Siswa', path: '/dashboard/attendance' }
+                        { label: 'Kelas Ajar', path: '/dashboard/classes' }
                     ]
                 });
                 break;

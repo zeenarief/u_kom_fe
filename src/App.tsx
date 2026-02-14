@@ -38,6 +38,7 @@ import TeacherAttendancePage from "./features/teacher/TeacherAttendancePage.tsx"
 import TeacherScoreInputPage from "./features/teacher/TeacherScoreInputPage.tsx";
 import TeacherSchedulePage from "./features/teacher/TeacherSchedulePage.tsx";
 import TeacherAttendanceInputPage from "./features/teacher/TeacherAttendanceInputPage.tsx";
+import TeacherClassLayout from "./features/teacher/TeacherClassLayout.tsx";
 const ScheduleWrapper = () => {
     const { activeRole } = useAuthStore();
     return activeRole === 'teacher' ? <TeacherSchedulePage /> : <SchedulePage />;
@@ -122,13 +123,22 @@ function App() {
                         <Route path="roles" element={<RolePage />} />
                         <Route path="profile" element={<ProfilePage />} />
 
-                        {/* Teacher Routes */}
+                        {/* Teacher Classes List (Entry Point) */}
                         <Route path="classes" element={<TeacherClassesPage />} />
-                        <Route path="grades" element={<TeacherClassesPage />} /> {/* Entry point for grades */}
-                        <Route path="grades/:assignmentId" element={<TeacherGradePage />} />
+                        <Route path="grades" element={<TeacherClassesPage />} />
+                        <Route path="attendance" element={<TeacherClassesPage />} />
+
+                        {/* Wrapper for Class-Specific Pages (Layout Pattern) */}
+                        <Route path="class/:assignmentId" element={<TeacherClassLayout />}>
+                            <Route path="attendance" element={<TeacherAttendancePage />} />
+                            <Route path="grades" element={<TeacherGradePage />} />
+                        </Route>
+
+                        {/* Legacy Redirects or Direct Links (Optional: Keep for backward compatibility or remove) */}
+                        {/* Ideally we move everything to /class/:id/... structure */}
+
+                        {/* Sub-pages that might not fit in the main layout tabs or need full screen */}
                         <Route path="grades/assessment/:assessmentId" element={<TeacherScoreInputPage />} />
-                        <Route path="attendance" element={<TeacherClassesPage />} /> {/* Entry point for attendance */}
-                        <Route path="attendance/:assignmentId" element={<TeacherAttendancePage />} />
                         <Route path="attendance/:assignmentId/input" element={<TeacherAttendanceInputPage />} />
                     </Route>
 

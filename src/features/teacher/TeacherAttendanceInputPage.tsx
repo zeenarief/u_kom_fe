@@ -43,7 +43,7 @@ const TeacherAttendanceInputPage = () => {
     useEffect(() => {
         if (sessionData) {
             setTopic(sessionData.topic || '');
-            // setNotes(sessionData.notes || ''); // Should be handled if notes exists in session detail
+            setNotes(sessionData.notes || '');
 
             const newStatus: Record<string, string> = {};
             const newNotes: Record<string, string> = {};
@@ -89,7 +89,7 @@ const TeacherAttendanceInputPage = () => {
         }, {
             onSuccess: () => {
                 toast.success("Absensi berhasil disimpan");
-                navigate(`/dashboard/attendance/${assignmentId}`);
+                navigate(`/dashboard/class/${assignmentId}/attendance`);
             },
             onError: (error: any) => {
                 toast.error(error.response?.data?.message || "Gagal menyimpan absensi");
@@ -143,7 +143,7 @@ const TeacherAttendanceInputPage = () => {
         <div className="space-y-6 pb-20">
             {/* Header */}
             <div className="flex items-center gap-2">
-                <Link to={`/dashboard/attendance/${assignmentId}`} className="text-gray-500 hover:text-gray-700">
+                <Link to={`/dashboard/class/${assignmentId}/attendance`} className="text-gray-500 hover:text-gray-700">
                     <ArrowLeft size={20} />
                 </Link>
                 <h1 className="text-2xl font-bold text-gray-900">Input Absensi</h1>
@@ -270,7 +270,7 @@ const TeacherAttendanceInputPage = () => {
 
                     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 sm:pl-64">
                         <div className="max-w-7xl mx-auto flex justify-end gap-4">
-                            <Link to={`/dashboard/attendance/${assignmentId}`}>
+                            <Link to={`/dashboard/class/${assignmentId}/attendance`}>
                                 <Button variant="outline" type="button">Batal</Button>
                             </Link>
                             <Button

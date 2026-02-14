@@ -119,6 +119,15 @@ export const useUpdateAssessment = () => {
     });
 };
 
+export const useDeleteAssessment = () => {
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axiosInstance.delete(`/grades/assessments/${id}`);
+            return response.data;
+        },
+    });
+};
+
 // --- Scores ---
 
 export interface BulkScoreRequest {
@@ -198,6 +207,7 @@ export interface AttendanceSessionDetail {
     id: string; // Empty string if new session
     date: string;
     topic: string;
+    notes: string;
     schedule_info: Schedule;
     details: AttendanceDetail[];
     summary: Record<string, number>;
@@ -257,6 +267,15 @@ export const useSubmitAttendance = () => {
     return useMutation({
         mutationFn: async (data: SubmitAttendanceRequest) => {
             const response = await axiosInstance.post('/attendances', data);
+            return response.data;
+        },
+    });
+};
+
+export const useDeleteAttendance = () => {
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axiosInstance.delete(`/attendances/${id}`);
             return response.data;
         },
     });
