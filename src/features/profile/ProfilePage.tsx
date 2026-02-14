@@ -1,4 +1,4 @@
-import { useProfile } from '../users/userQueries';
+import { useProfile } from '../admin/users/userQueries';
 import { User, Mail, Shield, Calendar, Key, CheckCircle2 } from 'lucide-react';
 import { formatDate } from '../../lib/date';
 

@@ -1,30 +1,26 @@
 import { useState } from 'react';
-import { useUsers } from '../../features/admin/users/userQueries';
-import Button from '../ui/Button';
+import { useUsers } from '../users/userQueries'; // Reuse query user yang sudah ada
+import Button from '../../../components/ui/Button';
+import { useLinkStudentToUser } from './studentQueries';
 import { Link } from 'lucide-react';
 
 interface UserLinkerProps {
-    entityId: string;
-    entityType: 'student' | 'parent' | 'guardian' | 'employee';
-    onLink: (entityId: string, userId: string) => void;
-    isLoading?: boolean;
+    studentId: string;
 }
 
-export default function UserLinker({ entityId, entityType, onLink, isLoading: linkLoading }: UserLinkerProps) {
+export default function UserLinker({ studentId }: UserLinkerProps) {
     const [selectedUserId, setSelectedUserId] = useState('');
     const { data: users, isLoading } = useUsers();
+    const linkMutation = useLinkStudentToUser();
 
     const handleLink = () => {
         if (!selectedUserId) return;
-        onLink(entityId, selectedUserId);
+        linkMutation.mutate({ studentId, userId: selectedUserId });
     };
 
-    const entityLabels = {
-        student: 'Siswa',
-        parent: 'Orang Tua',
-        guardian: 'Wali',
-        employee: 'Pegawai'
-    };
+    // Filter User: Idealnya backend menyediakan endpoint /users/available
+    // Tapi untuk sekarang kita tampilkan semua user dulu di dropdown
+    // Nanti Anda bisa filter user yang sudah punya role 'student' atau filter di backend
 
     return (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
@@ -35,7 +31,7 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
                 <div className="flex-1">
                     <h4 className="text-sm font-bold text-yellow-800">Hubungkan ke Akun Login</h4>
                     <p className="text-xs text-yellow-700 mb-3">
-                        {entityLabels[entityType]} ini belum bisa login. Pilih akun User yang sudah dibuat untuk dihubungkan.
+                        Siswa ini belum bisa login. Pilih akun User yang sudah dibuat untuk dihubungkan.
                     </p>
 
                     <div className="flex gap-2 items-center">
@@ -46,7 +42,7 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
                             disabled={isLoading}
                         >
                             <option value="">-- Pilih Akun User --</option>
-                            {users?.map((user: { id: string; name: string; username: string }) => (
+                            {users?.map((user) => (
                                 <option key={user.id} value={user.id}>
                                     {user.name} (@{user.username})
                                 </option>
@@ -54,7 +50,7 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
                         </select>
                         <Button
                             onClick={handleLink}
-                            isLoading={linkLoading}
+                            isLoading={linkMutation.isPending}
                             disabled={!selectedUserId}
                             className="whitespace-nowrap"
                         >

@@ -1,29 +1,21 @@
 import { useState } from 'react';
-import { useUsers } from '../../features/admin/users/userQueries';
-import Button from '../ui/Button';
 import { Link } from 'lucide-react';
+import { useUsers } from '../users/userQueries';
+import Button from '../../../components/ui/Button';
+import { useLinkParentToUser } from './parentQueries';
 
-interface UserLinkerProps {
-    entityId: string;
-    entityType: 'student' | 'parent' | 'guardian' | 'employee';
-    onLink: (entityId: string, userId: string) => void;
-    isLoading?: boolean;
+interface ParentUserLinkerProps {
+    parentId: string;
 }
 
-export default function UserLinker({ entityId, entityType, onLink, isLoading: linkLoading }: UserLinkerProps) {
+export default function ParentUserLinker({ parentId }: ParentUserLinkerProps) {
     const [selectedUserId, setSelectedUserId] = useState('');
     const { data: users, isLoading } = useUsers();
+    const linkMutation = useLinkParentToUser();
 
     const handleLink = () => {
         if (!selectedUserId) return;
-        onLink(entityId, selectedUserId);
-    };
-
-    const entityLabels = {
-        student: 'Siswa',
-        parent: 'Orang Tua',
-        guardian: 'Wali',
-        employee: 'Pegawai'
+        linkMutation.mutate({ parentId, userId: selectedUserId });
     };
 
     return (
@@ -35,18 +27,18 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
                 <div className="flex-1">
                     <h4 className="text-sm font-bold text-yellow-800">Hubungkan ke Akun Login</h4>
                     <p className="text-xs text-yellow-700 mb-3">
-                        {entityLabels[entityType]} ini belum bisa login. Pilih akun User yang sudah dibuat untuk dihubungkan.
+                        Orang tua ini belum bisa login ke aplikasi wali murid. Pilih akun User.
                     </p>
 
                     <div className="flex gap-2 items-center">
                         <select
                             value={selectedUserId}
                             onChange={(e) => setSelectedUserId(e.target.value)}
-                            className="flex-1 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border"
+                            className="flex-1 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 py-2 px-3 border outline-none"
                             disabled={isLoading}
                         >
                             <option value="">-- Pilih Akun User --</option>
-                            {users?.map((user: { id: string; name: string; username: string }) => (
+                            {users?.map((user) => (
                                 <option key={user.id} value={user.id}>
                                     {user.name} (@{user.username})
                                 </option>
@@ -54,16 +46,12 @@ export default function UserLinker({ entityId, entityType, onLink, isLoading: li
                         </select>
                         <Button
                             onClick={handleLink}
-                            isLoading={linkLoading}
+                            isLoading={linkMutation.isPending}
                             disabled={!selectedUserId}
-                            className="whitespace-nowrap"
                         >
                             Simpan
                         </Button>
                     </div>
-                    <p className="text-[10px] text-gray-500 mt-2">
-                        *Pastikan Anda sudah membuat akun di menu "Manajemen User" terlebih dahulu.
-                    </p>
                 </div>
             </div>
         </div>

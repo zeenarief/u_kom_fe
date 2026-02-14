@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../lib/axios';
 import type { ApiResponse, ApiError } from '../../types/api';
-import type { AttendanceSubmitRequest, AttendanceSession } from '../schedules/types';
+import type { AttendanceSubmitRequest, AttendanceSession } from '../admin/schedules/types';
 import toast from 'react-hot-toast';
 
 // === SUBMIT ATTENDANCE ===

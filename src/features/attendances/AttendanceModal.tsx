@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { useClassroomDetail } from '../classrooms/classroomQueries';
+import { useClassroomDetail } from '../admin/classrooms/classroomQueries';
 import { useSubmitAttendance, useCheckAttendanceSession } from './attendanceQueries';
-import type { Schedule } from '../schedules/types';
+import type { Schedule } from '../admin/schedules/types';
 import { Check, Loader2 } from 'lucide-react';
 
 interface Props {

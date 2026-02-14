@@ -1,11 +1,11 @@
 import { useAuthStore } from '../../store/authStore';
-import StudentDashboard from './student/StudentDashboard';
-import ParentDashboard from './parent/ParentDashboard';
+import StudentDashboard from "../student/StudentDashboard";
+import ParentDashboard from "../parent/ParentDashboard";
 // EmployeeDashboard was removed as we route directly to sub-dashboards
-import FinanceDashboard from './employee/FinanceDashboard';
-import EducationDashboard from './employee/EducationDashboard';
-import TeacherDashboard from './employee/TeacherDashboard';
-import AdminDashboard from './admin/AdminDashboard';
+import FinanceDashboard from "./employee/FinanceDashboard";
+import EducationDashboard from "./employee/EducationDashboard";
+import TeacherDashboard from "./employee/TeacherDashboard";
+import AdminDashboard from "./admin/AdminDashboard";
 import UnregisteredDashboard from './UnregisteredDashboard';
 
 export default function DashboardHome() {
