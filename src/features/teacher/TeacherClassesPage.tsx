@@ -1,5 +1,5 @@
 import { useTeacherAssignments } from './teacherQueries';
-import { BookOpen, Users, ArrowRight, GraduationCap } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { TeachingAssignment } from './teacherQueries';
 
@@ -46,18 +46,8 @@ const TeacherClassesPage = () => {
                                 </span>
                             </div>
 
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">{assignment.subject.name}</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-1">{assignment.subject.name + " (" + assignment.subject.code + ")"}</h3>
                             <p className="text-gray-500 text-sm mb-4">{assignment.classroom.name}</p>
-                            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                                <GraduationCap size={12} />
-                                <span>{assignment.subject.code}</span>
-                            </div>
-
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                                <Users size={16} />
-                                <span>Manage Students & Grades</span>
-                            </div>
-
                             <div className="flex gap-2">
                                 <Link
                                     to={`/dashboard/class/${assignment.id}/grades`}
