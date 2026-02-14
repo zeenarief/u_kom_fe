@@ -1,17 +1,24 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
-import { useAttendanceHistory, useDeleteAttendance } from './teacherQueries';
-import { Plus, Calendar, FileText, Trash2, Edit } from 'lucide-react'; // Changed Eye to Edit for clarity in context
-import Button from '../../components/ui/Button';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAttendanceHistory, useDeleteAttendance, type AttendanceHistory } from './teacherQueries';
+import { Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAlertStore } from '../../store/alertStore';
+import TeacherAttendanceCard from './components/TeacherAttendanceCard';
 
 const TeacherAttendancePage = () => {
     const { assignmentId } = useParams();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { data: history, isLoading } = useAttendanceHistory(assignmentId);
     const deleteAttendanceMutation = useDeleteAttendance();
     const { showAlert } = useAlertStore();
+
+    const handleEdit = (session: AttendanceHistory) => {
+        // Format date to YYYY-MM-DD to avoid "invalid date format" error
+        const formattedDate = new Date(session.date).toLocaleDateString('en-CA');
+        navigate(`/dashboard/class/${assignmentId}/attendance/input?schedule_id=${session.schedule_id || ''}&date=${formattedDate}`);
+    };
 
     const handleDelete = (id: string, topic: string) => {
         showAlert(
@@ -35,89 +42,39 @@ const TeacherAttendancePage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
-                <Link to={`/dashboard/class/${assignmentId}/attendance/input`}>
-                    <Button className="flex items-center gap-2">
-                        <Plus size={16} />
-                        Input Kehadiran
-                    </Button>
-                </Link>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tanggal
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Topik / Materi
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Aksi
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {isLoading ? (
-                                <tr>
-                                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
-                                        Loading data...
-                                    </td>
-                                </tr>
-                            ) : history?.length === 0 ? (
-                                <tr>
-                                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
-                                        Belum ada riwayat absensi.
-                                    </td>
-                                </tr>
-                            ) : (
-                                history?.map((session) => (
-                                    <tr key={session.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-2 text-sm text-gray-900">
-                                                <Calendar size={16} className="text-gray-400" />
-                                                {new Date(session.date).toLocaleDateString('id-ID', {
-                                                    weekday: 'long',
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric'
-                                                })}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-sm text-gray-900">
-                                                <FileText size={16} className="text-gray-400" />
-                                                <span className="font-medium">{session.topic}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <div className="flex justify-end gap-1">
-                                                <Link
-                                                    to={`/dashboard/class/${assignmentId}/attendance/input?schedule_id=${session.schedule_id || ''}&date=${session.date}`}
-                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Edit Absensi"
-                                                >
-                                                    <Edit size={18} />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDelete(session.id, session.topic)}
-                                                    disabled={deleteAttendanceMutation.isPending}
-                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Hapus Riwayat"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+
+
+            <div className="space-y-4">
+                {isLoading ? (
+                    <div className="p-8 text-center bg-white rounded-xl border border-gray-200">
+                        <p className="text-gray-500">Loading data...</p>
+                    </div>
+                ) : history?.length === 0 ? (
+                    <div className="p-12 text-center bg-white rounded-xl border border-gray-200">
+                        <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                        <h3 className="text-gray-900 font-medium">Belum ada riwayat absensi</h3>
+                        <p className="text-gray-500 text-sm mt-1">Mulai dengan menginput kehadiran siswa.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {/* Desktop Header */}
+                        <div className="hidden md:grid md:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700">
+                            <div className="col-span-6">TANGGAL & TOPIK</div>
+                            <div className="col-span-4">KEHADIRAN</div>
+                            <div className="col-span-2 text-right">AKSI</div>
+                        </div>
+
+                        {history?.map((session) => (
+                            <TeacherAttendanceCard
+                                key={session.id}
+                                session={session}
+                                onEdit={handleEdit}
+                                onDelete={(id, topic) => handleDelete(id, topic)} // Adapter for slightly different signature
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

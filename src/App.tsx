@@ -139,7 +139,7 @@ function App() {
 
                         {/* Sub-pages that might not fit in the main layout tabs or need full screen */}
                         <Route path="grades/assessment/:assessmentId" element={<TeacherScoreInputPage />} />
-                        <Route path="attendance/:assignmentId/input" element={<TeacherAttendanceInputPage />} />
+                        <Route path="class/:assignmentId/attendance/input" element={<TeacherAttendanceInputPage />} />
                     </Route>
 
                     {/* Default Redirect */}

@@ -335,28 +335,38 @@ const Header = () => {
 
                         {/* Mobile Role Switcher */}
                         {availableRoles.length > 1 && (
-                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                <p className="text-xs font-semibold text-blue-600 uppercase mb-2">Ganti Akun Akses</p>
-                                <div className="space-y-1">
-                                    {availableRoles.map((role) => (
-                                        <button
-                                            key={role.id}
-                                            onClick={() => {
-                                                setActiveRole(role.id);
-                                                setIsMobileMenuOpen(false);
-                                                navigate('/dashboard');
-                                                toast.success(`Mode akses: ${role.label}`);
-                                            }}
-                                            className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${activeRole === role.id
-                                                ? 'bg-white text-blue-700 shadow-sm font-medium'
-                                                : 'text-blue-600 hover:bg-blue-100'
-                                                }`}
-                                        >
-                                            {role.label}
-                                            {activeRole === role.id && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className="bg-blue-50 rounded-lg border border-blue-100 overflow-hidden">
+                                <button
+                                    onClick={() => toggleDropdown('mobile-role-switcher')}
+                                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-blue-600 uppercase"
+                                >
+                                    <span>Ganti Akun Akses</span>
+                                    <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === 'mobile-role-switcher' ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {activeDropdown === 'mobile-role-switcher' && (
+                                    <div className="px-3 pb-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                                        {availableRoles.map((role) => (
+                                            <button
+                                                key={role.id}
+                                                onClick={() => {
+                                                    setActiveRole(role.id);
+                                                    setIsMobileMenuOpen(false);
+                                                    setActiveDropdown(null);
+                                                    navigate('/dashboard');
+                                                    toast.success(`Mode akses: ${role.label}`);
+                                                }}
+                                                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${activeRole === role.id
+                                                    ? 'bg-white text-blue-700 shadow-sm font-medium'
+                                                    : 'text-blue-600 hover:bg-blue-100'
+                                                    }`}
+                                            >
+                                                {role.label}
+                                                {activeRole === role.id && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
 

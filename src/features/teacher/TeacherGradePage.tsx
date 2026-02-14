@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTeacherAssessments, useDeleteAssessment, type Assessment } from './teacherQueries';
-import { FileText, Plus, Calendar, Trash2, Edit } from 'lucide-react';
-import CreateAssessmentModal from './components/CreateAssessmentModal';
+import { FileText, Calendar, Trash2, Edit } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAlertStore } from '../../store/alertStore';
 
@@ -12,7 +10,6 @@ const TeacherGradePage = () => {
     const queryClient = useQueryClient();
     const { data: assessments, isLoading, isError } = useTeacherAssessments(assignmentId);
     const deleteAssessmentMutation = useDeleteAssessment();
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const { showAlert } = useAlertStore();
 
     const handleDelete = (id: string, title: string) => {
@@ -40,16 +37,6 @@ const TeacherGradePage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
-                <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                    <Plus size={16} />
-                    Buat Penilaian Baru
-                </button>
-            </div>
-
             {!assessments || assessments.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
                     <FileText className="mx-auto h-12 w-12 text-gray-300 mb-2" />
@@ -98,14 +85,6 @@ const TeacherGradePage = () => {
                         </div>
                     ))}
                 </div>
-            )}
-
-            {assignmentId && (
-                <CreateAssessmentModal
-                    isOpen={isCreateModalOpen}
-                    onClose={() => setIsCreateModalOpen(false)}
-                    teachingAssignmentId={assignmentId}
-                />
             )}
         </div>
     );

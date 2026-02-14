@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAssessmentDetail, useClassroomStudents, useSubmitScores, type StudentScore, useUpdateAssessment, type CreateAssessmentRequest } from './teacherQueries';
-import { ArrowLeft, Save, Edit } from 'lucide-react';
+import { ArrowLeft, Save, Edit, BookOpen, FileText } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import TeacherScoreCard from './components/TeacherScoreCard';
 
 const TeacherScoreInputPage = () => {
     const { assessmentId } = useParams();
@@ -132,13 +134,23 @@ const TeacherScoreInputPage = () => {
 
     return (
         <div className="space-y-6">
+            <div className="mb-4">
+                <Breadcrumb
+                    items={[
+                        { label: 'Kelas Ajar', href: '/dashboard/classes', icon: BookOpen },
+                        { label: assessment?.teaching_assignment?.classroom?.name || '...', href: `/dashboard/class/${assessment?.teaching_assignment_id}/grades` },
+                        { label: assessment?.title || 'Input Nilai', icon: FileText }
+                    ]}
+                />
+            </div>
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <Link to={`/dashboard/class/${assessment.teaching_assignment_id}/grades`} className="text-gray-500 hover:text-gray-700">
                             <ArrowLeft size={20} />
                         </Link>
-                        <h1 className="text-2xl font-bold text-gray-900">Input Nilai: {assessment.title}</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{assessment.title}</h1>
                         <button
                             onClick={() => setIsEditModalOpen(true)}
                             className="text-gray-400 hover:text-blue-600 transition-colors"
@@ -157,78 +169,68 @@ const TeacherScoreInputPage = () => {
                 <Button
                     onClick={handleSubmit}
                     isLoading={submitScoresMutation.isPending}
-                    className="flex items-center gap-2"
+                    className="hidden md:flex items-center gap-2"
                 >
                     <Save size={16} />
                     Simpan Semua Nilai
                 </Button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    No
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    NIM
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nama Siswa
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                                    Nilai (0-{assessment.max_score})
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Catatan / Feedback
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {students?.map((student, index) => (
-                                <tr key={student.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {index + 1}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {student.nim || student.nisn || '-'}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {student.full_name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max={assessment.max_score}
-                                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
-                                            value={scores[student.id] ?? ''}
-                                            onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                                            placeholder="0"
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <input
-                                            type="text"
-                                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
-                                            value={feedbacks[student.id] ?? ''}
-                                            onChange={(e) => handleFeedbackChange(student.id, e.target.value)}
-                                            placeholder="Catatan untuk siswa..."
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="space-y-4">
+                {/* Desktop Header */}
+                <div className="hidden md:grid md:grid-cols-12 gap-4 items-center bg-gray-50 px-4 py-3 border border-gray-200 rounded-xl text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <div className="col-span-1 text-center">No</div>
+                    <div className="col-span-2">NIM / NISN</div>
+                    <div className="col-span-3">Nama Siswa</div>
+                    <div className="col-span-2">Nilai (0-{assessment.max_score})</div>
+                    <div className="col-span-4">Catatan</div>
                 </div>
+
+                <div className="space-y-2">
+                    {students?.map((student, index) => (
+                        <TeacherScoreCard
+                            key={student.id}
+                            index={index}
+                            student={student}
+                            assessmentMaxScore={assessment.max_score}
+                            score={scores[student.id] ?? ''}
+                            feedback={feedbacks[student.id] ?? ''}
+                            onScoreChange={handleScoreChange}
+                            onFeedbackChange={handleFeedbackChange}
+                        />
+                    ))}
+                </div>
+
                 {!students || students.length === 0 && (
-                    <div className="p-12 text-center text-gray-500">
-                        Tidak ada siswa di kelas ini.
+                    <div className="p-12 text-center bg-white rounded-xl border border-gray-200">
+                        <p className="text-gray-500">Tidak ada siswa di kelas ini.</p>
                     </div>
                 )}
             </div>
+
+            <div className="md:hidden flex gap-3">
+                <Link
+                    to={`/dashboard/class/${assessment.teaching_assignment_id}/grades`}
+                    className="flex-1"
+                >
+                    <Button
+                        type="button"
+                        className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-black shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm transition-colors"
+                    >
+                        Cancel
+                    </Button>
+                </Link>
+
+                <Button
+                    onClick={handleSubmit}
+                    isLoading={submitScoresMutation.isPending}
+                    className="flex-1 flex items-center justify-center gap-2"
+                >
+                    <Save size={16} />
+                    Simpan
+                </Button>
+            </div>
+
 
             {/* Edit Modal */}
             {isEditModalOpen && (

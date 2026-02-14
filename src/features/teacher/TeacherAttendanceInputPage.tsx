@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, BookOpen, FileText } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Breadcrumb from '../../components/common/Breadcrumb';
 import toast from 'react-hot-toast';
 import {
     useTeachingAssignmentSchedules,
@@ -139,8 +140,21 @@ const TeacherAttendanceInputPage = () => {
         }
     }, [schedules, selectedScheduleId, selectedDate]);
 
+    // Get classroom name from schedules (fallback)
+    const classroomName = schedules?.[0]?.classroom_name || '...';
+
     return (
         <div className="space-y-6 pb-20">
+            <div className="mb-4">
+                <Breadcrumb
+                    items={[
+                        { label: 'Kelas Ajar', href: '/dashboard/classes', icon: BookOpen },
+                        { label: classroomName, href: `/dashboard/class/${assignmentId}/attendance` },
+                        { label: 'Input Absensi', icon: FileText }
+                    ]}
+                />
+            </div>
+
             {/* Header */}
             <div className="flex items-center gap-2">
                 <Link to={`/dashboard/class/${assignmentId}/attendance`} className="text-gray-500 hover:text-gray-700">
