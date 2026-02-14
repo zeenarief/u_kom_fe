@@ -18,6 +18,19 @@ export const useSchedulesByClass = (classroomId: string) => {
     });
 };
 
+// GET BY TEACHER
+export const useTeacherSchedules = (teacherId: string | undefined) => {
+    return useQuery({
+        queryKey: ['schedules', 'teacher', teacherId],
+        queryFn: async () => {
+            if (!teacherId) return [];
+            const response = await api.get<ApiResponse<Schedule[]>>(`/schedules/by-teacher?teacher_id=${teacherId}`);
+            return response.data.data;
+        },
+        enabled: !!teacherId
+    });
+};
+
 // CREATE
 export const useCreateSchedule = (classroomId: string, onSuccessCallback?: () => void) => {
     const queryClient = useQueryClient();

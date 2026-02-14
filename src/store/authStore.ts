@@ -1,8 +1,8 @@
-// src/store/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '../features/users/types';
 import type { AuthResponse } from '../types/auth';
+import { getAvailableRoles } from '../utils/roleUtils';
 
 interface AuthState {
     user: User | null;
@@ -15,11 +15,12 @@ interface AuthState {
     setAuth: (data: AuthResponse) => void;
     setActiveRole: (role: string) => void;
     logout: () => void;
+    ensureActiveRole: () => void; // New action
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             user: null,
             accessToken: null,
             refreshToken: null,
@@ -29,28 +30,51 @@ export const useAuthStore = create<AuthState>()(
             setAuth: (data) =>
                 set((state) => {
                     const roles = data.user.roles || state.user?.roles || [];
-                    const profileType = data.user.profile_context?.type;
 
-                    // Determine initial active role
-                    // Priority: profile_context.type -> first role -> null
-                    let initialRole = profileType;
-                    if (!initialRole && roles.length > 0) {
-                        initialRole = roles[0];
+                    // Create temporary user object to check available roles
+                    const tempUser = { ...data.user, roles };
+                    const availableRoles = getAvailableRoles(tempUser);
+
+                    // Priority: try to keep current activeRole if valid, else first available
+                    let initialRole = state.activeRole;
+                    const isValidRole = availableRoles.some(r => r.id === initialRole);
+
+                    if (!initialRole || !isValidRole) {
+                        initialRole = availableRoles.length > 0 ? availableRoles[0].id : null;
                     }
 
                     return {
-                        user: {
-                            ...data.user,
-                            roles: roles,
-                        },
+                        user: tempUser,
                         accessToken: data.access_token,
                         refreshToken: data.refresh_token,
                         isAuthenticated: true,
-                        activeRole: initialRole || null,
+                        activeRole: initialRole,
                     };
                 }),
 
             setActiveRole: (role) => set({ activeRole: role }),
+
+            ensureActiveRole: () => {
+                const { user, activeRole } = get();
+                if (!user) return;
+
+                const availableRoles = getAvailableRoles(user);
+
+                // 1. If no active role, select first available
+                if (!activeRole && availableRoles.length > 0) {
+                    set({ activeRole: availableRoles[0].id });
+                    return;
+                }
+
+                // 2. If active role exists but is no longer valid (e.g. lost permission), reset
+                if (activeRole && !availableRoles.some(r => r.id === activeRole)) {
+                    if (availableRoles.length > 0) {
+                        set({ activeRole: availableRoles[0].id });
+                    } else {
+                        set({ activeRole: null });
+                    }
+                }
+            },
 
             logout: () =>
                 set({

@@ -1,0 +1,89 @@
+import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useTeacherAssessments, type Assessment } from './teacherQueries';
+import { FileText, Plus, Calendar, ArrowLeft } from 'lucide-react';
+import CreateAssessmentModal from './components/CreateAssessmentModal';
+
+const TeacherGradePage = () => {
+    const { assignmentId } = useParams();
+    const { data: assessments, isLoading, isError } = useTeacherAssessments(assignmentId);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    if (isLoading) return <div className="p-6">Loading assessments...</div>;
+    if (isError) return <div className="p-6 text-red-600">Failed to load assessments.</div>;
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <Link to="/dashboard/classes" className="text-gray-500 hover:text-gray-700">
+                            <ArrowLeft size={20} />
+                        </Link>
+                        <h1 className="text-2xl font-bold text-gray-900">Daftar Penilaian</h1>
+                    </div>
+                    <p className="text-gray-500 text-sm ml-7">Kelola tugas, ujian, dan input nilai siswa.</p>
+                </div>
+
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                    <Plus size={16} />
+                    Buat Penilaian Baru
+                </button>
+            </div>
+
+            {!assessments || assessments.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <FileText className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                    <h3 className="text-gray-900 font-medium">Belum ada penilaian</h3>
+                    <p className="text-gray-500 text-sm mt-1">Buat penilaian baru untuk mulai menginput nilai.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {assessments.map((assessment: Assessment) => (
+                        <div key={assessment.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                                    <FileText size={20} />
+                                </div>
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${assessment.type === 'FINAL_EXAM' || assessment.type === 'MID_EXAM'
+                                        ? 'bg-red-100 text-red-700'
+                                        : 'bg-green-100 text-green-700'
+                                    }`}>
+                                    {assessment.type}
+                                </span>
+                            </div>
+
+                            <h3 className="font-bold text-gray-900 mb-1">{assessment.title}</h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                                <Calendar size={14} />
+                                <span>{new Date(assessment.date).toLocaleDateString('id-ID')}</span>
+                            </div>
+
+                            <div className="border-t border-gray-100 pt-4 mt-4">
+                                <Link
+                                    to={`/dashboard/grades/assessment/${assessment.id}`}
+                                    className="block w-full text-center text-blue-600 font-medium text-sm hover:underline"
+                                >
+                                    Input / Edit Nilai
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {assignmentId && (
+                <CreateAssessmentModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    teachingAssignmentId={assignmentId}
+                />
+            )}
+        </div>
+    );
+};
+
+export default TeacherGradePage;

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import AlertModal from './components/ui/AlertModal';
 import LoginPage from './pages/LoginPage';
@@ -31,6 +32,16 @@ import SubjectPage from "./features/subjects/SubjectPage.tsx";
 import AssignmentPage from "./features/assignments/AssignmentPage.tsx";
 import SchedulePage from "./features/schedules/SchedulePage.tsx";
 import ProfilePage from "./features/profile/ProfilePage.tsx";
+import TeacherClassesPage from "./features/dashboard/teacher/TeacherClassesPage.tsx";
+import TeacherGradePage from "./features/dashboard/teacher/TeacherGradePage.tsx";
+import TeacherAttendancePage from "./features/dashboard/teacher/TeacherAttendancePage.tsx";
+import TeacherScoreInputPage from "./features/dashboard/teacher/TeacherScoreInputPage.tsx";
+import TeacherSchedulePage from "./features/dashboard/teacher/TeacherSchedulePage.tsx";
+import TeacherAttendanceInputPage from "./features/dashboard/teacher/TeacherAttendanceInputPage.tsx";
+const ScheduleWrapper = () => {
+    const { activeRole } = useAuthStore();
+    return activeRole === 'teacher' ? <TeacherSchedulePage /> : <SchedulePage />;
+};
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -42,6 +53,14 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 };
 
 function App() {
+    const { isAuthenticated, user, ensureActiveRole } = useAuthStore();
+
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            ensureActiveRole();
+        }
+    }, [isAuthenticated, user, ensureActiveRole]);
+
     return (
         <>
             <Toaster
@@ -98,10 +117,19 @@ function App() {
                         <Route path="classrooms" element={<ClassroomPage />} />
                         <Route path="subjects" element={<SubjectPage />} />
                         <Route path="assignments" element={<AssignmentPage />} />
-                        <Route path="schedules" element={<SchedulePage />} />
+                        <Route path="schedules" element={<ScheduleWrapper />} />
 
                         <Route path="roles" element={<RolePage />} />
                         <Route path="profile" element={<ProfilePage />} />
+
+                        {/* Teacher Routes */}
+                        <Route path="classes" element={<TeacherClassesPage />} />
+                        <Route path="grades" element={<TeacherClassesPage />} /> {/* Entry point for grades */}
+                        <Route path="grades/:assignmentId" element={<TeacherGradePage />} />
+                        <Route path="grades/assessment/:assessmentId" element={<TeacherScoreInputPage />} />
+                        <Route path="attendance" element={<TeacherClassesPage />} /> {/* Entry point for attendance */}
+                        <Route path="attendance/:assignmentId" element={<TeacherAttendancePage />} />
+                        <Route path="attendance/:assignmentId/input" element={<TeacherAttendanceInputPage />} />
                     </Route>
 
                     {/* Default Redirect */}

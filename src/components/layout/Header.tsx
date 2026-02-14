@@ -3,6 +3,7 @@ import { LogOut, User as UserIcon, ChevronDown, LayoutDashboard, Menu, X } from 
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { getAvailableRoles } from '../../utils/roleUtils';
 
 const Header = () => {
     const { user, logout, activeRole, setActiveRole } = useAuthStore();
@@ -63,45 +64,7 @@ const Header = () => {
     const isGroupActive = (paths: string[]) => paths.some(path => location.pathname.startsWith(path));
 
     // --- Role Detection Logic ---
-    // Flatten all available roles for the switcher
-    const getAvailableRoles = () => {
-        const roles: { id: string; label: string }[] = [];
-
-        // 1. Student
-        if (user?.profile_context?.type === 'student' || user?.roles?.includes('student')) {
-            roles.push({ id: 'student', label: 'Siswa' });
-        }
-
-        // 2. Parent
-        if (['parent', 'guardian'].includes(user?.profile_context?.type || '') || user?.roles?.some(r => ['parent', 'guardian'].includes(r))) {
-            roles.push({ id: 'parent', label: 'Wali Murid' });
-        }
-
-        // 3. Employee Roles
-        if (user?.roles?.includes('teacher') || user?.roles?.includes('guru')) {
-            roles.push({ id: 'teacher', label: 'Guru' });
-        }
-        if (user?.roles?.includes('finance_admin') || user?.roles?.includes('admin-keuangan')) {
-            roles.push({ id: 'finance_admin', label: 'Keuangan' });
-        }
-        if (user?.roles?.includes('education_admin') || user?.roles?.includes('admin-pendidikan')) {
-            roles.push({ id: 'education_admin', label: 'Pendidikan' });
-        }
-
-        // 4. Admin
-        if (user?.roles?.includes('admin') || user?.profile_context?.type === 'admin') {
-            roles.push({ id: 'admin', label: 'Admin' });
-        }
-
-        // Fallback for generic employee if no specific role found
-        if (roles.length === 0 && user?.profile_context?.type === 'employee') {
-            roles.push({ id: 'employee', label: 'Karyawan' });
-        }
-
-        return roles;
-    };
-
-    const availableRoles = getAvailableRoles();
+    const availableRoles = getAvailableRoles(user);
 
     // --- Dynamic Nav Menu based on ACTIVE ROLE ---
     const getNavGroups = () => {
@@ -277,7 +240,7 @@ const Header = () => {
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
                             >
                                 <span className="opacity-70">Akses:</span>
-                                <span>{availableRoles.find(r => r.id === activeRole)?.label || 'Pilih Role'}</span>
+                                <span>{availableRoles.find(r => r.id === activeRole)?.label}</span>
                                 <ChevronDown size={14} />
                             </button>
 
