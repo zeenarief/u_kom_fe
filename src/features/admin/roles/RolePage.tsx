@@ -178,9 +178,9 @@ export default function RolePage() {
                                 <div className="flex items-center gap-3 overflow-hidden">
                                     <Shield size={18} className={`shrink-0 ${selectedRoleId === role.id ? 'fill-blue-200' : ''} `} />
                                     <div className="truncate">
-                                        <p className="font-medium text-sm">{role.name}</p>
+                                        <p className="font-medium text-sm">{role.description}</p>
                                         {/* Tampilkan deskripsi pendek jika ada */}
-                                        {role.description && <p className="text-xs text-gray-400 truncate">{role.description}</p>}
+                                        {role.description && <p className="text-xs text-gray-400 truncate">{role.name}</p>}
                                     </div>
                                 </div>
 

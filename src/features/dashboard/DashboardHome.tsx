@@ -7,6 +7,7 @@ import EducationDashboard from "./employee/EducationDashboard";
 import TeacherDashboard from "./employee/TeacherDashboard";
 import AdminDashboard from "./admin/AdminDashboard";
 import UnregisteredDashboard from './UnregisteredDashboard';
+import MusyrifDashboard from "./employee/MusyrifDashboard";
 
 export default function DashboardHome() {
     const { activeRole } = useAuthStore();
@@ -36,6 +37,8 @@ export default function DashboardHome() {
         case 'admin-pendidikan':
         case 'education':
             return <EducationDashboard />;
+        case 'musyrif':
+            return <MusyrifDashboard />;
         // Employee fallback if specific role not found but context is employee
         case 'employee':
             // Fallback to Unregistered if they are 'employee' but have no specific role dashboard

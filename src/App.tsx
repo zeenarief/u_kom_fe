@@ -45,6 +45,11 @@ import TeacherSchedulePage from "./features/teacher/TeacherSchedulePage.tsx";
 import TeacherAttendanceInputPage from "./features/teacher/TeacherAttendanceInputPage.tsx";
 import TeacherClassLayout from "./features/teacher/TeacherClassLayout.tsx";
 
+// Musyrif Pages
+import ViolationInputForm from "./features/musyrif/violations/ViolationInputForm.tsx";
+import ViolationHistory from "./features/musyrif/violations/ViolationHistory.tsx";
+import ViolationMasterData from "./features/musyrif/violations/master/ViolationMasterData.tsx";
+
 const ScheduleWrapper = () => {
     const { activeRole } = useAuthStore();
     return activeRole === 'teacher' ? <TeacherSchedulePage /> : <SchedulePage />;
@@ -136,6 +141,14 @@ function App() {
                             <Route path="employees/create" element={<EmployeeCreatePage />} />
                             <Route path="employees/:id" element={<EmployeeDetailPage />} />
                             <Route path="employees/:id/edit" element={<EmployeeEditPage />} />
+                        </Route>
+
+
+                        {/* Musyrif Routes */}
+                        <Route element={<RoleGuard allowedRoles={['musyrif', 'admin']} />}>
+                            <Route path="violations/record" element={<ViolationInputForm />} />
+                            <Route path="violations/history" element={<ViolationHistory />} />
+                            <Route path="violations/master" element={<ViolationMasterData />} />
                         </Route>
 
                         {/* Teacher Routes - Partially protected by layout, but adding explicit guard is better */}

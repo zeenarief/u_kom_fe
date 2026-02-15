@@ -1,4 +1,4 @@
-import type { User } from '../features/users/types';
+import type { User } from '../features/admin/users/types';
 
 export const getAvailableRoles = (user: User | null) => {
     const roles: { id: string; label: string }[] = [];
@@ -11,7 +11,7 @@ export const getAvailableRoles = (user: User | null) => {
     }
 
     // 2. Parent
-    if (['parent', 'guardian'].includes(user.profile_context?.type || '') || user.roles?.some(r => ['parent', 'guardian'].includes(r))) {
+    if (['parent', 'guardian'].includes(user.profile_context?.type || '') || user.roles?.some((r: string) => ['parent', 'guardian'].includes(r))) {
         roles.push({ id: 'parent', label: 'Wali Murid' });
     }
 
@@ -29,6 +29,11 @@ export const getAvailableRoles = (user: User | null) => {
     // 4. Admin
     if (user.roles?.includes('admin') || user.profile_context?.type === 'admin') {
         roles.push({ id: 'admin', label: 'Admin' });
+    }
+
+    // 5. Musyrif
+    if (user.roles?.includes('musyrif')) {
+        roles.push({ id: 'musyrif', label: 'Musyrif' });
     }
 
     // Fallback for generic employee if no specific role found

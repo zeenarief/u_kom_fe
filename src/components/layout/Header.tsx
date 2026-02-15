@@ -133,6 +133,16 @@ const Header = () => {
                 });
                 break;
 
+            case 'musyrif':
+                groups.push({
+                    name: 'Menu Musyrif',
+                    items: [
+                        { label: 'Pelanggaran Santri', path: '/dashboard/violations/history' },
+                        { label: 'Tata Tertib', path: '/dashboard/violations/master' },
+                    ]
+                });
+                break;
+
             case 'admin':
                 groups.push(
                     {
