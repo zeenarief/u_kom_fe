@@ -143,6 +143,17 @@ const Header = () => {
                 });
                 break;
 
+            case 'fundraiser':
+                groups.push({
+                    name: 'Menu Fundraising',
+                    items: [
+                        { label: 'Catat Donasi', path: '/dashboard/finance/donations/create' },
+                        { label: 'Riwayat Donasi', path: '/dashboard/finance/donations/history' },
+                        { label: 'Data Donatur', path: '/dashboard/finance/donors' },
+                    ]
+                });
+                break;
+
             case 'admin':
                 groups.push(
                     {

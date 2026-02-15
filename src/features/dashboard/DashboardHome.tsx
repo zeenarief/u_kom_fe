@@ -8,6 +8,7 @@ import TeacherDashboard from "./employee/TeacherDashboard";
 import AdminDashboard from "./admin/AdminDashboard";
 import UnregisteredDashboard from './UnregisteredDashboard';
 import MusyrifDashboard from "./employee/MusyrifDashboard";
+import FundraiserDashboard from "./employee/FundraiserDashboard";
 
 export default function DashboardHome() {
     const { activeRole } = useAuthStore();
@@ -33,6 +34,8 @@ export default function DashboardHome() {
         case 'admin-keuangan':
         case 'finance':
             return <FinanceDashboard />;
+        case 'fundraiser':
+            return <FundraiserDashboard />;
         case 'education_admin':
         case 'admin-pendidikan':
         case 'education':

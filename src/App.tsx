@@ -50,6 +50,16 @@ import ViolationInputForm from "./features/musyrif/violations/ViolationInputForm
 import ViolationHistory from "./features/musyrif/violations/ViolationHistory.tsx";
 import ViolationMasterData from "./features/musyrif/violations/master/ViolationMasterData.tsx";
 
+// Finance/Fundraiser Pages
+import DonationCreatePage from "./features/finance/donations/DonationCreatePage.tsx";
+import DonationPage from "./features/finance/donations/DonationPage.tsx";
+import DonationEditPage from "./features/finance/donations/DonationEditPage.tsx";
+import DonationDetailPage from "./features/finance/donations/DonationDetailPage.tsx";
+import DonorPage from "./features/finance/donors/DonorPage.tsx";
+import DonorCreatePage from "./features/finance/donors/DonorCreatePage.tsx";
+import DonorEditPage from "./features/finance/donors/DonorEditPage.tsx";
+import DonorDetailPage from "./features/finance/donors/DonorDetailPage.tsx";
+
 const ScheduleWrapper = () => {
     const { activeRole } = useAuthStore();
     return activeRole === 'teacher' ? <TeacherSchedulePage /> : <SchedulePage />;
@@ -150,6 +160,20 @@ function App() {
                             <Route path="violations/history" element={<ViolationHistory />} />
                             <Route path="violations/master" element={<ViolationMasterData />} />
                         </Route>
+
+                        {/* Fundraiser/Finance Routes */}
+                        <Route element={<RoleGuard allowedRoles={['fundraiser', 'admin', 'finance_admin']} />}>
+                            <Route path="finance/donations/create" element={<DonationCreatePage />} />
+                            <Route path="finance/donations/history" element={<DonationPage />} />
+                            <Route path="finance/donations/:id" element={<DonationDetailPage />} />
+                            <Route path="finance/donations/:id/edit" element={<DonationEditPage />} />
+                            <Route path="finance/donors" element={<DonorPage />} />
+                            <Route path="finance/donors/create" element={<DonorCreatePage />} />
+                            <Route path="finance/donors/:id" element={<DonorDetailPage />} />
+                            <Route path="finance/donors/:id/edit" element={<DonorEditPage />} />
+                        </Route>
+
+
 
                         {/* Teacher Routes - Partially protected by layout, but adding explicit guard is better */}
                         <Route element={<RoleGuard allowedRoles={['teacher', 'guru', 'admin']} />}>

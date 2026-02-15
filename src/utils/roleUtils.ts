@@ -36,6 +36,11 @@ export const getAvailableRoles = (user: User | null) => {
         roles.push({ id: 'musyrif', label: 'Musyrif' });
     }
 
+    // 6. Fundraiser
+    if (user.roles?.includes('fundraiser') || user.permissions?.includes('finance_donations.create')) {
+        roles.push({ id: 'fundraiser', label: 'Fundraiser' });
+    }
+
     // Fallback for generic employee if no specific role found
     if (roles.length === 0 && user.profile_context?.type === 'employee') {
         roles.push({ id: 'employee', label: 'Karyawan' });
