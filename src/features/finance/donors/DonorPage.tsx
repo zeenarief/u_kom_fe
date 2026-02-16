@@ -13,8 +13,12 @@ const DonorPage = () => {
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
 
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
     // Fetch Data
-    const { data: donorsData, isLoading, isError } = useDonors({ name: debouncedSearch });
+    const { data: donorsData, isLoading, isError } = useDonors({ page, limit, q: debouncedSearch });
     const donors = donorsData?.items || [];
 
     const handleCreate = () => {
@@ -93,8 +97,33 @@ const DonorPage = () => {
                                 />
                             ))}
 
-                            <div className="text-sm text-gray-500 pt-2 text-center">
-                                Menampilkan {donors.length} data
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {donors.length} dari {donorsData?.meta.total_items || 0} data
+                                </div>
+                                {donorsData?.meta && donorsData.meta.total_pages > 1 && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            disabled={donorsData.meta.current_page === 1}
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <span className="flex items-center text-sm font-medium text-gray-700">
+                                            Page {donorsData.meta.current_page} of {donorsData.meta.total_pages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            disabled={donorsData.meta.current_page === donorsData.meta.total_pages}
+                                            onClick={() => setPage((p) => p + 1)}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : (

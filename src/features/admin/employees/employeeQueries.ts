@@ -1,17 +1,16 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../../lib/axios';
-import type { ApiResponse, ApiError } from '../../../types/api';
+import type { ApiResponse, ApiError, PaginatedResponse } from '../../../types/api';
 import type { Employee, EmployeeFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List ===
-export const useEmployees = (search?: string) => {
+export const useEmployees = (params?: { page?: number; limit?: number; q?: string }) => {
     return useQuery({
-        queryKey: ['employees', search],
+        queryKey: ['employees', JSON.stringify(params)],
         queryFn: async () => {
-            const params = search ? { q: search } : {};
-            const response = await api.get<ApiResponse<Employee[]>>('/employees', { params });
+            const response = await api.get<ApiResponse<PaginatedResponse<Employee>>>('/employees', { params });
             return response.data.data;
         },
         placeholderData: keepPreviousData,

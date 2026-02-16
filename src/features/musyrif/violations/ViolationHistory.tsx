@@ -5,18 +5,20 @@ import { useAlertStore } from '../../../store/alertStore';
 import { Link } from 'react-router-dom';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import Button from '../../../components/ui/Button';
+import { useDebounce } from '../../../hooks/useDebounce';
 
 const ViolationHistory = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: violations, isLoading } = useAllViolations();
+    const debouncedSearch = useDebounce(searchTerm, 500);
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: violations, isLoading } = useAllViolations({ page, limit, q: debouncedSearch });
     const deleteMutation = useDeleteViolation();
     const { showAlert } = useAlertStore();
 
-    // Client-side filtering for now (backend usually handles this, but for simplicity)
-    const filteredViolations = violations?.filter(v =>
-        v.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        v.violation_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Use items from paginated response
+    const filteredViolations = violations?.items || [];
 
     const handleDelete = (id: string) => {
         showAlert(
@@ -126,6 +128,36 @@ const ViolationHistory = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination */}
+            {violations?.meta && violations.meta.total_pages > 1 && (
+                <div className="flex justify-between items-center pt-4">
+                    <div className="text-sm text-gray-500">
+                        Menampilkan {filteredViolations.length} dari {violations.meta.total_items} data
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            disabled={violations.meta.current_page === 1}
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            className="text-sm"
+                        >
+                            Previous
+                        </Button>
+                        <span className="flex items-center text-sm font-medium text-gray-700 px-2">
+                            Page {violations.meta.current_page} of {violations.meta.total_pages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            disabled={violations.meta.current_page === violations.meta.total_pages}
+                            onClick={() => setPage(p => p + 1)}
+                            className="text-sm"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

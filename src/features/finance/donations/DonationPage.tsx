@@ -14,28 +14,30 @@ export default function DonationPage() {
     const debouncedSearch = useDebounce(search, 500);
     const [typeFilter, setTypeFilter] = useState<string>('ALL');
 
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
     // Fetch Data
     // Note: API might need 'search' param support or client-side filtering. 
     // Assuming 'type' param is supported. Search usually filters donor name.
     const { data: donationsData, isLoading, isError } = useDonations({
-        type: typeFilter !== 'ALL' ? typeFilter : undefined
+        page,
+        limit,
+        type: typeFilter !== 'ALL' ? typeFilter : undefined,
+        q: debouncedSearch
     });
 
     const donations = donationsData?.items || [];
 
-    // Client-side filtering for search (if API doesn't support generic search param yet)
-    // The previous DonationList used client-side search on donor name.
-    const filteredDonations = donations.filter(donation => {
-        const matchesSearch = donation.donor?.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-            donation.description?.toLowerCase().includes(debouncedSearch.toLowerCase());
-        return matchesSearch;
-    });
+    // Use items from paginated response
+    const filteredDonations = donationsData?.items || [];
 
-    const totalMoney = donations
+    const totalMoney = filteredDonations
         .filter(d => d.type === 'MONEY')
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
 
-    const totalGoods = donations.filter(d => d.type === 'GOODS').length;
+    const totalGoods = filteredDonations.filter(d => d.type === 'GOODS').length;
 
     const handleCreate = () => {
         navigate('/dashboard/finance/donations/create');
@@ -164,8 +166,33 @@ export default function DonationPage() {
                                 />
                             ))}
 
-                            <div className="text-sm text-gray-500 pt-2 text-center">
-                                Menampilkan {filteredDonations.length} dari {donations.length} data
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {filteredDonations.length} dari {donationsData?.meta.total_items || 0} data
+                                </div>
+                                {donationsData?.meta && donationsData.meta.total_pages > 1 && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            disabled={donationsData.meta.current_page === 1}
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <span className="flex items-center text-sm font-medium text-gray-700">
+                                            Page {donationsData.meta.current_page} of {donationsData.meta.total_pages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            disabled={donationsData.meta.current_page === donationsData.meta.total_pages}
+                                            onClick={() => setPage((p) => p + 1)}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : (

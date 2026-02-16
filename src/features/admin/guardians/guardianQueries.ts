@@ -1,17 +1,16 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../../lib/axios';
-import type { ApiResponse, ApiError } from '../../../types/api';
+import type { ApiResponse, ApiError, PaginatedResponse } from '../../../types/api';
 import type { Guardian, GuardianFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List Guardians ===
-export const useGuardians = (search?: string) => {
+export const useGuardians = (params?: { page?: number; limit?: number; q?: string }) => {
     return useQuery({
-        queryKey: ['guardians', search],
+        queryKey: ['guardians', JSON.stringify(params)],
         queryFn: async () => {
-            const params = search ? { q: search } : {};
-            const response = await api.get<ApiResponse<Guardian[]>>('/guardians', { params });
+            const response = await api.get<ApiResponse<PaginatedResponse<Guardian>>>('/guardians', { params });
             return response.data.data;
         },
         placeholderData: keepPreviousData,

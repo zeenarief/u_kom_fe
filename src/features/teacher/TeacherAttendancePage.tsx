@@ -4,13 +4,18 @@ import { useAttendanceHistory, useDeleteAttendance, type AttendanceHistory } fro
 import { Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAlertStore } from '../../store/alertStore';
+import { useState } from 'react';
 import TeacherAttendanceCard from './components/TeacherAttendanceCard';
+import Button from '../../components/ui/Button';
 
 const TeacherAttendancePage = () => {
     const { assignmentId } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { data: history, isLoading } = useAttendanceHistory(assignmentId);
+    const [page, setPage] = useState(1);
+    const limit = 10;
+    const { data: historyData, isLoading } = useAttendanceHistory(assignmentId, { page, limit });
+    const history = historyData?.items || [];
     const deleteAttendanceMutation = useDeleteAttendance();
     const { showAlert } = useAlertStore();
 
@@ -65,7 +70,7 @@ const TeacherAttendancePage = () => {
                             <div className="col-span-2 text-right">AKSI</div>
                         </div>
 
-                        {history?.map((session) => (
+                        {history.map((session) => (
                             <TeacherAttendanceCard
                                 key={session.id}
                                 session={session}
@@ -73,6 +78,36 @@ const TeacherAttendancePage = () => {
                                 onDelete={(id, topic) => handleDelete(id, topic)} // Adapter for slightly different signature
                             />
                         ))}
+
+                        {/* Pagination */}
+                        {historyData?.meta && historyData.meta.total_pages > 1 && (
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {history.length} dari {historyData.meta.total_items} sesi
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        disabled={historyData.meta.current_page === 1}
+                                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                                        className="text-sm px-3 py-1 h-8"
+                                    >
+                                        Previous
+                                    </Button>
+                                    <span className="flex items-center text-sm font-medium text-gray-700 px-2">
+                                        Page {historyData.meta.current_page} of {historyData.meta.total_pages}
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        disabled={historyData.meta.current_page === historyData.meta.total_pages}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="text-sm px-3 py-1 h-8"
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

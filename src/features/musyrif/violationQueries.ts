@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import api from '../../lib/axios';
-import type { ApiResponse } from '../../types/api'; // Adjust path if needed
+import type { ApiResponse, PaginatedResponse } from '../../types/api'; // Adjust path if needed
 import toast from 'react-hot-toast';
 import type {
     ViolationCategory,
@@ -115,13 +115,14 @@ export const useViolationsByStudent = (studentId: string) => {
     });
 };
 
-export const useAllViolations = () => {
+export const useAllViolations = (params?: { page?: number; limit?: number; q?: string }) => {
     return useQuery({
-        queryKey: ['all-violations'],
+        queryKey: ['all-violations', JSON.stringify(params)],
         queryFn: async () => {
-            const response = await api.get<ApiResponse<StudentViolation[]>>('/violations/all');
+            const response = await api.get<ApiResponse<PaginatedResponse<StudentViolation>>>('/violations/all', { params });
             return response.data.data;
         },
+        placeholderData: keepPreviousData,
     });
 };
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../../lib/axios';
-import type { ApiResponse, ApiError } from '../../../types/api';
+import type { ApiResponse, ApiError, PaginatedResponse } from '../../../types/api';
 import type {
     Student,
     StudentFormInput,
@@ -11,12 +11,11 @@ import type {
 } from './types'; import toast from 'react-hot-toast';
 
 // === READ: List Siswa ===
-export const useStudents = (search?: string) => {
+export const useStudents = (params?: { page?: number; limit?: number; q?: string }) => {
     return useQuery({
-        queryKey: ['students', search],
+        queryKey: ['students', JSON.stringify(params)],
         queryFn: async () => {
-            const params = search ? { q: search } : {};
-            const response = await api.get<ApiResponse<Student[]>>('/students', { params });
+            const response = await api.get<ApiResponse<PaginatedResponse<Student>>>('/students', { params });
             return response.data.data;
         },
         placeholderData: keepPreviousData,

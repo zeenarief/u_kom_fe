@@ -23,11 +23,17 @@ export default function StudentPage() {
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
     const [genderFilter, setGenderFilter] = useState<string>('ALL');
 
-    const { data: students, isLoading, isError } = useStudents(debouncedSearch);
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: students, isLoading, isError } = useStudents({ page, limit, q: debouncedSearch });
     const deleteMutation = useDeleteStudent();
 
     // Filter students berdasarkan status dan gender
-    const filteredStudents = students?.filter(student => {
+    // Filter students berdasarkan status dan gender (Client-side filtering for now as API might not support all filters yet)
+    // Note: Ideally, these filters should be passed to the API
+    const filteredStudents = students?.items.filter(student => {
         const matchesStatus = statusFilter === 'ALL' || student.status === statusFilter;
         const matchesGender = genderFilter === 'ALL' || student.gender === genderFilter;
         return matchesStatus && matchesGender;
@@ -79,18 +85,18 @@ export default function StudentPage() {
                     <div className="flex items-center gap-1 mt-4 bg-white p-1 rounded-xl border border-gray-200 shadow-sm w-fit">
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total</div>
-                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{students?.length || 0}</div>
+                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{students?.meta.total_items || 0}</div>
                         </div>
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Aktif</div>
                             <div className="text-xl font-bold text-green-600 leading-none mt-0.5">
-                                {students?.filter(s => s.status === 'ACTIVE').length || 0}
+                                {students?.items.filter(s => s.status === 'ACTIVE').length || 0}
                             </div>
                         </div>
                         <div className="px-4 py-2">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Lulus</div>
                             <div className="text-xl font-bold text-blue-600 leading-none mt-0.5">
-                                {students?.filter(s => s.status === 'GRADUATED').length || 0}
+                                {students?.items.filter(s => s.status === 'GRADUATED').length || 0}
                             </div>
                         </div>
                     </div>
@@ -252,16 +258,39 @@ export default function StudentPage() {
                                 />
                             ))}
 
-                            {/* Result Count */}
-                            <div className="text-sm text-gray-500 pt-2">
-                                Menampilkan {filteredStudents.length} dari {students?.length || 0} siswa
-                                {(statusFilter !== 'ALL' || genderFilter !== 'ALL') && (
-                                    <span className="ml-2">
-                                        (difilter berdasarkan
-                                        {statusFilter !== 'ALL' && ` status: ${statusFilter}`}
-                                        {statusFilter !== 'ALL' && genderFilter !== 'ALL' && ' dan '}
-                                        {genderFilter !== 'ALL' && ` gender: ${genderFilter === 'male' ? 'Laki-laki' : 'Perempuan'}`})
-                                    </span>
+                            {/* Pagination and Result Count */}
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {filteredStudents.length} dari {students?.meta.total_items || 0} siswa
+                                    {(statusFilter !== 'ALL' || genderFilter !== 'ALL') && (
+                                        <span className="ml-1">
+                                            (difilter)
+                                        </span>
+                                    )}
+                                </div>
+
+                                {students?.meta && students.meta.total_pages > 1 && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            disabled={students.meta.current_page === 1}
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <span className="flex items-center text-sm font-medium text-gray-700">
+                                            Page {students.meta.current_page} of {students.meta.total_pages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            disabled={students.meta.current_page === students.meta.total_pages}
+                                            onClick={() => setPage((p) => p + 1)}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
                         </div>

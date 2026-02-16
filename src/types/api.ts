@@ -26,3 +26,15 @@ export interface DashboardStats {
         female: number;
     };
 }
+
+export interface PaginationMeta {
+    current_page: number;
+    total_pages: number;
+    page_size: number;
+    total_items: number;
+}
+
+export interface PaginatedResponse<T> {
+    items: T[];
+    meta: PaginationMeta;
+}

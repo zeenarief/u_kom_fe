@@ -21,16 +21,20 @@ export default function GuardianPage() {
     // Filter State
     const [relationshipFilter, setRelationshipFilter] = useState<string>('ALL');
 
-    const { data: guardians, isLoading, isError } = useGuardians(debouncedSearch);
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: guardians, isLoading, isError } = useGuardians({ page, limit, q: debouncedSearch });
 
     // Filter guardians
-    const filteredGuardians = guardians?.filter(guardian => {
+    const filteredGuardians = guardians?.items.filter(guardian => {
         const matchesRelationship = relationshipFilter === 'ALL' || guardian.relationship_to_student === relationshipFilter;
         return matchesRelationship;
     }) || [];
 
     // Get unique relationships for filter
-    const uniqueRelationships = Array.from(new Set(guardians?.map(g => g.relationship_to_student).filter(Boolean))) as string[];
+    const uniqueRelationships = Array.from(new Set(guardians?.items.map(g => g.relationship_to_student).filter(Boolean))) as string[];
 
     const handleCreate = () => {
         navigate('/dashboard/guardians/create');
@@ -71,13 +75,13 @@ export default function GuardianPage() {
                     <div className="flex items-center gap-1 mt-4 bg-white p-1 rounded-xl border border-gray-200 shadow-sm w-fit">
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total</div>
-                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{guardians?.length || 0}</div>
+                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{guardians?.meta.total_items || 0}</div>
                         </div>
                         {uniqueRelationships.slice(0, 3).map((rel) => (
                             <div key={rel} className="px-4 py-2 border-r border-gray-100 last:border-0">
                                 <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider truncate max-w-[80px]">{rel}</div>
                                 <div className="text-xl font-bold text-orange-600 leading-none mt-0.5">
-                                    {guardians?.filter(g => g.relationship_to_student === rel).length || 0}
+                                    {guardians?.items.filter(g => g.relationship_to_student === rel).length || 0}
                                 </div>
                             </div>
                         ))}
@@ -218,6 +222,42 @@ export default function GuardianPage() {
                             onViewDetail={handleViewDetail}
                         />
                     ))}
+
+                    {/* Pagination and Result Count */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                        <div className="text-sm text-gray-500">
+                            Menampilkan {filteredGuardians.length} dari {guardians?.meta.total_items || 0} wali
+                            {(relationshipFilter !== 'ALL') && (
+                                <span className="ml-1">
+                                    (difilter)
+                                </span>
+                            )}
+                        </div>
+
+                        {guardians?.meta && guardians.meta.total_pages > 1 && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    disabled={guardians.meta.current_page === 1}
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    className="text-sm px-3 py-1 h-8"
+                                >
+                                    Previous
+                                </Button>
+                                <span className="flex items-center text-sm font-medium text-gray-700">
+                                    Page {guardians.meta.current_page} of {guardians.meta.total_pages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    disabled={guardians.meta.current_page === guardians.meta.total_pages}
+                                    onClick={() => setPage((p) => p + 1)}
+                                    className="text-sm px-3 py-1 h-8"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

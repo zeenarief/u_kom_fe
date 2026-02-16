@@ -22,11 +22,15 @@ export default function EmployeePage() {
     // Filter State
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-    const { data: employees, isLoading, isError } = useEmployees(debouncedSearch);
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: employees, isLoading, isError } = useEmployees({ page, limit, q: debouncedSearch });
     const deleteMutation = useDeleteEmployee();
 
     // Filter employees berdasarkan employment status
-    const filteredEmployees = employees?.filter(employee => {
+    const filteredEmployees = employees?.items.filter(employee => {
         const matchesStatus = statusFilter === 'ALL' || employee.employment_status === statusFilter;
         return matchesStatus;
     }) || [];
@@ -81,24 +85,24 @@ export default function EmployeePage() {
                     <div className="flex items-center gap-1 mt-4 bg-white p-1 rounded-xl border border-gray-200 shadow-sm w-fit">
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total</div>
-                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{employees?.length || 0}</div>
+                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{employees?.meta.total_items || 0}</div>
                         </div>
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">PNS</div>
                             <div className="text-xl font-bold text-green-600 leading-none mt-0.5">
-                                {employees?.filter(e => e.employment_status === 'PNS').length || 0}
+                                {employees?.items.filter(e => e.employment_status === 'PNS').length || 0}
                             </div>
                         </div>
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Honorer</div>
                             <div className="text-xl font-bold text-yellow-600 leading-none mt-0.5">
-                                {employees?.filter(e => e.employment_status === 'Honorer').length || 0}
+                                {employees?.items.filter(e => e.employment_status === 'Honorer').length || 0}
                             </div>
                         </div>
                         <div className="px-4 py-2">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Tetap</div>
                             <div className="text-xl font-bold text-blue-600 leading-none mt-0.5">
-                                {employees?.filter(e => e.employment_status === 'Tetap').length || 0}
+                                {employees?.items.filter(e => e.employment_status === 'Tetap').length || 0}
                             </div>
                         </div>
                     </div>
@@ -235,13 +239,39 @@ export default function EmployeePage() {
                                 />
                             ))}
 
-                            {/* Result Count */}
-                            <div className="text-sm text-gray-500 pt-2">
-                                Menampilkan {filteredEmployees.length} dari {employees?.length || 0} pegawai
-                                {statusFilter !== 'ALL' && (
-                                    <span className="ml-2">
-                                        (difilter berdasarkan status: {statusFilter})
-                                    </span>
+                            {/* Pagination and Result Count */}
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {filteredEmployees.length} dari {employees?.meta.total_items || 0} pegawai
+                                    {statusFilter !== 'ALL' && (
+                                        <span className="ml-2">
+                                            (difilter berdasarkan status: {statusFilter})
+                                        </span>
+                                    )}
+                                </div>
+
+                                {employees?.meta && employees.meta.total_pages > 1 && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            disabled={employees.meta.current_page === 1}
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <span className="flex items-center text-sm font-medium text-gray-700">
+                                            Page {employees.meta.current_page} of {employees.meta.total_pages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            disabled={employees.meta.current_page === employees.meta.total_pages}
+                                            onClick={() => setPage((p) => p + 1)}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
                         </div>

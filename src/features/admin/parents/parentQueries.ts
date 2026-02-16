@@ -1,17 +1,16 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import api from '../../../lib/axios';
-import type { ApiResponse, ApiError } from '../../../types/api';
+import type { ApiResponse, ApiError, PaginatedResponse } from '../../../types/api';
 import type { Parent, ParentFormInput } from './types';
 import toast from 'react-hot-toast';
 
 // === READ: List Parents ===
-export const useParents = (search?: string) => {
+export const useParents = (params?: { page?: number; limit?: number; q?: string }) => {
     return useQuery({
-        queryKey: ['parents', search],
+        queryKey: ['parents', JSON.stringify(params)],
         queryFn: async () => {
-            const params = search ? { q: search } : {};
-            const response = await api.get<ApiResponse<Parent[]>>('/parents', { params });
+            const response = await api.get<ApiResponse<PaginatedResponse<Parent>>>('/parents', { params });
             return response.data.data;
         },
         placeholderData: keepPreviousData,

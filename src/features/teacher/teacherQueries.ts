@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axiosInstance from '../../lib/axios';
 import { useAuthStore } from '../../store/authStore';
+import type { PaginatedResponse } from '../../types/api';
 
 // --- Teaching Assignments ---
 
@@ -68,12 +69,12 @@ export interface StudentScore {
     feedback: string;
 }
 
-export const useTeacherAssessments = (teachingAssignmentId: string | undefined) => {
+export const useTeacherAssessments = (teachingAssignmentId: string | undefined, params?: { page?: number; limit?: number }) => {
     return useQuery({
-        queryKey: ['assessments', teachingAssignmentId],
+        queryKey: ['assessments', teachingAssignmentId, JSON.stringify(params)],
         queryFn: async () => {
             if (!teachingAssignmentId) throw new Error("Teaching Assignment ID required");
-            const { data } = await axiosInstance.get<{ data: Assessment[] }>(`/grades/assessments/teaching-assignment/${teachingAssignmentId}`);
+            const { data } = await axiosInstance.get<{ data: PaginatedResponse<Assessment> }>(`/grades/assessments/teaching-assignment/${teachingAssignmentId}`, { params });
             return data.data;
         },
         enabled: !!teachingAssignmentId,
@@ -162,11 +163,16 @@ export const useClassroomStudents = (classroomId: string | undefined) => {
         queryKey: ['classroom-students', classroomId],
         queryFn: async () => {
             if (!classroomId) throw new Error("Classroom ID required");
-            // Assuming this endpoint exists or similar
-            const { data } = await axiosInstance.get<{ data: Student[] }>(`/students`, {
-                params: { classroom_id: classroomId, limit: 100 }
+            // API now returns PaginatedResponse
+            const { data } = await axiosInstance.get<{ data: PaginatedResponse<Student> }>(`/students`, {
+                params: {
+                    classroom_id: classroomId,
+                    limit: 100, // Fetch up to 100 students for now
+                    status: 'ACTIVE' // Only active students
+                }
             });
-            return data.data;
+            // Return items array for backward compatibility with components expecting Student[]
+            return data.data.items || [];
         },
         enabled: !!classroomId,
     });
@@ -237,12 +243,12 @@ export const useTeachingAssignmentSchedules = (assignmentId: string | undefined)
     });
 };
 
-export const useAttendanceHistory = (assignmentId: string | undefined) => {
+export const useAttendanceHistory = (assignmentId: string | undefined, params?: { page?: number; limit?: number }) => {
     return useQuery({
-        queryKey: ['attendance-history', assignmentId],
+        queryKey: ['attendance-history', assignmentId, JSON.stringify(params)],
         queryFn: async () => {
             if (!assignmentId) throw new Error("Assignment ID required");
-            const { data } = await axiosInstance.get<{ data: AttendanceHistory[] }>(`/attendances/history/teaching-assignment/${assignmentId}`);
+            const { data } = await axiosInstance.get<{ data: PaginatedResponse<AttendanceHistory> }>(`/attendances/history/teaching-assignment/${assignmentId}`, { params });
             return data.data;
         },
         enabled: !!assignmentId,

@@ -1,14 +1,20 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTeacherAssessments, useDeleteAssessment, type Assessment } from './teacherQueries';
 import { FileText, Calendar, Trash2, Edit } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 import { useAlertStore } from '../../store/alertStore';
 
 const TeacherGradePage = () => {
     const { assignmentId } = useParams();
     const queryClient = useQueryClient();
-    const { data: assessments, isLoading, isError } = useTeacherAssessments(assignmentId);
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: assessmentsData, isLoading, isError } = useTeacherAssessments(assignmentId, { page, limit });
+    const assessments = assessmentsData?.items || [];
     const deleteAssessmentMutation = useDeleteAssessment();
     const { showAlert } = useAlertStore();
 
@@ -84,6 +90,36 @@ const TeacherGradePage = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Pagination */}
+            {assessmentsData?.meta && assessmentsData.meta.total_pages > 1 && (
+                <div className="flex justify-between items-center pt-4">
+                    <div className="text-sm text-gray-500">
+                        Menampilkan {assessments.length} dari {assessmentsData.meta.total_items} penilaian
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            disabled={assessmentsData.meta.current_page === 1}
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            className="text-sm px-3 py-1 h-8"
+                        >
+                            Previous
+                        </Button>
+                        <span className="flex items-center text-sm font-medium text-gray-700 px-2">
+                            Page {assessmentsData.meta.current_page} of {assessmentsData.meta.total_pages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            disabled={assessmentsData.meta.current_page === assessmentsData.meta.total_pages}
+                            onClick={() => setPage(p => p + 1)}
+                            className="text-sm px-3 py-1 h-8"
+                        >
+                            Next
+                        </Button>
+                    </div>
                 </div>
             )}
         </div>

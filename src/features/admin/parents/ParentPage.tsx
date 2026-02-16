@@ -24,11 +24,15 @@ export default function ParentPage() {
     const [genderFilter, setGenderFilter] = useState<string>('ALL');
     const [occupationFilter, setOccupationFilter] = useState<string>('ALL');
 
-    const { data: parents, isLoading, isError } = useParents(debouncedSearch);
+    // Page State
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
+    const { data: parents, isLoading, isError } = useParents({ page, limit, q: debouncedSearch });
     const deleteMutation = useDeleteParent();
 
     // Filter parents
-    const filteredParents = parents?.filter(parent => {
+    const filteredParents = parents?.items.filter(parent => {
         const matchesLifeStatus = lifeStatusFilter === 'ALL' || parent.life_status === lifeStatusFilter;
         const matchesGender = genderFilter === 'ALL' || parent.gender === genderFilter;
         const matchesOccupation = occupationFilter === 'ALL' || parent.occupation === occupationFilter;
@@ -36,7 +40,7 @@ export default function ParentPage() {
     }) || [];
 
     // Get unique occupations for filter
-    const uniqueOccupations = Array.from(new Set(parents?.map(p => p.occupation).filter(Boolean))) as string[];
+    const uniqueOccupations = Array.from(new Set(parents?.items.map(p => p.occupation).filter(Boolean))) as string[];
 
     const handleCreate = () => {
         navigate('/dashboard/parents/create');
@@ -82,18 +86,18 @@ export default function ParentPage() {
                     <div className="flex items-center gap-1 mt-4 bg-white p-1 rounded-xl border border-gray-200 shadow-sm w-fit">
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total</div>
-                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{parents?.length || 0}</div>
+                            <div className="text-xl font-bold text-gray-900 leading-none mt-0.5">{parents?.meta.total_items || 0}</div>
                         </div>
                         <div className="px-4 py-2 border-r border-gray-100 last:border-0">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Hidup</div>
                             <div className="text-xl font-bold text-green-600 leading-none mt-0.5">
-                                {parents?.filter(p => p.life_status === 'alive').length || 0}
+                                {parents?.items.filter(p => p.life_status === 'alive').length || 0}
                             </div>
                         </div>
                         <div className="px-4 py-2">
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Meninggal</div>
                             <div className="text-xl font-bold text-gray-600 leading-none mt-0.5">
-                                {parents?.filter(p => p.life_status === 'deceased').length || 0}
+                                {parents?.items.filter(p => p.life_status === 'deceased').length || 0}
                             </div>
                         </div>
                     </div>
@@ -275,13 +279,39 @@ export default function ParentPage() {
                                 />
                             ))}
 
-                            {/* Result Count */}
-                            <div className="text-sm text-gray-500 pt-2">
-                                Menampilkan {filteredParents.length} dari {parents?.length || 0} orang tua
-                                {(lifeStatusFilter !== 'ALL' || genderFilter !== 'ALL' || occupationFilter !== 'ALL') && (
-                                    <span className="ml-2">
-                                        (difilter)
-                                    </span>
+                            {/* Pagination and Result Count */}
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Menampilkan {filteredParents.length} dari {parents?.meta.total_items || 0} orang tua
+                                    {(lifeStatusFilter !== 'ALL' || genderFilter !== 'ALL' || occupationFilter !== 'ALL') && (
+                                        <span className="ml-1">
+                                            (difilter)
+                                        </span>
+                                    )}
+                                </div>
+
+                                {parents?.meta && parents.meta.total_pages > 1 && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            disabled={parents.meta.current_page === 1}
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <span className="flex items-center text-sm font-medium text-gray-700">
+                                            Page {parents.meta.current_page} of {parents.meta.total_pages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            disabled={parents.meta.current_page === parents.meta.total_pages}
+                                            onClick={() => setPage((p) => p + 1)}
+                                            className="text-sm px-3 py-1 h-8"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
                         </div>

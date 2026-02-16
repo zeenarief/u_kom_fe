@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from '../../lib/axios';
-import type { CreateDonationRequest, DonationListResponse, DonorListResponse } from './types';
+import type { CreateDonationRequest, Donation, Donor } from './types';
+import type { PaginatedResponse } from '../../types/api';
 import toast from 'react-hot-toast';
 
 // Keys
@@ -42,11 +43,11 @@ export const useDonor = (id: string) => {
 
 // --- Donations ---
 
-export const useDonations = (params?: { limit?: number; offset?: number; type?: string; donor_id?: string; date_from?: string; date_to?: string }) => {
+export const useDonations = (params?: { page?: number; limit?: number; type?: string; donor_id?: string; date_from?: string; date_to?: string; q?: string }) => {
     return useQuery({
         queryKey: donationKeys.list(JSON.stringify(params)),
         queryFn: async () => {
-            const { data } = await axios.get<{ data: DonationListResponse }>('/finance/donations', { params });
+            const { data } = await axios.get<{ data: PaginatedResponse<Donation> }>('/finance/donations', { params });
             return data.data;
         }
     });
@@ -86,11 +87,11 @@ export const useCreateDonation = () => {
 
 // --- Donors ---
 
-export const useDonors = (params?: { limit?: number; offset?: number; name?: string }) => {
+export const useDonors = (params?: { page?: number; limit?: number; name?: string; q?: string }) => {
     return useQuery({
         queryKey: donationKeys.donorsList(JSON.stringify(params)),
         queryFn: async () => {
-            const { data } = await axios.get<{ data: DonorListResponse }>('/finance/donors', { params });
+            const { data } = await axios.get<{ data: PaginatedResponse<Donor> }>('/finance/donors', { params });
             return data.data;
         }
     });
