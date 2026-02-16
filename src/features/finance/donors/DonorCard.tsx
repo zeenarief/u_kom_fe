@@ -1,4 +1,4 @@
-import { Phone, MapPin, ChevronRight, Eye, Pencil } from 'lucide-react';
+import { Phone, MapPin, ChevronRight, Pencil } from 'lucide-react';
 import type { Donor } from '../types';
 import { useNavigate } from 'react-router-dom';
 
@@ -70,14 +70,13 @@ const DonorCard = ({ donor }: DonorCardProps) => {
                     </div>
                     <div className="min-w-0">
                         <h3 className="font-bold text-gray-900 truncate">{donor.name}</h3>
-                        <div className="text-xs text-gray-500 truncate">{donor.email || '-'}</div>
+                        {/* <div className="text-xs text-gray-500 truncate">{donor.email || '-'}</div> */}
                     </div>
                 </div>
 
                 {/* Phone */}
                 <div className="col-span-3">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Phone size={14} className="text-gray-400" />
                         <span>{donor.phone || '-'}</span>
                     </div>
                 </div>
@@ -85,20 +84,12 @@ const DonorCard = ({ donor }: DonorCardProps) => {
                 {/* Address */}
                 <div className="col-span-4">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <MapPin size={14} className="text-gray-400 flex-shrink-0" />
                         <span className="truncate">{donor.address || '-'}</span>
                     </div>
                 </div>
 
                 {/* Actions */}
                 <div className="col-span-1 flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    <button
-                        onClick={handleViewDetail}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Lihat Detail"
-                    >
-                        <Eye size={18} />
-                    </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();

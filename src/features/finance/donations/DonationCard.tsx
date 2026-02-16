@@ -1,4 +1,4 @@
-import { Calendar, Wallet, Package, CreditCard, ChevronRight, Pencil, Eye } from 'lucide-react';
+import { Calendar, Wallet, Package, CreditCard, Pencil, Eye } from 'lucide-react';
 import type { Donation } from '../types';
 import { useNavigate } from 'react-router-dom';
 
@@ -89,12 +89,17 @@ const DonationCard = ({ donation }: DonationCardProps) => {
                 {/* Footer Actions */}
                 <div className="flex justify-end gap-2 mt-3 pt-2 text-gray-400">
                     <button
+                        onClick={handleViewDetail}
+                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                    >
+                        <Eye size={14} /> Detail
+                    </button>
+                    <button
                         onClick={handleEdit}
                         className="p-2 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
                     >
                         <Pencil size={16} />
                     </button>
-                    <ChevronRight size={20} className="text-gray-300" />
                 </div>
             </div>
 
@@ -152,13 +157,6 @@ const DonationCard = ({ donation }: DonationCardProps) => {
                         title="Edit Donasi"
                     >
                         <Pencil size={18} />
-                    </button>
-                    <button
-                        onClick={handleViewDetail}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Lihat Detail"
-                    >
-                        <Eye size={18} />
                     </button>
                 </div>
             </div>

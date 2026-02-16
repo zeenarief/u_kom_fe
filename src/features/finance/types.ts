@@ -16,6 +16,15 @@ export interface Donor {
     email?: string;
     address?: string;
     created_at?: string;
+    recent_donations?: RecentDonation[];
+}
+
+export interface RecentDonation {
+    id: string;
+    date: string;
+    total_amount?: number;
+    type: DonationType;
+    items?: DonationItem[];
 }
 
 export interface Donation {
@@ -26,6 +35,7 @@ export interface Donation {
     total_amount?: number;
     description?: string;
     proof_file?: string;
+    proof_file_url?: string;
     donor: Donor;
     employee: {
         id: string;

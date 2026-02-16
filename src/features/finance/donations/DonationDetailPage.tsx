@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDonation } from '../donationQueries';
-import { Loader2, Calendar, User, Phone, MapPin, ArrowLeft, Wallet, Package, FileText } from 'lucide-react';
+import { Loader2, Calendar, User, Phone, MapPin, Wallet, Package, FileText } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import Breadcrumb from '../../../components/common/Breadcrumb';
+import SecureFilePreview from '../../../components/common/SecureFilePreview';
 
 const DonationDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -38,16 +39,6 @@ const DonationDetailPage = () => {
                 ]}
             />
 
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <ArrowLeft size={20} className="text-gray-600" />
-                </button>
-                <h1 className="text-2xl font-bold text-gray-900">Detail Donasi</h1>
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Info */}
                 <div className="lg:col-span-2 space-y-6">
@@ -58,9 +49,6 @@ const DonationDetailPage = () => {
                                     {donation.type === 'MONEY' ? <Wallet className="text-emerald-500" /> : <Package className="text-blue-500" />}
                                     Donasi {donation.type === 'MONEY' ? 'Uang' : 'Barang'}
                                 </h2>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    ID: {donation.id}
-                                </p>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${donation.type === 'MONEY' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
                                 }`}>
@@ -140,19 +128,21 @@ const DonationDetailPage = () => {
                             <User size={18} /> Informasi Donatur
                         </h3>
                         <div className="space-y-4">
-                            <div>
-                                <label className="text-xs text-gray-500">Nama Donatur</label>
-                                <div className="font-medium text-gray-900">{donation.donor.name}</div>
-                            </div>
-                            {donation.donor.phone && (
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs text-gray-500">Nomor Telepon</label>
-                                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                                        <Phone size={14} className="text-gray-400" />
-                                        {donation.donor.phone}
-                                    </div>
+                                    <label className="text-xs text-gray-500">Nama Donatur</label>
+                                    <div className="font-medium text-gray-900">{donation.donor.name}</div>
                                 </div>
-                            )}
+                                {donation.donor.phone && (
+                                    <div>
+                                        <label className="text-xs text-gray-500">Nomor Telepon</label>
+                                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                                            <Phone size={14} className="text-gray-400" />
+                                            {donation.donor.phone}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             {donation.donor.address && (
                                 <div>
                                     <label className="text-xs text-gray-500">Alamat</label>
@@ -165,26 +155,37 @@ const DonationDetailPage = () => {
                         </div>
                     </div>
 
+                    {/* Receiving Officer Info */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 pb-3 border-b border-gray-100">
+                            <User size={18} /> Petugas Penerima
+                        </h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-xs text-gray-500">Nama Petugas</label>
+                                <div className="font-medium text-gray-900">{donation.employee?.name || '-'}</div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Proof File */}
-                    {donation.proof_file && (
+                    {donation.proof_file_url && (
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 pb-3 border-b border-gray-100">
                                 <FileText size={18} /> Bukti Transfer
                             </h3>
-                            <a
-                                href={donation.proof_file} // Adjust according to how file URLs are served
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
-                            >
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
                                 <div className="p-2 bg-white rounded border border-gray-200 group-hover:border-emerald-200">
                                     <FileText size={20} className="text-emerald-600" />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                    <p className="text-sm font-medium text-gray-900 truncate">Lihat Bukti</p>
-                                    <p className="text-xs text-gray-500">Klik untuk membuka</p>
+                                    <SecureFilePreview
+                                        url={donation.proof_file_url}
+                                        buttonText="Lihat Bukti Transfer"
+                                        className="text-gray-900 hover:text-emerald-700 hover:bg-transparent p-0 h-auto font-medium"
+                                    />
                                 </div>
-                            </a>
+                            </div>
                         </div>
                     )}
                 </div>

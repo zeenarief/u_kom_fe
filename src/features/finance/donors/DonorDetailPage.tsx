@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDonor } from '../donationQueries';
-import { Loader2, ArrowLeft, Phone, Mail, MapPin, Wallet } from 'lucide-react';
+import { Loader2, ArrowLeft, Phone, Mail, MapPin, Wallet, Package } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 
@@ -37,16 +37,6 @@ const DonorDetailPage = () => {
                     { label: 'Detail Donatur' }
                 ]}
             />
-
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <ArrowLeft size={20} className="text-gray-600" />
-                </button>
-                <h1 className="text-2xl font-bold text-gray-900">Detail Donatur</h1>
-            </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 bg-gray-50">
@@ -89,14 +79,58 @@ const DonorDetailPage = () => {
             </div>
 
             {/* Donation History for this Donor (Placeholder/Future Feature) */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-gray-900 text-lg">Riwayat Donasi</h3>
-                    {/* Add logic to filter donations by this donor if API supports it */}
+            {/* Donation History */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 className="font-semibold text-gray-900 text-lg">Riwayat 5 Donasi Terakhir</h3>
+                    {/* Future: Link to full history */}
                 </div>
-                <p className="text-gray-500 italic text-sm">
-                    Fitur riwayat donasi per donatur akan segera hadir.
-                </p>
+
+                {!donor.recent_donations || donor.recent_donations.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                        <p>Belum ada riwayat donasi.</p>
+                    </div>
+                ) : (
+                    <div className="divide-y divide-gray-100">
+                        {donor.recent_donations.map((donation) => (
+                            <div key={donation.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group cursor-pointer" onClick={() => navigate(`/dashboard/finance/donations/${donation.id}`)}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${donation.type === 'MONEY'
+                                        ? 'bg-emerald-100 text-emerald-600'
+                                        : 'bg-blue-100 text-blue-600'
+                                        }`}>
+                                        {donation.type === 'MONEY' ? <Wallet size={18} /> : <Package size={18} />}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${donation.type === 'MONEY'
+                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                                                : 'bg-blue-50 text-blue-700 border border-blue-100'
+                                                }`}>
+                                                {donation.type === 'MONEY' ? 'Uang' : 'Barang'}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                                {new Date(donation.date).toLocaleDateString('id-ID', {
+                                                    day: 'numeric', month: 'long', year: 'numeric'
+                                                })}
+                                            </span>
+                                        </div>
+                                        <div className="font-medium text-gray-900 mt-1">
+                                            {donation.type === 'MONEY' ? (
+                                                <span>Rp {donation.total_amount?.toLocaleString('id-ID')}</span>
+                                            ) : (
+                                                <span>{donation.items?.length || 0} Item Barang</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-gray-400 group-hover:text-gray-600">
+                                    <ArrowLeft size={16} className="rotate-180" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

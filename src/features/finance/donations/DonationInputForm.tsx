@@ -182,6 +182,7 @@ const DonationInputForm = ({ initialData, isEditing = false }: DonationInputForm
             <Breadcrumb
                 items={[
                     { label: 'Fundraising', href: '/dashboard', icon: Wallet },
+                    { label: 'Riwayat Donasi', href: '/dashboard/finance/donations/history' },
                     { label: isEditing ? 'Edit Donasi' : 'Catat Donasi' }
                 ]}
             />
