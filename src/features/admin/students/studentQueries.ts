@@ -16,7 +16,11 @@ export const useStudents = (params?: { page?: number; limit?: number; q?: string
         queryKey: ['students', JSON.stringify(params)],
         queryFn: async () => {
             const response = await api.get<ApiResponse<PaginatedResponse<Student>>>('/students', { params });
-            return response.data.data;
+            const data = response.data.data;
+            return {
+                ...data,
+                items: data.items || []
+            };
         },
         placeholderData: keepPreviousData,
     });

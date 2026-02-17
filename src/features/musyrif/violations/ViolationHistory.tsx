@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useAllViolations, useDeleteViolation } from '../violationQueries';
-import { Search, Trash2, Calendar, Plus, FileText } from 'lucide-react';
+import { Search, Plus, FileText, AlertCircle } from 'lucide-react';
 import { useAlertStore } from '../../../store/alertStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import Button from '../../../components/ui/Button';
 import { useDebounce } from '../../../hooks/useDebounce';
+import ViolationCard from './ViolationCard';
 
 const ViolationHistory = () => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebounce(searchTerm, 500);
     const [page, setPage] = useState(1);
@@ -17,7 +19,6 @@ const ViolationHistory = () => {
     const deleteMutation = useDeleteViolation();
     const { showAlert } = useAlertStore();
 
-    // Use items from paginated response
     const filteredViolations = violations?.items || [];
 
     const handleDelete = (id: string) => {
@@ -28,6 +29,10 @@ const ViolationHistory = () => {
             () => deleteMutation.mutate(id),
             () => { }
         );
+    };
+
+    const handleViewDetail = (id: string) => {
+        navigate(`/dashboard/violations/${id}`);
     };
 
     return (
@@ -65,97 +70,78 @@ const ViolationHistory = () => {
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3">Tanggal</th>
-                                <th className="px-6 py-3">Santri</th>
-                                <th className="px-6 py-3">Pelanggaran</th>
-                                <th className="px-6 py-3">Poin</th>
-                                <th className="px-6 py-3">Tindakan</th>
-                                <th className="px-6 py-3 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {isLoading ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-8">Loading...</td>
-                                </tr>
-                            ) : filteredViolations?.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-8 text-gray-400">Belum ada data pelanggaran</td>
-                                </tr>
-                            ) : (
-                                filteredViolations?.map((v) => (
-                                    <tr key={v.id} className="bg-white hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar size={14} className="text-gray-400" />
-                                                {new Date(v.violation_date).toLocaleDateString('id-ID')}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 font-medium text-gray-900">
-                                            {v.student_name || 'N/A'}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="flex items-center gap-1.5">
-                                                {v.violation_name || 'N/A'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-0.5 rounded border border-red-200">
-                                                +{v.points}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600 truncate max-w-xs">
-                                            {v.action_taken || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button
-                                                onClick={() => handleDelete(v.id)}
-                                                className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors"
-                                                title="Hapus"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+            {isLoading ? (
+                <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                    <p className="mt-3 text-gray-500">Memuat data pelanggaran...</p>
                 </div>
-            </div>
+            ) : filteredViolations.length === 0 ? (
+                <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <AlertCircle className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {searchTerm ? 'Data tidak ditemukan' : 'Belum ada data pelanggaran'}
+                    </h3>
+                    <p className="text-gray-500 max-w-md mx-auto mb-6">
+                        {searchTerm ? 'Coba ubah kata kunci pencarian.' : 'Mulai dengan mencatat pelanggaran baru.'}
+                    </p>
+                    <Link to="/dashboard/violations/record">
+                        <Button className="mx-auto">
+                            <Plus className="w-4 h-4 mr-2" /> Catat Pelanggaran
+                        </Button>
+                    </Link>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {/* Header for Desktop */}
+                    <div className="hidden md:grid md:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700">
+                        <div className="col-span-2">TANGGAL</div>
+                        <div className="col-span-2">SANTRI</div>
+                        <div className="col-span-2">KATEGORI</div>
+                        <div className="col-span-5">PELANGGARAN</div>
+                        <div className="col-span-1 text-center">POIN</div>
+                        {/* <div className="col-span-1 text-right">AKSI</div> */}
+                    </div>
 
-            {/* Pagination */}
-            {violations?.meta && violations.meta.total_pages > 1 && (
-                <div className="flex justify-between items-center pt-4">
-                    <div className="text-sm text-gray-500">
-                        Menampilkan {filteredViolations.length} dari {violations.meta.total_items} data
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            disabled={violations.meta.current_page === 1}
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            className="text-sm"
-                        >
-                            Previous
-                        </Button>
-                        <span className="flex items-center text-sm font-medium text-gray-700 px-2">
-                            Page {violations.meta.current_page} of {violations.meta.total_pages}
-                        </span>
-                        <Button
-                            variant="outline"
-                            disabled={violations.meta.current_page === violations.meta.total_pages}
-                            onClick={() => setPage(p => p + 1)}
-                            className="text-sm"
-                        >
-                            Next
-                        </Button>
-                    </div>
+                    {filteredViolations.map((violation) => (
+                        <ViolationCard
+                            key={violation.id}
+                            violation={violation}
+                            onViewDetail={handleViewDetail}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+
+                    {/* Pagination */}
+                    {violations?.meta && violations.meta.total_pages > 1 && (
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-100">
+                            <div className="text-sm text-gray-500">
+                                Menampilkan {filteredViolations.length} dari {violations.meta.total_items} data
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    disabled={violations.meta.current_page === 1}
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    className="text-sm px-3 py-1 h-8"
+                                >
+                                    Previous
+                                </Button>
+                                <span className="flex items-center text-sm font-medium text-gray-700 px-2">
+                                    Page {violations.meta.current_page} of {violations.meta.total_pages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    disabled={violations.meta.current_page === violations.meta.total_pages}
+                                    onClick={() => setPage(p => p + 1)}
+                                    className="text-sm px-3 py-1 h-8"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

@@ -22,6 +22,7 @@ export interface StudentViolation {
     id: string;
     student_id: string;
     violation_type_id: string;
+    violation_category: string;
     violation_date: string;
     points: number;
     action_taken: string;
@@ -29,6 +30,8 @@ export interface StudentViolation {
 
     // UI Helpers from backend response
     student_name?: string;
+    student_nim?: string;
+    student_nisn?: string;
     violation_name?: string;
 
     // Relationships (optional, depending on API expand)

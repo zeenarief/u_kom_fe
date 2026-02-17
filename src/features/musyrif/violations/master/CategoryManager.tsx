@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { useViolationCategories, useCreateViolationCategory, useDeleteViolationCategory } from '../../violationQueries';
-import { Trash2, Plus, X, List } from 'lucide-react';
+import { useViolationCategories, useCreateViolationCategory, useUpdateViolationCategory, useDeleteViolationCategory } from '../../violationQueries';
+import { Trash2, Plus, X, List, Edit } from 'lucide-react';
 import Button from '../../../../components/ui/Button';
 import { useAlertStore } from '../../../../store/alertStore';
 
 const CategoryManager = () => {
     const { data: categories, isLoading } = useViolationCategories();
     const createMutation = useCreateViolationCategory();
+    const updateMutation = useUpdateViolationCategory();
     const deleteMutation = useDeleteViolationCategory();
     const { showAlert } = useAlertStore();
 
-    const [isAdding, setIsAdding] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
 
@@ -18,10 +20,20 @@ const CategoryManager = () => {
         e.preventDefault();
         if (!name) return;
 
-        await createMutation.mutateAsync({ name, description });
-        setIsAdding(false);
-        setName('');
-        setDescription('');
+        if (editingId) {
+            await updateMutation.mutateAsync({ id: editingId, data: { name, description } });
+        } else {
+            await createMutation.mutateAsync({ name, description });
+        }
+
+        resetForm();
+    };
+
+    const handleEdit = (category: any) => {
+        setEditingId(category.id);
+        setName(category.name);
+        setDescription(category.description || '');
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id: string) => {
@@ -34,6 +46,13 @@ const CategoryManager = () => {
         );
     };
 
+    const resetForm = () => {
+        setIsFormOpen(false);
+        setEditingId(null);
+        setName('');
+        setDescription('');
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -41,17 +60,17 @@ const CategoryManager = () => {
                     <h3 className="text-lg font-semibold text-gray-800">Daftar Kategori</h3>
                     <p className="text-sm text-gray-500">Kategori utama pelanggaran</p>
                 </div>
-                <Button onClick={() => setIsAdding(true)} disabled={isAdding} variant="primary">
+                <Button onClick={() => setIsFormOpen(true)} disabled={isFormOpen && !editingId} variant="primary">
                     <Plus size={16} className="mr-2" />
                     Tambah Kategori
                 </Button>
             </div>
 
-            {isAdding && (
+            {isFormOpen && (
                 <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 animate-in slide-in-from-top-2 duration-200">
                     <div className="flex justify-between items-center mb-4">
-                        <h4 className="font-medium text-gray-900">Tambah Kategori Baru</h4>
-                        <button onClick={() => setIsAdding(false)} className="text-gray-400 hover:text-gray-600">
+                        <h4 className="font-medium text-gray-900">{editingId ? 'Edit Kategori' : 'Tambah Kategori Baru'}</h4>
+                        <button onClick={resetForm} className="text-gray-400 hover:text-gray-600">
                             <X size={20} />
                         </button>
                     </div>
@@ -80,11 +99,11 @@ const CategoryManager = () => {
                             </div>
                         </div>
                         <div className="flex justify-end gap-3">
-                            <Button type="button" variant="outline" onClick={() => setIsAdding(false)}>
+                            <Button type="button" variant="outline" onClick={resetForm}>
                                 Batal
                             </Button>
-                            <Button type="submit" isLoading={createMutation.isPending}>
-                                Simpan Kategori
+                            <Button type="submit" isLoading={createMutation.isPending || updateMutation.isPending}>
+                                {editingId ? 'Simpan Perubahan' : 'Simpan Kategori'}
                             </Button>
                         </div>
                     </form>
@@ -97,7 +116,7 @@ const CategoryManager = () => {
                         <tr>
                             <th className="px-6 py-3 border-b border-gray-100 w-1/3">Nama Kategori</th>
                             <th className="px-6 py-3 border-b border-gray-100">Deskripsi</th>
-                            <th className="px-6 py-3 border-b border-gray-100 text-right w-24">Aksi</th>
+                            <th className="px-6 py-3 border-b border-gray-100 text-right w-32">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 bg-white">
@@ -120,13 +139,22 @@ const CategoryManager = () => {
                                     <td className="px-6 py-4 font-medium text-gray-900">{cat.name}</td>
                                     <td className="px-6 py-4 text-gray-600">{cat.description || '-'}</td>
                                     <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => handleDelete(cat.id)}
-                                            className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                                            title="Hapus Kategori"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                            <button
+                                                onClick={() => handleEdit(cat)}
+                                                className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-all"
+                                                title="Edit Kategori"
+                                            >
+                                                <Edit size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(cat.id)}
+                                                className="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Hapus Kategori"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))

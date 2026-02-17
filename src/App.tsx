@@ -49,6 +49,8 @@ import TeacherClassLayout from "./features/teacher/TeacherClassLayout.tsx";
 import ViolationInputForm from "./features/musyrif/violations/ViolationInputForm.tsx";
 import ViolationHistory from "./features/musyrif/violations/ViolationHistory.tsx";
 import ViolationMasterData from "./features/musyrif/violations/master/ViolationMasterData.tsx";
+import ViolationDetailPage from "./features/musyrif/violations/ViolationDetailPage.tsx";
+import ViolationEditPage from "./features/musyrif/violations/ViolationEditPage.tsx";
 
 // Finance/Fundraiser Pages
 import DonationCreatePage from "./features/finance/donations/DonationCreatePage.tsx";
@@ -159,6 +161,8 @@ function App() {
                             <Route path="violations/record" element={<ViolationInputForm />} />
                             <Route path="violations/history" element={<ViolationHistory />} />
                             <Route path="violations/master" element={<ViolationMasterData />} />
+                            <Route path="violations/:id" element={<ViolationDetailPage />} />
+                            <Route path="violations/:id/edit" element={<ViolationEditPage />} />
                         </Route>
 
                         {/* Fundraiser/Finance Routes */}

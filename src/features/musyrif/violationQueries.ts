@@ -57,6 +57,22 @@ export const useDeleteViolationCategory = () => {
     });
 };
 
+export const useUpdateViolationCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: string; data: UpdateCategoryPayload }) => {
+            return await api.put(`/violations/categories/${id}`, data);
+        },
+        onSuccess: () => {
+            toast.success('Kategori berhasil diperbarui');
+            queryClient.invalidateQueries({ queryKey: ['violation-categories'] });
+        },
+        onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Gagal memperbarui kategori');
+        }
+    });
+};
+
 // === TYPES (Jenis Pelanggaran) ===
 
 export const useViolationTypes = () => {
@@ -97,6 +113,22 @@ export const useDeleteViolationType = () => {
         },
         onError: (err: any) => {
             toast.error(err.response?.data?.message || 'Gagal menghapus jenis pelanggaran');
+        }
+    });
+};
+
+export const useUpdateViolationType = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: string; data: UpdateTypePayload }) => {
+            return await api.put(`/violations/types/${id}`, data);
+        },
+        onSuccess: () => {
+            toast.success('Jenis pelanggaran berhasil diperbarui');
+            queryClient.invalidateQueries({ queryKey: ['violation-types'] });
+        },
+        onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Gagal memperbarui jenis pelanggaran');
         }
     });
 };
@@ -157,6 +189,36 @@ export const useDeleteViolation = () => {
         },
         onError: (err: any) => {
             toast.error(err.response?.data?.message || 'Gagal menghapus data pelanggaran');
+        }
+    });
+};
+// === SINGLE VIOLATION & UPDATE ===
+
+export const useViolation = (id: string) => {
+    return useQuery({
+        queryKey: ['violation', id],
+        queryFn: async () => {
+            const response = await api.get<ApiResponse<StudentViolation>>(`/violations/record/${id}`);
+            return response.data.data;
+        },
+        enabled: !!id,
+    });
+};
+
+export const useUpdateViolation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: string; data: CreateViolationPayload }) => {
+            return await api.put(`/violations/record/${id}`, data);
+        },
+        onSuccess: (_data, variables) => {
+            toast.success('Data pelanggaran berhasil diperbarui');
+            queryClient.invalidateQueries({ queryKey: ['violation', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['all-violations'] });
+            queryClient.invalidateQueries({ queryKey: ['student-violations'] });
+        },
+        onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Gagal memperbarui data pelanggaran');
         }
     });
 };
